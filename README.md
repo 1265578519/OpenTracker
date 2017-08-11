@@ -55,9 +55,10 @@ You can inquire opentracker's version (i.e. CVS versions of all its objects) usi
 Centos 6.9 x64位安装说明
 ``` markdown
 yum -y install unzip wget
-wget https://github.com/1265578519/OpenTracker/archive/master.zip -O /home/OpenTracker.zip
-cd /home
+wget https://github.com/1265578519/OpenTracker/archive/master.zip -O /root/OpenTracker.zip
 unzip OpenTracker.zip
+mv OpenTracker-master /home
+cd /home
 cd OpenTracker-master
 cd libowfat
 make
