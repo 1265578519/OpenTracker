@@ -1,0 +1,60 @@
+.TH socket_fastopen_connect6 3
+.SH NAME
+socket_fastopen_connect6 \- make a TCP connection and send some data
+.SH SYNTAX
+.B #include <libowfat/socket.h>
+
+ssize_t \fBsocket_fastopen_connect6\fP(int \fIs\fR,
+                 const char \fIip\fR[16],uint16 \fIport\fR,uint32 \fIscope_id\fR,
+                 const char* \fIbuf\fR,size_t \fIlen\fR);
+.SH DESCRIPTION
+socket_fastopen_connect6 attempts to make a connection from TCP socket \fIs\fR to
+TCP port \fIport\fR on IP address \fIip\fR.  If that succeeds, it
+attempts to send \fIlen\fR bytes from \fIbuf\fR.
+
+The difference to calling socket_connect6 followed by write is that, on
+platforms supporting TCP Fast Open, socket_fastopen_connect6 will send
+the first data packet in the third packet of the TCP handshake, saving
+one useless ACK packet in network traffic.
+
+This is only useful for protocols where the client sends the first
+bytes.
+
+socket_connect6 may return
+.sp 1
+.IP \(bu
+>=0, to indicate that the connection succeeded and this many bytes were
+sent.
+.IP \(bu
+-1, setting errno to error_inprogress or error_wouldblock, to indicate
+that the socket is non-blocking
+.IP \(bu
+-1, setting errno to something else, to indicate that the connection
+failed (and failed immediately, if the socket is non-blocking).
+.PP
+
+When a background connection succeeds or fails, \fIs\fR becomes
+writable; you can use socket_connected to see whether the connection
+succeeded.  If the connection failed, socket_connected returns 0,
+setting errno appropriately.
+
+Once a TCP socket is connected, you can use the read and write
+system calls to transmit data.
+
+You can call socket_connect6 without calling socket_bind6.  This has the
+effect as first calling socket_bind6 with IP address :: and port 0.
+
+.SH EXAMPLE
+  #include <libowfat/socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[16];
+  uint16 \fIp\fR;
+  uint32 \fIscope_id\fR;
+
+  \fIs\fR = socket_tcp6b();
+  socket_bind6(s,ip,p);
+  socket_fastopen_connect6(s,ip,p,scope_id,"hello",5);
+
+.SH "SEE ALSO"
+socket_connect6(3), socket_fastopen_connect4(3), socket_fastopen(3)

@@ -1,0 +1,1 @@
+IPv6 is implemented in opentracker now. You can chose whether your tracker runs in v4 or v6 mode in Makefile. YMMV.

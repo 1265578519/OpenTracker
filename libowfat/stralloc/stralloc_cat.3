@@ -1,0 +1,18 @@
+.TH stralloc_cat 3
+.SH NAME
+stralloc_cat \- append data to a stralloc
+.SH SYNTAX
+.B #include <libowfat/stralloc.h>
+
+int \fBstralloc_cat\fP(stralloc* \fIsato\fR,const stralloc* \fIsafrom\fR);
+.SH DESCRIPTION
+stralloc_cat appends the string stored in \fIsafrom\fR to \fIsa\fR. It
+is the same as
+\fBstralloc_catb\fR(&\fIsato\fR, \fIsafrom\fR.s, \fIsafrom\fR.len).
+\fIsafrom\fR must already be allocated.
+
+The data that \fIsa\fR previously contained is overwritten and truncated.
+.SH "RETURN VALUE"
+1 for success, 0 on memory allocation failure.
+.SH "SEE ALSO"
+stralloc_catb(3)

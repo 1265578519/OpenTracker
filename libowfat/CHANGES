@@ -1,0 +1,345 @@
+0.32:
+  remove OpenBSD #warning (obsd maintainer says no longer needed)
+  move headers to <libowfat/> upon install
+  fix fmt_ip6 (Erwin Hoffmann)
+
+0.31:
+  special case buffer_get_token with token length 1 through memccpy (almost 4x speedup)
+  test for pread and use it instead of lseek+read in cdb and io_mmapwritefile
+  add mmap_readat (like mmap_read but open by fd, not by name)
+  add fmt_iso8601 and scan_iso8601 (time_t -> "2014-05-27T19:22:16Z")
+  add fmt_netstring and scan_netstring (http://cr.yp.to/proto/netstrings.txt)
+  add (fmt|scan)_varint and (fmt|scan)_pb_* (binary marshaling ala protocol buffers)
+
+0.30:
+  add compiletimeassert.h
+  add haveuint128.h
+  byte.h now defines UNALIGNED_ACCESS_OK on x86
+  add scan_ulongn, scan_8longn, scan_xlongn, scan_longn, scan_netstring
+  change buffer to have a destructor function pointer
+  SECURITY: fmt_strn would write one byte too many (returned right length though, so usually not a problem as that byte would be overwritten with \0 by the caller anyway)
+  fmt_pad and fmt_fill fail more gracefully when srclen > maxlen
+  You can now say $ make WERROR=-Werror (compiling t.c may fail but that's strictly speaking not part of the library)
+  scan_html now decodes HTML entities based on the actual w3c list (from entities.json, say gmake update to fetch the current version)
+  added fmt_escapechar* to fmt.h (implement various escaping mechanisms also found in textcode but for a single char not a whole string, and they always escape, not just when they think it's needed)
+  scan_ushort was supposed to abort early and return 5 when attempting to parse "65536", because the result does not fit.  It did not.  Now it does.
+  scan_*long, scan_*int, scan_*short now properly abort if the number would not fit
+  SECURITY: check for integer overflow in stralloc_ready
+  switch io_fds from array to newly implemented (hopefully thread-safe) iarray
+  switch epoll from level triggering to edge triggering
+  introduce io_eagain_read and io_eagain_write (discontinue using io_eagain plz)
+  fix buffer_get
+  add fmt_html_tagarg, fmt_xml, scan_html_tagarg
+  add socket_fastopen, socket_fastopen_connect4, socket_fastopen_connect6 and socket_quickack
+  on Linux, in iob_send, if MSG_MORE is defined, and the request type
+    lends itself to it, used sendto/sendmsg with MSG_MORE instead of
+    TCP_CORK (saves two syscalls)
+  add io_fd_flags so the caller can tell io_fd whether the socket is blocking
+    (saves one fcntl syscall)
+  more constness for stralloc and buffer
+  mmap_read/mmap_shared on zero length files no longer fail but return a
+    zero length buffer
+  if SOCK_NONBLOCK is defined, use it instead of socket+fcntl
+  ... but if errno==EINVAL still fall back to socket+fcntl (Robert Henney)
+  SECURITY: fix botched integer overflow handling logic in stralloc_ready (Giorgio)
+  add critbit
+
+0.29:
+  save 8 bytes in taia.h for 64-bit systems
+  add buffer_tosa (buffer writing to auto-growing stralloc)
+  add iarray
+  support SCTP in addition to TCP
+  fix io_receivefd so the incoming buffer is only 1 byte; io_passfd
+    sends only one byte, so we might receive (and discard) other data if
+    we try to read more (Stefan Bühler, from the lightttpd project)
+  add io_fd_canwrite (like io_fd but assume the fd is writable)
+  save a few syscalls here and there
+  add awesome hack in isset.h (comex, Linus Torvalds)
+  add byte_equal_notimingattack
+
+0.28:
+  add uint64 pack and unpack routines
+  fix subtle typo in sub_of (David Sirovsky)
+  work around gcc bugs
+
+0.27:
+  add fmt_strm
+  add iob_addbuf_munmap
+  add socket_deferaccept
+  catch one more case in umult64 (Tomi Jylhä-Ollila)
+
+0.26:
+  fix really pathological case where io_timeouted would never
+    start over from the beginning because always new accept()ed
+    connections came in and got newer, higher descriptors since the last
+    io_timeouted loop.  (Dirk Engling)
+  add some int overflow check macros to rangecheck.h
+  fmt_ip6 compresses at best spot, not at first spot (Nikola Vladov)
+  use inttypes.h to declare ints in uint*.h
+  escape more in fmt_ldapescape
+  try to catch malicious input in textcode fmt_* functions
+  fmt_xlonglong was utterly broken (Johannes Vetter)
+
+0.25:
+  array_allocate no longer truncates the array
+  array_get now not only checks whether the element fits in the
+    allocates space, it also needs to be in the initialized space.
+  add -D_REENTRANT to CFLAGS so libowfat can be used in multi-threaded
+    programs
+  further Windoze support (test/io5.c works, gatling still doesn't)
+    This is just to get gatling to work, I may remove it again after
+    that.
+  implement Nikola's idea to remove limit number of strings in errmsg
+  add taia_half
+  add cdb
+  add rangecheck.h
+  add io_block
+  make socket_(tc|ud)p[46] actually return non-blocking sockets as
+    documented (Richard Lyons)
+  fix for NetBSD 3.0 (Their /sys/types.h actually does not define u_char
+    unless you #define _NETBSD_SOURCE, and then their CMSG_* macros use
+    it.  This is horrible even by OpenBSD standards)
+  remove support for ip6.int (it's no longer delegated)
+  add asm versions of imult64 and umult64 for x86_64
+    (22 cycles -> 12 cycles on my Athlon 64)
+  use size_t and ssize_t instead of unsigned long et al
+  add iob_bytesleft
+  don't leak memory in test/httpd
+
+0.24:
+  fix scan_to_sa (Tim Lorenz)
+  turns out we can not do file descriptor passing on OpenBSD
+    if _XOPEN_SOURCE is defined, which is needed for Solaris.
+    OpenBSD sucks.  I checked in a _really_ kludge now.  Please do not
+    use OpenBSD if you have a choice.  Or Solaris, for that matter.
+  turns out the imult routines (which I never used) were incorrect.
+    Noted by Matthew Dempsky
+  open_* from open.h now open in large file mode
+
+0.23:
+  also recognize EPFNOSUPPORT as EAFNOSUPPORT (groan)
+  fix a few man pages
+  optimize fmt_base64 (Dan Gundlach)
+  gcc 4 cleanups (mostly unsigned char* vs char*)
+  fix scan_xlong, scan_xlonglong and scan_8long
+  remove a few gcc 4 warnings
+  work around freebsd 5.4 brokenness (if you don't have IPv6 in the
+    kernel, socket(PF_INET6,SOCK_STREAM,0) returns EPROTONOSUPPORT
+    instead of EPFNOSUPPORT, which basically says "yeah, I know IPv6,
+    but TCP?  never heard of it")
+  remove even more warnings
+  64-bit cleanliness issue with auto-NULL-appending macros
+  IRIX compatibility (yuck!)
+
+0.22:
+  uh, the scope_id detection #defined the wrong constant.  libowfat
+    always thought there was no scope_id.  Oops.
+  #include <unistd.h> in io/io_sendfile.c (broken OpenBSD, thx Rob)
+  add scan_urlencoded2 (like scan_urlencoded but will not convert '+' to
+    ' '; needed for web servers, so they can serve libstdc++.tar.gz)
+  fix iob_write to handle failure properly
+  document that the iob_write callback should limit itself
+  fix mmap_shared
+  add iob_free, add man pages for iob_free and iob_reset
+  fix descriptor leak in iob_addfile_close if the range was 0 (oops)
+
+0.21:
+  errno cleanup and man page updates (Rolf Eike Beer)
+  implement iob_prefetch with madvise MADV_WILLNEED if it's defined
+  extend API To read line/token to stralloc to allow clearing the
+    stralloc first.
+  add stralloc_zero to clear a stralloc
+  add buffer_putsflush
+  add stralloc_catm and stralloc_copym
+  add buffer_putm and buffer_putmflush
+  cleanups in stralloc and buffer:
+    int -> long for sizes
+    char -> unsigned char for strings
+  buffer_getline is now a function, not a macro
+  add iob_write (send io batch through callback, e.g. for SSL)
+  add errmsg_info and errmsg_infosys to write to stdout instead
+  epoll fix (how could this ever work?)
+
+0.20:
+  add errmsg API
+  work around broken Linux sendfile API (offset 64-bit but count 32-bit)
+  add io_appendfile, io_readwritefile
+  support ip6.arpa in addition to ip6.int in dns_name (adds one
+    parameter to dns_name6_domain and two constants in dns.h)
+  Solaris compatibility for io_passfd and io_receivefd
+
+0.19.2:
+  for some reason, a botched dependency slipped in the the Makefile
+
+0.19.1:
+  oops, I botched havealloca.h, which was not generated but static
+    Now it is generated.
+
+0.19:
+  add io_socketpair
+  add io_passfd and io_receivefd (and test/fdpassing.c)
+  io_trywrite and io_waitwrite not ignore SIGPIPE
+  add man pages for libio, safemult
+  fix possible signal race in io_tryread and io_trywrite (Scott Lamb)
+  fix byte_rchr return value (Marcus Winkler)
+  fix bug in mmap code path of io_sendfile (David Leadbeater)
+
+0.18:
+  make libowfat compile on BSD again (sorry, and thanks to everyone who
+    sent me a patch :-D)
+  add iob_addfile_close, needed for gatling 0.5+
+  add test/client and test/server, two simple TCP shell interfaces
+
+0.17:
+  add Linux SIGIO support to IO
+  expand IO api to be able to cope with edge triggered event
+    notification: introduce io_eagain
+  the integer scan routines should only write *dest if they actually
+    scanned something
+  io_sendfile and iob_send should return -1 to -3 just like io_trywrite
+  make io_waituntil actually take an "until", not a "how long"
+  turns out that BSD kqueue is actually Free/OpenBSD kqueue -- NetBSD
+    doesn't have it.  That means I'll need some adaptive two-threads-
+    running-poll approach to get C10k type scalability on NetBSD :-(
+  turns out that BSD sendfile is actually FreeBSD sendfile -- neither
+    OpenBSD nor NetBSD have it (as of 3.4 and 1.6.1).  That means I'll
+    need to try using mmap on OpenBSD and NetBSD to get zero-copy TCP.
+  guard against same event being signalled twice (confused our list
+    handling)
+  add support for Solaris /dev/poll
+  add lose32 support (broken, please don't use!)
+  head -1 -> head -n 1
+  apending 0 bytes to an empty array would fail it
+  remove socket_sendfile now that we have io_sendfile
+  break out alloca #include dependency into havealloca.h
+  support HP-UX sendfile64 (thanks to Rolf Eike Beer)
+  support Solaris sendfile64
+  support MacOS X sendfile (and comment it out again, the headers
+    declare it but it's not actually there) (thanks to Bernhard Schmidt)
+  support AIX 5 (thanks to Lutz Chwala and Arthur Erhardt)
+  fix ip6_fmt (martin paljak)
+
+0.16:
+  add buffer_fromsa (make buffer from stralloc)
+  add API for integer multiply with overflow detection
+  change length counters from int to long for 64-bit platforms
+  add array API from http://cr.yp.to/lib/array.html
+  oops, had a declaration and man page for taia_addsec but not the
+    function itself
+  add buffer functions to write strerror(errno)
+  add io API supporting poll, epoll and kqueue
+  remove obsolete "extern" from header files
+  add iob API to send several buffers and files in one batch
+
+0.15:
+  man page update (document stralloc return values)
+  add stralloc_chop and stralloc_chomp
+  add buffer_putsa, buffer_get_token_sa and buffer_getline_sa
+  extended uudecode test.  See comment at top for details.
+  fix #include in ndelay*.3 (Hynek Schlawack)
+  add stralloc_diff and stralloc_diffs (my invention)
+  scan_ip6 returned 1 for "::" (Uwe Ohse)
+  add el-cheapo MIME decoding to test/uudecode
+  make install forgot to install ndelay.h
+  fix typos in several man pages (Hynek Schlawack)
+  add stralloc versions of textcode API (Kai Ruemmler)
+  add html to textcode ('<' to '&lt;' etc)
+  add fmt_human and fmt_humank (format numbers ala ls -H/-h)
+  add fmt_httpdate and scan_httpdate
+  fix typo breaking buffer_GETC in buffer (Marcus Winkler)
+  fix typo breaking fmt_long for dest==NULL
+  add fmt_*longlong()
+  add range check to scan_ulong, scan_ulonglong, scan_uint and
+    scan_ushort
+  extended socket API; you can now pass NULL for results you don't want
+  rename Makefile to GNUmakefile; create Makefile target
+  add buffer_get_token_pred and buffer_get_token_sa_pred
+
+0.14:
+  avoid bus errors in byte_copy
+  byte_rchr was completely broken
+  add case, iopause, tai, taia, openreadclose and ipv6-enhanced dns
+
+0.13:
+  fixed several bugs in test/uudecode.c
+  add uninstall target
+  add uint16_read API like the uint32_read one
+  add buffer_putnlflush
+  lots of general clean-ups from Jukka Zitting:
+    add FMT_LONG to fmt.h (FMT_ULONG plus 1 for sign)
+    fmt_strn did not work for out==NULL
+    fix inconsistencies in man pages
+  make scan_urlencode do the '+' -> ' ' transformation
+
+0.12:
+  add textcode api for uuencode/uudecode, base64, quoted printable,
+    url-encoding and yenc.
+
+0.11:
+  fix fmt_long (didn't count the '-'), which in turn broke
+    buffer_putlong
+  referenced wrong include file in stralloc_ready and stralloc_readyplus
+    man page.
+
+0.10:
+  add comment to stralloc.h that explains the structure (Markus Brischke)
+  fix socket routines (two cut-and-paste errors)
+
+0.9:
+  fmt_str did not check for out==NULL!  Thanks, Uwe Ohse.
+  Updated to buffer to fix read buffers.  Thanks, David Lichteblau.
+  Oops!  byte_copy had a trivial and dumb typo in it that I'm unsure how
+    I could have missed it.
+  add mmap man pages.
+  update and add socket man pages.
+  don't include str.h from fmt.h
+  document error signalling for the mmap functions.
+
+0.8:
+  BSD compatibility.
+  fix mmap_shared.
+  ranlib.
+  s/EPROTO/EPROTONOSUPPORT/.
+
+0.7:
+  add buffer_putspace
+  fix b0read prototype in buffer/buffer_0*
+  scan_ip6 will not transparently scan IPv4 addresses and save them as
+    v4-mapped addresses (::ffff:127.0.0.1).
+  byte_copy was sped up (but made larger in the process)
+
+0.6:
+  changed name to libowfat.
+  fixed fmt_ulong (did not output 0 correctly).
+  added buffer.
+  extended buffer API to include buffer_putulong() and friends.
+  oops, the read buffering was completely broken!
+  add mmap library (idea from Ingo Oeser)
+
+0.5:
+  made subdirectories for the different libraries.
+  moved the sources into the corresponding subdirectory.
+  imported my man pages from libdjb.
+  removed fmt_int.c and fmt_uint.c (they are macros in fmt.h).
+  corrected comment in open.h for open_excl.
+  wrote new man pages for fmt_double, scan_double, the sign fmt_ and
+    scan_ routines, the whitespace and charset scan_ routines, and the
+    str and stralloc routines.
+
+0.4:
+  implemented stralloc.
+
+0.3:
+  implemented uint16, uint32 and uint64.  The header files try to
+    define shortcut endianness conversion routines that do not convert
+    anything.
+  implemented open (I hope I got open_excl right, I couldn't find an
+    implementationen).
+
+0.2:
+  implemented the scan, fmt and str interfaces.
+  added adapted fmt_double and scan_double from diet libc.
+
+0.1:
+  initial release.
+  implemented the byte interface.

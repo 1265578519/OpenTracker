@@ -1,0 +1,40 @@
+.TH io_fd_flags 3
+.SH NAME
+io_fd_flags \- prepare descriptor for io_wait
+.SH SYNTAX
+.B #include <libowfat/io.h>
+
+int \fBio_fd\fP(int64 fd);
+
+#ifdef HAVE_IO_FD_FLAGS
+
+int \fBio_fd_flags\fP(int64 fd);
+.SH DESCRIPTION
+io_fd_flags behaves just like io_fd, but certain flags can be
+bitwise-ORed to it to alter its behavior:
+
+.RS 0
+.IP IO_FD_CANWRITE
+tell io_fd that the descriptor is writable.  This is useful so
+io_wantwrite can queue the descriptor immediately and there is no need
+to query the operating system event reporting mechanism.
+.IP IO_FD_BLOCK
+tell io_fd that the descriptor is blocking.
+.IP IO_FD_NONBLOCK
+tell io_fd that the descriptor is non-blocking.
+.RE
+
+Normally, io_fd calls fcntl to ask the operating system whether the
+descriptor is blocking or not.  The frameworks needs to know because it
+alters how io_tryread and io_trywrite handle the socket.  Never pass
+both IO_FD_BLOCK and IO_FD_NONBLOCK at the same time.
+
+Newly connected stream sockets are always writable if the connection is
+established, so it is usually safe to pass IO_FD_CANWRITE.  The main
+exception case where IO_FD_CANWRITE should not be passed is on a
+non-blocking socket where a connect() is pending.  Then you need to poll
+for writability to get notified when the connection is established.
+.SH "RETURN VALUE"
+io_fd_flags returns 1 on success, 0 on error.
+.SH "SEE ALSO"
+io_fd(3), io_fd_canwrite(3)
