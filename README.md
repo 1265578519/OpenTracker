@@ -99,14 +99,13 @@ Usage: ./opentracker [-i ip] [-p port] [-P port] [-r redirect] [-d dir] [-u user
 Example:   ./opentracker -i 127.0.0.1 -p 6969 -P 6969 -f ./opentracker.conf -i 10.1.1.23 -p 2710 -p 80
 ```
 
-最小间隔可以在编译前进行修改
+间隔可以在编译前进行修改，默认我改成了1小时
 trackerlogic.h:#define OT_CLIENT_REQUEST_INTERVAL (60*30)
 
 utorrent中制作种子过程tracker写
 http://ip:8080/announce
 
 udp://ip:8080/announce
-
 
 
 -------
