@@ -51,32 +51,39 @@ The statedump mode dumps non-recreatable states of the tracker so you can later 
 You can inquire opentracker's version (i.e. CVS versions of all its objects) using the version mode.
 
 
+下面中文的，方便讲解使用
+Centos 6.9 x64位安装说明
 ``` markdown
 yum -y install unzip wget
-wget https://github.com/1265578519/OpenTracker/archive/master.zip -O /root/OpenTracker.zip
+wget https://github.com/1265578519/OpenTracker/archive/master.zip -O /home/OpenTracker.zip
+cd /home
 unzip OpenTracker.zip
 cd OpenTracker-master
 cd libowfat
 make
-cd /root/OpenTracker-master
+cd /home/OpenTracker-master
 cd opentracker
 make
 
 ```
 
+运行程序，并且监听tcp和udp端口的8080，运行后x掉当前ssh登陆窗口即可自动后台工作
 ``` markdown
 ./opentracker -p 8080 -P 8080
 ```
 
+新建一个ssh窗口后可以查看是否在工作中
 ``` markdown
 netstat -apn | grep opentracker
 ```
 
+通过浏览器访问程序的统计功能
 ``` markdown
 http://ip:8080/stats
 http://ip:8080/stats?mode=everything
 ```
 
+软件的自带帮助说明
 ``` markdown
 Usage: ./opentracker [-i ip] [-p port] [-P port] [-r redirect] [-d dir] [-u user] [-A ip] [-f config] [-s livesyncport]
 	-f config include and execute the config file
@@ -91,10 +98,17 @@ Usage: ./opentracker [-i ip] [-p port] [-P port] [-r redirect] [-d dir] [-u user
 Example:   ./opentracker -i 127.0.0.1 -p 6969 -P 6969 -f ./opentracker.conf -i 10.1.1.23 -p 2710 -p 80
 ```
 
-最小间隔可以在编译时候修改
+最小间隔可以在编译前进行修改
 trackerlogic.h:#define OT_CLIENT_REQUEST_INTERVAL (60*30)
 
-种子tracker写
+utorrent中制作种子过程tracker写
 http://ip:8080/announce
 
 udp://ip:8080/announce
+
+
+
+-------
+程序来自官网
+https://erdgeist.org/arts/software/opentracker/
+mail:erdgeist@erdgeist.org

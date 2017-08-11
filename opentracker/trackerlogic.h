@@ -25,11 +25,11 @@ typedef struct { ot_ip6 address; int bits; }
 #endif
 
 /* Some tracker behaviour tunable */
-#define OT_CLIENT_TIMEOUT 300
+#define OT_CLIENT_TIMEOUT 30
 #define OT_CLIENT_TIMEOUT_CHECKINTERVAL 10
-#define OT_CLIENT_TIMEOUT_SEND (60*30)
+#define OT_CLIENT_TIMEOUT_SEND (60*15)
 #define OT_CLIENT_REQUEST_INTERVAL (60*30)
-#define OT_CLIENT_REQUEST_VARIATION (60*15)
+#define OT_CLIENT_REQUEST_VARIATION (60*6)
 
 #define OT_TORRENT_TIMEOUT_HOURS 24
 #define OT_TORRENT_TIMEOUT      (60*OT_TORRENT_TIMEOUT_HOURS)
