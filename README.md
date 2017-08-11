@@ -31,6 +31,26 @@ Config file
 opentracker's config file is very straight forward and a very well documented example config can be found in the file opentracker.conf.sample.
 
 
+-------
+Closed mode
+While personally I like my tracker to be open, I can see that there's people that want to control what torrents to track – or not to track. If you've compiled opentracker with one of the accesslist-options (see Build instructions above), you can control which torrents are tracked by providing a file that contains a list of human readable info_hashes. An example whitelist file would look like
+
+0123456789abcdef0123456789abcdef01234567
+890123456789abcdef0123456789abcdef012345
+To make opentracker reload it's white/blacklist, send a SIGHUP unix signal.
+
+
+-------
+Statistics
+Given its very network centric approach, talking to opentracker via http comes very naturally. Besides the /announce and /scrape paths, there is a third path you can access the tracker by: /stats. This request takes parameters, for a quick overview just inquire /stats?mode=everything`.
+
+Statistics have grown over time and are currently not very tidied up. Most modes were written to dump legacy-SNMP-style blocks that can easily be monitored by MRTG. These modes are: peer, conn, scrp, udp4, tcp4, busy, torr, fscr, completed, syncs. I'm not going to explain these here.
+
+The statedump mode dumps non-recreatable states of the tracker so you can later reconstruct an opentracker session with the -l option. This is beta and wildly undocumented.
+
+You can inquire opentracker's version (i.e. CVS versions of all its objects) using the version mode.
+
+
 ``` markdown
 yum -y install unzip wget
 wget https://github.com/1265578519/OpenTracker/archive/master.zip -O /root/OpenTracker.zip
@@ -45,13 +65,19 @@ make
 ```
 
 ``` markdown
-./opentracker
+./opentracker -p 8080 -P 8080
 ```
 
 ``` markdown
 netstat -apn | grep opentracker
 ```
 
+``` markdown
+http://ip:8080/stats
+http://ip:8080/stats?mode=everything
+```
+
+``` markdown
 Usage: ./opentracker [-i ip] [-p port] [-P port] [-r redirect] [-d dir] [-u user] [-A ip] [-f config] [-s livesyncport]
 	-f config include and execute the config file
 	-i ip     specify ip to bind to (default: *, you may specify more than one)
@@ -63,4 +89,12 @@ Usage: ./opentracker [-i ip] [-p port] [-P port] [-r redirect] [-d dir] [-u user
 	-A ip     bless an ip address as admin address (e.g. to allow syncs from this address)
 
 Example:   ./opentracker -i 127.0.0.1 -p 6969 -P 6969 -f ./opentracker.conf -i 10.1.1.23 -p 2710 -p 80
+```
 
+最小间隔可以在编译时候修改
+trackerlogic.h:#define OT_CLIENT_REQUEST_INTERVAL (60*30)
+
+种子tracker写
+http://ip:8080/announce
+
+udp://ip:8080/announce
