@@ -19,9 +19,9 @@ Currently there is some packages for some linux distributions and OpenBSD around
 
 -------
 Invocation
-opentracker can be run by just typing ./opentracker. This will make opentracker bind to 0.0.0.0:8080 and happily serve all torrents presented to it. If ran as root, opentracker will immediately chroot to . (or any directory given with the -d option) and drop all priviliges after binding to whatever tcp or udp ports it is requested.
+opentracker can be run by just typing ./opentracker. This will make opentracker bind to 0.0.0.0:6969 and happily serve all torrents presented to it. If ran as root, opentracker will immediately chroot to . (or any directory given with the -d option) and drop all priviliges after binding to whatever tcp or udp ports it is requested.
 
-When options were few, opentracker used to accept all of them from command line. While this still is possible for most options, using them is quite unhandy: an example invocation would look like ./opentracker -i 23.23.23.7 -p 80 -P 80 -p 8080 -i 23.23.23.8 -p 80 -r http://www.mytorrentsite.com/ -d /usr/local/etc/opentracker -w mytorrents.list -A 127.0.0.1.
+When options were few, opentracker used to accept all of them from command line. While this still is possible for most options, using them is quite unhandy: an example invocation would look like ./opentracker -i 23.23.23.7 -p 80 -P 80 -p 6969 -i 23.23.23.8 -p 80 -r http://www.mytorrentsite.com/ -d /usr/local/etc/opentracker -w mytorrents.list -A 127.0.0.1.
 
 opentracker now uses a config file that you can provide with the -f switch.
 
@@ -35,13 +35,32 @@ opentracker's config file is very straight forward and a very well documented ex
 yum -y install unzip wget
 wget https://github.com/1265578519/OpenTracker/archive/master.zip -O /root/OpenTracker.zip
 unzip OpenTracker.zip
+cd OpenTracker-master
 cd libowfat
 make
-cd /root
+cd /root/OpenTracker-master
 cd opentracker
 make
+
 ```
 
-ÔËÐÐ
+``` markdown
 ./opentracker
+```
+
+``` markdown
+netstat -apn | grep opentracker
+```
+
+Usage: ./opentracker [-i ip] [-p port] [-P port] [-r redirect] [-d dir] [-u user] [-A ip] [-f config] [-s livesyncport]
+	-f config include and execute the config file
+	-i ip     specify ip to bind to (default: *, you may specify more than one)
+	-p port   specify tcp port to bind to (default: 6969, you may specify more than one)
+	-P port   specify udp port to bind to (default: 6969, you may specify more than one)
+	-r redirecturlspecify url where / should be redirected to (default none)
+	-d dir    specify directory to try to chroot to (default: ".")
+	-u user   specify user under whose priviliges opentracker should run (default: "nobody")
+	-A ip     bless an ip address as admin address (e.g. to allow syncs from this address)
+
+Example:   ./opentracker -i 127.0.0.1 -p 6969 -P 6969 -f ./opentracker.conf -i 10.1.1.23 -p 2710 -p 80
 
