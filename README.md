@@ -73,6 +73,12 @@ make
 ./opentracker -p 8080 -P 8080
 ```
 
+多端口可以加多个即可
+``` markdown
+./opentracker -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710
+```
+
+
 新建一个ssh窗口后可以查看是否在工作中
 ``` markdown
 netstat -apn | grep opentracker
@@ -99,7 +105,7 @@ Usage: ./opentracker [-i ip] [-p port] [-P port] [-r redirect] [-d dir] [-u user
 Example:   ./opentracker -i 127.0.0.1 -p 6969 -P 6969 -f ./opentracker.conf -i 10.1.1.23 -p 2710 -p 80
 ```
 
-间隔可以在编译前进行修改，默认我改成了1小时
+间隔可以在编译前进行修改，默认我改成了2小时，以便降低服务器宽带开销
 trackerlogic.h:#define OT_CLIENT_REQUEST_INTERVAL (60*30)
 
 utorrent中制作种子过程tracker写
