@@ -640,6 +640,8 @@ int main( int argc, char **argv ) {
     panic( "selfpipe failed: " );
   if( !io_fd( g_self_pipe[0] ) )
     panic( "selfpipe io_fd failed: " );
+	  if( !io_fd( g_self_pipe[1] ) )
+    panic( "selfpipe io_fd failed: " );
   io_setcookie( g_self_pipe[0], (void*)FLAG_SELFPIPE );
   io_wantread( g_self_pipe[0] );
 
