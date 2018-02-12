@@ -79,9 +79,9 @@ make
 ```
 
 
-新建一个ssh窗口后可以查看是否在工作中
+输入下方命令可以查看是否在工作中
 ``` markdown
-netstat -apn | grep opentracker
+top -b -n 1 |grep opentracker
 ```
 
 通过浏览器访问程序的统计功能
