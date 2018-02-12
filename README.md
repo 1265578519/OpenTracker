@@ -68,14 +68,14 @@ make
 
 ```
 
-运行程序，并且监听tcp和udp端口的8080，运行后x掉当前ssh登陆窗口即可自动后台工作
+运行程序，并且监听tcp和udp端口的8080，并且自动后台工作
 ``` markdown
-./opentracker -p 8080 -P 8080
+./opentracker -p 8080 -P 8080 &
 ```
 
 多端口可以加多个即可
 ``` markdown
-./opentracker -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710
+./opentracker -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &
 ```
 
 
@@ -109,9 +109,9 @@ Example:   ./opentracker -i 127.0.0.1 -p 6969 -P 6969 -f ./opentracker.conf -i 1
 trackerlogic.h:#define OT_CLIENT_REQUEST_INTERVAL (60*30)
 
 utorrent中制作种子过程tracker写
-http://ip:8080/announce
+http://服务器ip:8080/announce
 
-udp://ip:8080/announce
+udp://服务器ip:8080/announce
 
 
 -------
