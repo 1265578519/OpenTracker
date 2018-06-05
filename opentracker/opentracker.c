@@ -239,6 +239,7 @@ static void handle_accept( const int64 serversocket ) {
     tai_unix( &(t.sec), (g_now_seconds + OT_CLIENT_TIMEOUT) );
     io_timeout( sock, t );
   }
+  io_eagain(serversocket);
 }
 
 static void * server_mainloop( void * args ) {
