@@ -106,8 +106,10 @@ Example:   ./opentracker -i 127.0.0.1 -p 6969 -P 6969 -f ./opentracker.conf -i 1
 ```
 
 间隔可以在编译前进行修改，默认我改成了2小时，以便降低服务器宽带开销
+``` markdown
 trackerlogic.h:#define OT_CLIENT_REQUEST_INTERVAL (60*30)
 trackerlogic.h:##define OT_PEER_TIMEOUT 45
+```
 
 
 utorrent中制作种子过程tracker写
