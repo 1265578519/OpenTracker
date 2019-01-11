@@ -2,7 +2,7 @@
 .SH NAME
 socket_tcp6 \- create a non-blocking IPv6 TCP/IP stream socket
 .SH SYNTAX
-.B #include <libowfat/socket.h>
+.B #include <socket.h>
 
 int \fBsocket_tcp6\fP();
 .SH DESCRIPTION
@@ -12,7 +12,7 @@ socket_tcp6 returns -1, setting errno appropriately, without allocating
 any resources.
 
 .SH EXAMPLE
-  #include <libowfat/socket.h>
+  #include <socket.h>
 
   int \fIs\fR;
   char \fIip\fR[16];

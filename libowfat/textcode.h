@@ -49,7 +49,7 @@ size_t fmt_foldwhitespace(char* dest,const char* src,size_t len);
 size_t fmt_ldapescape(char* dest,const char* src,size_t len);
 size_t fmt_ldapescape2(char* dest,const char* src,size_t len,const char* escapeme);
 /* Encode JSON string from UTF-8; will backslash-escape the bare minimum.
- * Invalid UTF-8 in input will output as valid UTF-8 for each byte
+ * Will not verify that the input is valid UTF-8!
  * Worst case: len*6 */
 size_t fmt_jsonescape(char* dest,const char* src,size_t len);
 

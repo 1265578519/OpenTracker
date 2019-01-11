@@ -2,7 +2,7 @@
 .SH NAME
 socket_sctp4b \- create a blocking SCTP/IP stream socket
 .SH SYNTAX
-.B #include <libowfat/socket.h>
+.B #include <socket.h>
 
 int \fBsocket_sctp4b\fP();
 .SH DESCRIPTION
@@ -12,7 +12,7 @@ socket_sctp4b returns -1, setting errno appropriately, without allocating
 any resources.
 
 .SH EXAMPLE
-  #include <libowfat/socket.h>
+  #include <socket.h>
 
   int \fIs\fR;
   char \fIip\fR[4];

@@ -3,8 +3,8 @@
 buffer_get_new_token_sa_pred \- read token from buffer
 .SH SYNTAX
 .nf
-.B #include <libowfat/stralloc.h>
-.B #include <libowfat/buffer.h>
+.B #include <stralloc.h>
+.B #include <buffer.h>
 
 int \fBbuffer_get_new_token_sa_pred\fP(buffer* \fIb\fR,stralloc* \fIsa\fR,
                  int (*\fIpredicate\fR)(stralloc* * \fIsa\fR));

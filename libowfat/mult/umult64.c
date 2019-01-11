@@ -47,16 +47,3 @@ int umult64(uint64 a,uint64 b,uint64* c) {
 #endif
 
 #endif
-
-#ifdef UNITTEST
-#include <assert.h>
-
-int main() {
-  uint64 a;
-  assert(umult64(4,0x8000000000000000ull,&a)==0);
-  assert(umult64(16,0x4500000000000000ull,&a)==0);		// make sure we don't fall for "if a*b<a && a*b<b"
-  assert(umult64(5,10,&a)==1 && a==50);
-  assert(umult64(0x60000000,0x10000000,&a)==1 && a==0x600000000000000);
-  return 0;
-}
-#endif

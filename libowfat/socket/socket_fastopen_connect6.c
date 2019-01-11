@@ -13,11 +13,7 @@ ssize_t socket_fastopen_connect6(int s,const char* ip,uint16 port,uint32_t scope
   int r;
   {
 #else
-  int r;
-  if (len)
-    r=socket_send6_flag(s,buf,len,ip,port,scope_id,MSG_FASTOPEN);
-  else
-    r=socket_connect6(s,ip,port,scope_id);
+  int r=socket_send6_flag(s,buf,len,ip,port,scope_id,MSG_FASTOPEN);
   if (r==-1 && errno==ENOTCONN) {
 #endif
     /* apparently the kernel does not support TCP fast open */

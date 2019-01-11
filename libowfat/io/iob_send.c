@@ -119,12 +119,10 @@ int64 iob_send(int64 s,io_batch* b) {
 #include <unistd.h>
 #include <string.h>
 #include "havealloca.h"
-#include "io_internal.h"
 #include "iob_internal.h"
 
 int64 iob_send(int64 s,io_batch* b) {
   iob_entry* e,* last;
-  io_entry* E;
   struct iovec* v;
   uint64 total;
   int64 sent;
@@ -139,13 +137,8 @@ int64 iob_send(int64 s,io_batch* b) {
 #ifdef TCP_CORK
   int corked=0;
 #endif
-#ifdef MSG_ZEROCOPY
-  size_t sum=0;
-#endif
 
   if (b->bytesleft==0) return 0;
-  E=iarray_get(&io_fds,s);
-  if (!E) { errno=EBADF; return -3; }
   last=(iob_entry*)(((char*)array_start(&b->b))+array_bytes(&b->b));
   v=alloca(b->bufs*sizeof(struct iovec));
   total=0;
@@ -161,9 +154,6 @@ int64 iob_send(int64 s,io_batch* b) {
       if (e[i].type==FROMFILE) break;
       v[i].iov_base=(char*)(e[i].buf+e[i].offset);
       v[i].iov_len=e[i].n;
-#ifdef MSG_ZEROCOPY
-      if (sum + v[i].iov_len > sum) sum += v[i].iov_len; else sum=-1;
-#endif
     }
     headers=i;
 #ifdef HAVE_BSDSENDFILE
@@ -220,42 +210,20 @@ eagain:
       corked=1;
     }
     if (headers) {
-      int ZEROCOPY=0;
-#ifdef MSG_ZEROCOPY
-      static int nozerocopy;
-      int dozerocopy=1;
-#else
-      const int nozerocopy=0;
-      const int dozerocopy=1;
-#endif
-      if (nozerocopy && dozerocopy==0 && docork<0) {	/* write+writev */
+      if (docork<0) {	/* write+writev */
 	if (headers==1)	/* cosmetics for strace */
 	  sent=write(s,v[0].iov_base,v[0].iov_len);
 	else
 	  sent=writev(s,v,headers);
       } else {
-#ifdef MSG_ZEROCOPY
-	  if (!nozerocopy && sum>=8*1024) {
-	    /* MSG_ZEROCOPY has page table management overhead,
-	     * it only pays off after 8k or so */
-	    if (E->zerocopy==0) {
-	      if (setsockopt(s, SOL_SOCKET, SO_ZEROCOPY, (int[]){ 1 },sizeof(int)) == 0) {
-		E->zerocopy=1;
-		ZEROCOPY=MSG_ZEROCOPY;
-	      } else
-		nozerocopy=1;
-	    } else
-	      ZEROCOPY=MSG_ZEROCOPY;
-	  }
-#endif
 	if (headers==1)	/* cosmetics for strace */
-	  sent=sendto(s, v[0].iov_base, v[0].iov_len, MSG_MORE|ZEROCOPY, NULL, 0);
+	  sent=sendto(s,v[0].iov_base,v[0].iov_len,MSG_MORE, NULL, 0);
 	else {
 	  struct msghdr msg;
 	  memset(&msg,0,sizeof(msg));
 	  msg.msg_iov=v;
 	  msg.msg_iovlen=headers;
-	  sent=sendmsg(s,&msg,MSG_MORE|ZEROCOPY);
+	  sent=sendmsg(s,&msg,MSG_MORE);
 	}
       }
       if (sent==-1) {

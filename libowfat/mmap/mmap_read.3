@@ -2,9 +2,9 @@
 .SH NAME
 mmap_read \- memory map a file for reading
 .SH SYNTAX
-.B #include <libowfat/mmap.h>
+.B #include <mmap.h>
 
-const char* \fBmmap_read\fP(const char* \fIfilename\fR,size_t* \fIfilesize\fR);
+char* \fBmmap_read\fP(const char* \fIfilename\fR,size_t* \fIfilesize\fR);
 .SH DESCRIPTION
 mmap_read opens \fIfilename\fR for reading, maps the whole file into
 memory, closes the file, writes the length of the file to \fIfilesize\fR

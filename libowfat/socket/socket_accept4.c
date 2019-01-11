@@ -3,7 +3,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #endif
-#include <string.h>
 #include "windoze.h"
 #include "socket.h"
 #include "havesl.h"

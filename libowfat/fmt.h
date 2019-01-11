@@ -198,7 +198,7 @@ size_t fmt_escapecharquotedprintable(char* dest,uint32_t ch) __pure__;
 /* MIME quoted-printable escaping with UTF-8: 'ö' -> '=c3=b6', characters > 0x7fffffff not supported */
 size_t fmt_escapecharquotedprintableutf8(char* dest,uint32_t ch) __pure__;
 
-/* C99 style escaping: '\' -> '\\', newline -> '\n', 0xc2 -> '\302' */
+/* C escaping: '\' -> '\\', newline -> '\n', 0xc2 -> '\302' */
 size_t fmt_escapecharc(char* dest,uint32_t ch) __pure__;
 
 /* internal functions, may be independently useful */

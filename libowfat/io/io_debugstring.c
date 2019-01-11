@@ -1,6 +1,5 @@
 #include "io_internal.h"
 #include <iarray.h>
-#include <time.h>
 #include "fmt.h"
 #include <sys/time.h>
 

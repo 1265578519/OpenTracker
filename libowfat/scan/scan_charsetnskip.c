@@ -15,15 +15,3 @@ size_t scan_charsetnskip(const char *s,const char *charset,size_t limit) {
   }
   return (size_t)(t-s);
 }
-
-#ifdef UNITTEST
-#include <assert.h>
-
-int main() {
-  assert(scan_charsetnskip("fnord","fo",4)==1);
-  assert(scan_charsetnskip("fnord","nf",4)==2);
-  assert(scan_charsetnskip("gaord","nf",4)==0);
-  assert(scan_charsetnskip("fnord","fnord",4)==4);
-  return 0;
-}
-#endif

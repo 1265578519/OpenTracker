@@ -2,7 +2,7 @@
 .SH NAME
 socket_send4 \- send a UDP datagram
 .SH SYNTAX
-.B #include <libowfat/socket.h>
+.B #include <socket.h>
 
 ssize_t \fBsocket_send4\fP(int \fIs\fR, const char* \fIbuf\fR, size_t \fIlen\fR,
                      const char \fIip\fR[4],uint16 \fIport\fR);
@@ -17,7 +17,7 @@ effect as first calling socket_bind4 with IP address 0.0.0.0 and port 0.
 socket_send4 returns 0 if the datagram was sent successfully.  If not,
 it returns -1 and sets errno appropriately.
 .SH EXAMPLE
-  #include <libowfat/socket.h>
+  #include <socket.h>
 
   int \fIs\fR;
   char \fIip\fR[4];

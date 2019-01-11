@@ -23,20 +23,3 @@ size_t scan_netstring(const char* in,size_t len,char** dest,size_t* slen) {
   *slen=l;
   return n+2+l;
 }
-
-#ifdef UNITTEST
-#include <assert.h>
-#include "scan_ulongn.c"
-
-int main() {
-  char buf[]="12:hello world!,";
-  char* s;
-  size_t l;
-  const char* orig;
-  assert(scan_netstring(buf,16,&s,&l)==16 && s==buf+3 && l==12);
-
-  orig="3:foo,"; assert(scan_netstring(orig,6,&s,&l)==6 && s==orig+2 && l==3);
-  orig="4294967295:foo,"; assert(scan_netstring(orig,15,&s,&l)==0);
-  orig="18446744073709551615:foo,"; assert(scan_netstring(orig,25,&s,&l)==0);
-}
-#endif

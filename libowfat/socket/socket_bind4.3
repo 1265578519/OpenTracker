@@ -2,7 +2,7 @@
 .SH NAME
 socket_bind4 \- set the local IP address and port of a socket
 .SH SYNTAX
-.B #include <libowfat/socket.h>
+.B #include <socket.h>
 
 int \fBsocket_bind4\fP(int \fIs\fR,char \fIip\fR[4],uint16 \fIport\fR);
 .SH DESCRIPTION
@@ -16,7 +16,7 @@ Normally socket_bind4 returns 0. If anything goes wrong, socket_bind4
 returns -1, setting errno appropriately.
 
 .SH EXAMPLE
-  #include <libowfat/socket.h>
+  #include <socket.h>
 
   int \fIs\fR;
   char \fIip\fR[4];

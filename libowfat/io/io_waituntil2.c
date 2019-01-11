@@ -119,19 +119,6 @@ int64 io_waituntil2(int64 milliseconds) {
   struct pollfd* p;
 #endif
   long i,j,r;
-  if (first_deferred!=-1) {
-    while (first_deferred!=-1) {
-      io_entry* e=iarray_get(&io_fds,first_deferred);
-      if (e) {
-	if (e->closed) {
-	  e->closed=0;
-	  close(first_deferred);
-	}
-	first_deferred=e->next_defer;
-      } else
-	first_deferred=-1;	// can't happen
-    }
-  }
   if (!io_wanted_fds) return 0;
 #ifdef HAVE_EPOLL
   if (io_waitmode==EPOLL) {

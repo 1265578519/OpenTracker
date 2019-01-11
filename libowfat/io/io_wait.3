@@ -2,7 +2,7 @@
 .SH NAME
 io_wait \- wait for events
 .SH SYNTAX
-.B #include <libowfat/io.h>
+.B #include <io.h>
 
 void \fBio_wait\fP();
 .SH DESCRIPTION
@@ -23,17 +23,5 @@ io_wait is not interrupted by the delivery of a signal. Programs that
 expect interruption are unreliable: they will block if the same signal
 is delivered a moment before io_wait. The correct way to handle signals
 is with the self-pipe trick.
-
-.SH NOTE
-Depending on the underlying operating system primitive, there is a
-potential race condition to be aware of. Some event notification
-mechanisms (for example, kqueue on BSD and epoll on Linux) will return
-multiple events. If your application operates on pairs of file
-descriptors (a proxy server maybe), and an error on one descriptor
-can lead to closing the other descriptor, then an outstanding event on
-the other descriptor can still be queued for delivery to you. Be
-prepared to receive events for a descriptor that has already been
-closed.
-
 .SH "SEE ALSO"
 io_waituntil(3), io_check(3), io_wantread(3), io_wantwrite(3), io_fd(3)

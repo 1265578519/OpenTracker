@@ -21,15 +21,3 @@ int str_diff(const char* a, const char* b) {
   }
   return j;
 }
-
-#ifdef UNITTEST
-#include <assert.h>
-#include <string.h>
-
-int main() {
-  assert(str_diff("foo","foo")==0);
-  assert(str_diff("foo","fob")==('o'-'b'));
-  assert(str_diff("foo","foox")==(-'x'));
-  assert(str_diff("foox","foo")=='x');
-}
-#endif

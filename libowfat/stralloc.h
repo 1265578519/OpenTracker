@@ -82,22 +82,6 @@ int stralloc_cat(stralloc* sa,const stralloc* in);
  * in sa. It is the same as stralloc_catb(&sa,in,1). */
 int stralloc_append(stralloc* sa,const char* in); /* beware: this takes a pointer to 1 char */
 
-#if 0
-#define stralloc_APPEND(sa,in) \
-  ( ((sa)->len != (sa)->a) \
-    ? ( (sa)->s[(sa)->len++] = (*in), 1 ) \
-    : buffer_put((s),&(c),1) \
-  )
-#endif
-
-static inline int stralloc_APPEND(stralloc* sa,const char* in) {
-  if (sa->len<sa->a) {
-    sa->s[sa->len++]=*in;
-    return 1;
-  }
-  return stralloc_append(sa,in);
-}
-
 /* stralloc_starts returns 1 if the \0-terminated string in "in", without
  * the terminating \0, is a prefix of the string stored in sa. Otherwise
  * it returns 0. sa must already be allocated. */

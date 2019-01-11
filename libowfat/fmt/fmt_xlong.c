@@ -16,14 +16,3 @@ size_t fmt_xlong(char *dest,unsigned long i) {
     }
   return len;
 }
-
-#ifdef UNITTEST
-#include <assert.h>
-#include <string.h>
-
-int main() {
-  char buf[100];
-  assert(fmt_xlong(buf,0x12345)==5 && !memcmp(buf,"12345",5));
-  return 0;
-}
-#endif

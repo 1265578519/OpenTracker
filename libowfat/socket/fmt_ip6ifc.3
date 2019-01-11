@@ -2,7 +2,7 @@
 .SH NAME
 fmt_ip6ifc \- write a formatted ASCII representation of an IPv6 number
 .SH SYNTAX
-.B #include <libowfat/ip6.h>
+.B #include <ip6.h>
 
 unsigned int \fBfmt_ip6ifc\fP(char *\fIdest\fR,const char \fIip\fR[16],uint32 \fIscope_id\fR);
 .SH DESCRIPTION
@@ -25,7 +25,7 @@ possible fmt_ip6 output plus \\0.  However, for fmt_ip6ifc you need to
 add 1 for the '%' and IF_NAMESIZE from <net/if.h> for the interface
 name.
 .SH EXAMPLE
-#include <libowfat/ip6.h>
+#include <ip6.h>
 
   char buf[IP6_FMT];
   char ip[16];

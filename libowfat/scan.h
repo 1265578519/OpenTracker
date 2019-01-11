@@ -111,7 +111,6 @@ size_t scan_iso8601(const char* in,struct timespec* t) __pure__;
 
 /* some variable length encodings for integers */
 size_t scan_utf8(const char* in,size_t len,uint32_t* n) __pure__;
-size_t scan_utf8_sem(const char* in,size_t len,uint32_t* n) __pure__;
 size_t scan_asn1derlength(const char* in,size_t len,unsigned long long* n) __pure__;
 size_t scan_asn1dertag(const char* in,size_t len,unsigned long long* n) __pure__;
 
