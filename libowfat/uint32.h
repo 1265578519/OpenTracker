@@ -25,9 +25,28 @@ static inline uint32 uint32_read(const char* in) {
   return *(const uint32*)in;
 }
 
+#if defined(__x86_64__) && defined(__GNUC__)
+
+static inline void uint32_pack_big(char *out,uint32 in) {
+  *(uint32*)out=__builtin_bswap32(in);
+}
+
+static inline void uint32_unpack_big(const char *in,uint32* out) {
+  *out=__builtin_bswap32(*(const uint32*)in);
+}
+
+static inline uint32 uint32_read_big(const char *in) {
+  return __builtin_bswap32(*(const uint32*)in);
+}
+
+#else
+
 void uint32_pack_big(char *out,uint32 in);
 void uint32_unpack_big(const char *in,uint32* out);
 uint32 uint32_read_big(const char *in);
+
+#endif
+
 #else
 
 void uint32_pack(char *out,uint32 in);

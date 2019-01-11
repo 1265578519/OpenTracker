@@ -5,6 +5,7 @@
 
 #ifdef __MINGW32__
 #include <winsock2.h>
+#include <windows.h>
 #include "windoze.h"
 #endif
 

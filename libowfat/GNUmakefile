@@ -15,9 +15,12 @@ textcode.a cdb.a critbit.a
 
 all: headers ent $(LIBS) libowfat.a libsocket t
 
+pic pie:
+	$(MAKE) CC="gcc -fPIC" LDFLAGS="-fpie"
+
 CROSS=
 #CROSS=i686-mingw-
-CC=gcc
+CC?=gcc
 CCC=$(CROSS)$(CC)
 WERROR=
 WARN=-W -Wall -Wextra $(WERROR)
@@ -230,7 +233,7 @@ install: headers install-inc install-man install-lib
 uninstall:
 	rm -f $(patsubst %.h,$(INCLUDEDIR)/%.h,$(INCLUDES))
 	rm -f $(INCLUDEDIR)/libowfat/*.h
-	rmdir -f $(INCLUDEDIR)/libowfat
+	test -d $(INCLUDEDIR)/libowfat && rmdir $(INCLUDEDIR)/libowfat
 	rm -f $(patsubst %.3,$(MAN3DIR)/%.3,$(notdir $(wildcard */*.3)))
 	rm -f $(LIBDIR)/libowfat.a
 

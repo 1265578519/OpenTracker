@@ -1,0 +1,33 @@
+.TH iom_add 3
+.SH NAME
+iom_add \- add event to I/O multiplexer
+.SH SYNTAX
+.B #include <libowfat/io.h>
+
+int \fBiom_add\fP(iomux_t* c, int64 fd, unsigned int events);
+.SH DESCRIPTION
+iom_add adds an event you are interested in to an I/O multiplexer.
+
+\fIfd\fR is the file descriptor (usually a socket) you are interested
+in, and \fIevents\fR is the operation you want to do. It can be IOM_READ
+or IOM_WRITE.
+
+If that operation becomes possible on that descriptor, and some thread
+is calling \fIiom_wait\fR at the time, it will return and tell you the
+fd and the event.
+
+Note that the event registration is removed from the iomux_t context if
+it occurs. You will have to call \fIiom_wait\fR again after you handled
+the event, if you are still interested in it.
+
+Closing a file descriptor with registered events will discard the event
+registration.
+
+.SH "LINKING"
+You may have to add \fI-lpthread\fR to the command line in the linking
+step.
+
+.SH "RETURN VALUE"
+iom_add returns 0 on success and -1 on error, setting errno.
+.SH "SEE ALSO"
+iom_init, iom_wait, iom_abort

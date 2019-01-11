@@ -197,6 +197,7 @@ int main() {
 #endif
       if (*s==']') break;
     } while (*s==',');
+    (*cur)->utf8[ul]=0;
 #if 0
     puts("\" },");
 #endif

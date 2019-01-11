@@ -77,7 +77,7 @@ int main() {
   assert(fmt_escapecharc(buf,'\t')==2 && !memcmp(buf,"\\t",2));
   assert(fmt_escapecharc(buf,'\v')==2 && !memcmp(buf,"\\v",2));
   assert(fmt_escapecharc(buf,'\\')==2 && !memcmp(buf,"\\\\",2));
-  assert(fmt_escapecharc(buf,'1')==4 && !memcmp(buf,"\\001",2));
+  assert(fmt_escapecharc(buf,'1')==4 && !memcmp(buf,"\\061",4));
   assert(fmt_escapecharc(buf,0xfefe)==6 && !memcmp(buf,"\\ufefe",6));
   assert(fmt_escapecharc(buf,0xfefec0de)==10 && !memcmp(buf,"\\Ufefec0de",10));
   return 0;

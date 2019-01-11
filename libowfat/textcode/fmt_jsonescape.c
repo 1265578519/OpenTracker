@@ -1,3 +1,4 @@
+#include <string.h>
 #include "fmt.h"
 #include "textcode.h"
 #include "str.h"
@@ -41,8 +42,13 @@ escape:
 	/* UTF-8! Convert to surrogate pair if needed. */
 	uint32_t u;
 	size_t j=scan_utf8_sem((const char*)s+i,len-i,&u);
-	if (j==0) /* Invalid UTF-8! Abort! */
-	  return written;
+	if (j==0) {	/* Invalid UTF-8! Try to limp on! */
+	  written+=fmt_utf8(dest?dest+written:0,s[i]);
+	  break;
+	}
+	/* It turns out we are not required to escape these.
+	 * So we won't. */
+#if 0
 	if (u>0xffff) {
 	  if (dest) {
 	    dest[written  ]='\\';
@@ -53,7 +59,9 @@ escape:
 	    fmt_xlong(dest+written+8,0xdc00 + (u & 0x3ff));
 	  }
 	  written+=12;
-	} else {
+	} else
+#endif
+	       {
 	  if (dest) memcpy(dest+written,s+i,j);
 	  written+=j;
 	}
@@ -82,6 +90,9 @@ int main() {
   /* test escaping of unprintable characters */
   assert(fmt_jsonescape(buf,"\001x",2)==7 && !memcmp(buf,"\\u0001x",7));
   /* test conversion of large UTF-8 chars to UTF-16 surrogate pairs (poop emoji) */
-  assert(fmt_jsonescape(buf,"\xf0\x9f\x92\xa9x",5)==13 && !memcmp(buf,"\\ud83d\\udca9x",13));
+  /* EDIT: this escaping is not actually needed, so we aren't doing it
+   * anymore. This test will fail now:
+  assert(fmt_jsonescape(buf,"\xf0\x9f\x92\xa9x",5)==13 && !memcmp(buf,"\\ud83d\\udca9x",13)); */
+  assert(fmt_jsonescape(buf,"a\x81x",3)==4 && !memcmp(buf,"a\xc2\x81x",4));
 }
 #endif

@@ -13,7 +13,11 @@ ssize_t socket_fastopen_connect4(int s,const char* ip,uint16 port,const char* bu
   int r;
   {
 #else
-  int r=socket_send4_flag(s,buf,len,ip,port,MSG_FASTOPEN);
+  int r;
+  if (len)
+    r=socket_send4_flag(s,buf,len,ip,port,MSG_FASTOPEN);
+  else
+    r=socket_connect4(s,ip,port);
   if (r==-1 && errno==ENOTCONN) {
 #endif
     /* apparently the kernel does not support TCP fast open */

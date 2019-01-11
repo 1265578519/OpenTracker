@@ -25,9 +25,28 @@ static inline uint16 uint16_read(const char* in) {
   return *(const uint16*)in;
 }
 
+#if defined(__x86_64__) && defined(__GNUC__)
+
+static inline void uint16_pack_big(char* out,uint16 in) {
+  *(uint16*)out=__builtin_bswap16(in);
+}
+
+static inline void uint16_unpack_big(const char *in,uint16* out) {
+  *out=__builtin_bswap16(*(const uint16*)in);
+}
+
+static inline uint16 uint16_read_big(const char* in) {
+  return __builtin_bswap16(*(const uint16*)in);
+}
+
+#else
+
 void uint16_pack_big(char *out,uint16 in);
 void uint16_unpack_big(const char *in,uint16* out);
 uint16 uint16_read_big(const char *in);
+
+#endif
+
 #else
 
 void uint16_pack(char *out,uint16 in);

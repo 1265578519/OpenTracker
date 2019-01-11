@@ -132,7 +132,7 @@ int main(int argc,char* argv[]) {
   assert(scan_jsonescape("foo\\u000abar\\\\",buf,&l)==14 && l==8 && byte_equal(buf,8,"foo\nbar\\"));
   memset(buf,0,sizeof(buf));
   /* example from the json spec: G clef U+1D11E encoded using UTF-16 surrogates*/
-  assert(scan_jsonescape("\\uD834\\uDD1Exyz",buf,&l)==15 && l==7 && byte_equal(buf,7,"\xf4\x8d\x84\x9exyz"));
+  assert(scan_jsonescape("\\uD834\\uDD1Exyz",buf,&l)==15 && l==7 && byte_equal(buf,7,"\xf0\x9d\x84\x9exyz"));
 
 /*
 	 1D11E -> 0001 1101 0001 0001 1110
