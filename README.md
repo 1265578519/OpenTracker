@@ -73,6 +73,8 @@ make
 ./opentracker -p 8080 -P 8080 &
 ```
 
+推荐使用8080端口，基本上免备案不会扫描，而且CloudFlare也支持使用CDN隐藏IP来使用。
+
 多端口可以加多个即可
 ``` markdown
 ./opentracker -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &
@@ -107,8 +109,10 @@ Example:   ./opentracker -i 127.0.0.1 -p 6969 -P 6969 -f ./opentracker.conf -i 1
 
 间隔可以在编译前进行修改，默认我改成了2小时，以便降低服务器宽带开销
 ``` markdown
-trackerlogic.h:#define OT_CLIENT_REQUEST_INTERVAL (60*30)
-trackerlogic.h:##define OT_PEER_TIMEOUT 45
+trackerlogic.h:#define OT_CLIENT_REQUEST_INTERVAL (60*30)#(60*120)，客户端默认间隔请求时间
+trackerlogic.h:#define OT_CLIENT_TIMEOUT_SEND (60*15)#(60*30)，客户端最小间隔请求时间，部分客户端的可能不会准守
+trackerlogic.h:##define OT_PEER_TIMEOUT 45#144，服务端删除peer时间，单位分钟
+trackerlogic.h:##define OT_CLIENT_REQUEST_VARIATION (60*6)#服务端下发随机客户端间隔请求时间调整，提高性能，默认允许误差随机6分钟内，保持默认无修改
 ```
 
 
@@ -118,6 +122,7 @@ http://服务器ip:8080/announce
 udp://服务器ip:8080/announce
 
 
+反映：http://bbs.itzmx.com/thread-18214-1-1.html
 -------
 程序来自官网
 https://erdgeist.org/arts/software/opentracker/
