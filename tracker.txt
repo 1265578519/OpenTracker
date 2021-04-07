@@ -52,7 +52,10 @@ udp://bt.1000.pet:2713/announce
 udp://bt.10000.pet:2715/announce
 udp://exodus.desync.com:6969/announce
 udp://explodie.org:6969/announce
+udp://ipv4.tracker.harry.lu/announce
+udp://open.stealth.si:80/announce
 udp://retracker.hotplug.ru:2710/announce
+udp://retracker.lanta-net.ru:2710/announce
 udp://retracker.netbynet.ru:2710/announce
 udp://retracker.sevstar.net:2710/announce
 udp://tr.cili001.com:8070/announce
@@ -60,7 +63,9 @@ udp://tracker.birkenwald.de:6969/announce
 udp://tracker.cyberia.is:6969/announce
 udp://tracker.filemail.com:6969/announce
 udp://tracker.internetwarriors.net:1337/announce
+udp://tracker.moeking.me:6969/announce
 udp://tracker.torrent.eu.org:451/announce
+udp://tracker.tiny-vps.com:6969/announce
 udp://tracker.uw0.xyz:6969/announce
 udp://zephir.monocul.us:6969/announce
 wss://tracker.openwebtorrent.com:443/announce
