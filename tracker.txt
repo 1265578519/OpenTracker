@@ -13,6 +13,8 @@ http://[2a04:ac00:1:3dd8::1:2710]:2710/announce
 http://104.238.198.186:8000/announce
 http://1337.abcvg.info/announce
 http://78.30.254.12:2710/announce
+http://207.241.226.111:6969/announce
+http://207.241.231.226:6969/announce
 http://explodie.org:6969/announce
 http://open.acgnxtracker.com/announce
 http://open.acgtracker.com:1096/announce
@@ -43,6 +45,8 @@ udp://212.1.226.176:2710/announce
 udp://52.58.128.163:6969/announce
 udp://78.30.254.12:2710/announce
 udp://91.216.110.52:451/announce
+udp://207.241.226.111:6969/announce
+udp://207.241.231.226:6969/announce
 udp://exodus.desync.com:6969/announce
 udp://explodie.org:6969/announce
 udp://ipv4.tracker.harry.lu/announce
