@@ -16,7 +16,6 @@ http://78.30.254.12:2710/announce
 http://207.241.226.111:6969/announce
 http://207.241.231.226:6969/announce
 http://explodie.org:6969/announce
-http://open.acgnxtracker.com/announce
 http://open.acgtracker.com:1096/announce
 http://retracker.hotplug.ru:2710/announce
 http://retracker.sevstar.net:2710/announce
@@ -27,12 +26,9 @@ http://tracker.birkenwald.de:6969/announce
 http://tracker.bt4g.com:2095/announce
 http://tracker.files.fm:6969/announce
 http://tracker.openbittorrent.com/announce
-http://tracker.gbitt.info/announce
-http://tracker.uw0.xyz:6969/announce
 http://tracker2.dler.org/announce
 http://vps02.net.orel.ru/announce
 https://1337.abcvg.info/announce
-https://opentracker.acgnx.se/announce
 https://tracker.nanoha.org/announce
 udp://tracker.opentrackr.org:1337/announce
 udp://[2001:1b10:1000:8101:0:242:ac11:2]:6969/announce
@@ -64,6 +60,5 @@ udp://tracker.filemail.com:6969/announce
 udp://tracker.moeking.me:6969/announce
 udp://tracker.torrent.eu.org:451/announce
 udp://tracker.tiny-vps.com:6969/announce
-udp://tracker.uw0.xyz:6969/announce
 udp://abufinzio.monocul.us:6969/announce
 wss://tracker.openwebtorrent.com:443/announce
