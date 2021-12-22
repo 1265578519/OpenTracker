@@ -24,12 +24,10 @@ http://t.acg.rip:6699/announce
 http://t.nyaatracker.com/announce
 http://tracker.birkenwald.de:6969/announce
 http://tracker.bt4g.com:2095/announce
-http://tracker.files.fm:6969/announce
 http://tracker.openbittorrent.com/announce
 http://tracker2.dler.org/announce
 http://vps02.net.orel.ru/announce
 https://1337.abcvg.info/announce
-https://tracker.nanoha.org/announce
 udp://tracker.opentrackr.org:1337/announce
 udp://[2001:1b10:1000:8101:0:242:ac11:2]:6969/announce
 udp://[2001:470:1:189:0:1:2:3]:6969/announce
