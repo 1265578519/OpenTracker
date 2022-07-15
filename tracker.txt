@@ -30,6 +30,7 @@ http://fe.dealclub.de:6969/announce
 http://vps02.net.orel.ru/announce
 https://1337.abcvg.info/announce
 https://tracker.srv00.com/announce
+http://chouchou.top:8080/announce
 udp://tracker.opentrackr.org:1337/announce
 udp://[2001:1b10:1000:8101:0:242:ac11:2]:6969/announce
 udp://[2001:470:1:189:0:1:2:3]:6969/announce
@@ -61,4 +62,5 @@ udp://movies.zsw.ca:6969/announce
 udp://fe.dealclub.de:6969/announce
 udp://tracker.torrent.eu.org:451/announce
 udp://tracker.tiny-vps.com:6969/announce
+udp://chouchou.top:8080/announce
 wss://tracker.openwebtorrent.com:443/announce
