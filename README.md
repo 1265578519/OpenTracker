@@ -1,3 +1,4 @@
+
 [OpenTracker](https://erdgeist.org/arts/software/opentracker/)
 =======
 
@@ -54,7 +55,7 @@ You can inquire opentracker's version (i.e. CVS versions of all its objects) usi
 下面中文的，方便讲解使用
 Centos 6.9 x64位安装说明
 ``` markdown
-yum -y install unzip wget gcc zlib-devel
+yum -y install unzip wget gcc zlib-devel make
 wget https://github.com/1265578519/OpenTracker/archive/master.zip -O /root/OpenTracker.zip
 unzip OpenTracker.zip
 mv OpenTracker-master /home
@@ -80,16 +81,37 @@ make
 ./opentracker -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &
 ```
 
+添加开机启动，执行一次即可，否则会启动多个进程。。。可以搭配下方的计划任务自动重启进程，如果centos 7未有killall命令可以用 yum -y install psmisc 安装
+``` markdown
+echo "cd /home/OpenTracker-master;cd opentracker;./opentracker -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &" >> /etc/rc.d/rc.local
+```
 
 输入下方命令可以查看是否在工作中
 ``` markdown
 top -b -n 1 |grep opentracker
 ```
 
+查看进程当前并发连接数
+``` markdown
+netstat -apn|grep opentracker |wc -l
+```
+
+查看系统当前网络情况
+``` markdown
+netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}'
+```
+
 通过浏览器访问程序的统计功能
 ``` markdown
 http://ip:8080/stats
 http://ip:8080/stats?mode=everything
+http://ip:8080/stats?mode=top100
+http://ip:8080/scrape
+```
+
+服务器里面可以
+``` markdown
+curl http://localhost:8080/stats
 ```
 
 软件的自带帮助说明
@@ -109,10 +131,10 @@ Example:   ./opentracker -i 127.0.0.1 -p 6969 -P 6969 -f ./opentracker.conf -i 1
 
 间隔可以在编译前进行修改，默认我改成了2小时，以便降低服务器宽带开销
 ``` markdown
+trackerlogic.h:#define OT_CLIENT_TIMEOUT_SEND (60*15)#(60*30)，客户端最小间隔请求时间，客户端可能不会遵守
 trackerlogic.h:#define OT_CLIENT_REQUEST_INTERVAL (60*30)#(60*120)，客户端默认间隔请求时间
-trackerlogic.h:#define OT_CLIENT_TIMEOUT_SEND (60*15)#(60*30)，客户端最小间隔请求时间，部分客户端的可能不会准守
-trackerlogic.h:##define OT_PEER_TIMEOUT 45#144，服务端删除peer时间，单位分钟
-trackerlogic.h:##define OT_CLIENT_REQUEST_VARIATION (60*6)#服务端下发随机客户端间隔请求时间调整，提高性能，默认允许误差随机6分钟内，保持默认无修改
+trackerlogic.h:#define OT_CLIENT_REQUEST_VARIATION (60*6)，服务端下发随机客户端间隔请求时间调整，提高性能，默认允许误差随机6分钟内，保持默认无修改
+trackerlogic.h:#define OT_PEER_TIMEOUT 45#144，服务端删除peer时间，单位分钟
 ```
 
 
@@ -127,3 +149,6 @@ udp://服务器ip:8080/announce
 程序来自官网
 https://erdgeist.org/arts/software/opentracker/
 mail:erdgeist@erdgeist.org
+
+推荐Tracker服务器购买优惠注册地址：
+https://www.vultr.com/?ref=6813695
