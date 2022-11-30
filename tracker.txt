@@ -62,4 +62,3 @@ udp://fe.dealclub.de:6969/announce
 udp://tracker.torrent.eu.org:451/announce
 udp://tracker.tiny-vps.com:6969/announce
 udp://chouchou.top:8080/announce
-wss://tracker.openwebtorrent.com/announce
