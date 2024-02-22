@@ -408,7 +408,7 @@ static ssize_t http_handle_announce( const int64 sock, struct ot_workstruct *ws,
 
   OT_SETPORT( &ws->peer, &port );
   OT_PEERFLAG( &ws->peer ) = 0;
-  numwant = 438;
+  numwant = 400;
   scanon = 1;
 
   while( scanon ) {
@@ -442,8 +442,8 @@ static ssize_t http_handle_announce( const int64 sock, struct ot_workstruct *ws,
     case 4: /* matched "numwant" */
       len = scan_urlencoded_query( &read_ptr, write_ptr = read_ptr, SCAN_SEARCHPATH_VALUE );
       if( ( len <= 0 ) || scan_fixed_int( write_ptr, len, &numwant ) ) HTTPERROR_400_PARAM;
-      if( numwant < 0 ) numwant = 438;
-      if( numwant > 0 ) numwant = 438;
+      if( numwant < 0 ) numwant = 400;
+      if( numwant > 0 ) numwant = 400;
       break;
     case 5: /* matched "compact" */
       len = scan_urlencoded_query( &read_ptr, write_ptr = read_ptr, SCAN_SEARCHPATH_VALUE );

@@ -131,7 +131,7 @@ int handle_udp6( int64 serversocket, struct ot_workstruct *ws ) {
 
       /* Limit amount of peers to 200 */
       numwant = ntohl( inpacket[92/4] );
-      if (numwant > 0) numwant = 438;
+      if (numwant > 0) numwant = 400;
 
       event    = ntohl( inpacket[80/4] );
       port     = *(uint16_t*)( ((char*)inpacket) + 96 );
