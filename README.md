@@ -81,7 +81,7 @@ make
 ./opentracker -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &
 ```
 
-添加开机启动，执行一次即可，否则会启动多个进程。。。可以搭配下方的计划任务自动重启进程，如果centos 7未有killall命令可以用 yum -y install psmisc 安装
+添加开机启动，执行一次即可，否则会启动多个进程。。。可以搭配下方的计划任务自动重启进程，如果centos 7未有killall命令可以用 yum -y install psmisc 安装，centos7要赋予开机启动文件执行权限 chmod +x /etc/rc.d/rc.local;ll /etc/rc.d/rc.local
 ``` markdown
 echo "cd /home/OpenTracker-master;cd opentracker;./opentracker -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &" >> /etc/rc.d/rc.local
 ```
@@ -112,6 +112,18 @@ http://ip:8080/scrape
 服务器里面可以
 ``` markdown
 curl http://localhost:8080/stats
+```
+
+运行crontab -e
+可以根据需要使用计划任务自动重启进程，下方意思，每天0点、4点、8点、12点、16点、20点整，自动重启进程。
+``` markdown
+0 0,4,8,12,16,20 * * * killall -9 opentracker;sleep 3;cd /home/OpenTracker-master;cd opentracker;./opentracker -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &
+```
+
+方法二
+使用计划任务自动监控进程是否存在然后重启恢复，不进行定时重启
+``` markdown
+* * * * * /sbin/pidof opentracker||{ cd /home/OpenTracker-master;cd opentracker;./opentracker -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &}
 ```
 
 软件的自带帮助说明
@@ -152,3 +164,6 @@ mail:erdgeist@erdgeist.org
 
 推荐Tracker服务器购买优惠注册地址：
 https://www.vultr.com/?ref=6813695
+
+注：2024年2月27日更新一次版本代码改动
+centos6仅支持libowfat 0.31，centos7仅支持libowfat 0.32，请使用对应系统的版本编译opentracker，上方提供的安装代码当前版本为libowfat0.32
