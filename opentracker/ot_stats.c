@@ -691,7 +691,7 @@ void stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event
       int off = snprintf( _debug, sizeof(_debug), "[%08d] scrp:  ", (unsigned int)(g_now_seconds - ot_start_time)/60 );
       off += fmt_ip6c( _debug+off, *ip );
       off += snprintf( _debug+off, sizeof(_debug)-off, " - FULL SCRAPE\n" );
-      write( 2, _debug, off );
+      (void)write( 2, _debug, off );
       ot_full_scrape_request_count++;
     }
       break;
@@ -702,7 +702,7 @@ void stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event
       int off = snprintf( _debug, sizeof(_debug), "[%08d] scrp:  ", (unsigned int)(g_now_seconds - ot_start_time)/60 );
       off += fmt_ip6c(_debug+off, *ip );
       off += snprintf( _debug+off, sizeof(_debug)-off, " - FULL SCRAPE\n" );
-      write( 2, _debug, off );
+      (void)write( 2, _debug, off );
       ot_full_scrape_request_count++;
     }
       break;

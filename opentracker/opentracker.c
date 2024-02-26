@@ -123,7 +123,7 @@ static void help( char *name ) {
   HELPLINE("-P port","specify udp port to bind to (default: 6969, you may specify more than one)");
   HELPLINE("-r redirecturl","specify url where / should be redirected to (default none)");
   HELPLINE("-d dir","specify directory to try to chroot to (default: \".\")");
-  HELPLINE("-u user","specify user under whose priviliges opentracker should run (default: \"nobody\")");
+  HELPLINE("-u user","specify user under whose privileges opentracker should run (default: \"nobody\")");
   HELPLINE("-A ip","bless an ip address as admin address (e.g. to allow syncs from this address)");
 #ifdef WANT_ACCESSLIST_BLACK
   HELPLINE("-b file","specify blacklist file.");
@@ -156,7 +156,10 @@ static size_t header_complete( char * request, ssize_t byte_count ) {
 static void handle_dead( const int64 sock ) {
   struct http_data* cookie=io_getcookie( sock );
   if( cookie ) {
-    iob_reset( &cookie->batch );
+    size_t i;
+    for ( i = 0; i < cookie->batches; ++i)
+        iob_reset( cookie->batch + i );
+    free( cookie->batch );
     array_reset( &cookie->request );
     if( cookie->flag & STRUCT_HTTP_FLAG_WAITINGFORTASK )
       mutex_workqueue_canceltask( sock );
@@ -167,9 +170,9 @@ static void handle_dead( const int64 sock ) {
 
 static void handle_read( const int64 sock, struct ot_workstruct *ws ) {
   struct http_data* cookie = io_getcookie( sock );
-  ssize_t byte_count;
+  ssize_t byte_count = io_tryread( sock, ws->inbuf, G_INBUF_SIZE );
 
-  if( ( byte_count = io_tryread( sock, ws->inbuf, G_INBUF_SIZE ) ) <= 0 ) {
+  if( byte_count == 0 || byte_count == -3 ) {
     handle_dead( sock );
     return;
   }
@@ -204,8 +207,25 @@ static void handle_read( const int64 sock, struct ot_workstruct *ws ) {
 
 static void handle_write( const int64 sock ) {
   struct http_data* cookie=io_getcookie( sock );
-  if( !cookie || ( iob_send( sock, &cookie->batch ) <= 0 ) )
-    handle_dead( sock );
+  size_t i;
+
+  /* Look for the first io_batch still containing bytes to write */
+  if( cookie )
+    for( i = 0; i < cookie->batches; ++i )
+      if( cookie->batch[i].bytesleft ) {
+        int64 res = iob_send( sock, cookie->batch + i );
+
+        if( res == -3 )
+          break;
+
+        if( !cookie->batch[i].bytesleft )
+          continue;
+
+        if( res == -1 || res > 0 || i < cookie->batches - 1 )
+          return;
+      }
+
+  handle_dead( sock );
 }
 
 static void handle_accept( const int64 serversocket ) {
@@ -256,8 +276,17 @@ static void * server_mainloop( void * args ) {
 #ifdef _DEBUG_HTTPERROR
   ws.debugbuf= malloc( G_DEBUGBUF_SIZE );
 #endif
+
   if( !ws.inbuf || !ws.outbuf )
     panic( "Initializing worker failed" );
+
+#ifdef WANT_ARC4RANDOM
+  arc4random_buf(&ws.rand48_state[0], 3 * sizeof(uint16_t));
+#else
+  ws.rand48_state[0] = (uint16_t)random();
+  ws.rand48_state[1] = (uint16_t)random();
+  ws.rand48_state[2] = (uint16_t)random();
+#endif
 
   for( ; ; ) {
     int64 sock;
@@ -530,12 +559,12 @@ int drop_privileges ( const char * const serveruser, const char * const serverdi
     /* If we can't find server user, revert to nobody's default uid */
     if( !pws ) {
       fprintf( stderr, "Warning: Could not get password entry for %s. Reverting to uid -2.\n", serveruser );
-      setegid( (gid_t)-2 ); setgid( (gid_t)-2 );
-      setuid( (uid_t)-2 );  seteuid( (uid_t)-2 );
+      if (setegid( (gid_t)-2 ) || setgid( (gid_t)-2 ) || setuid( (uid_t)-2 ) || seteuid( (uid_t)-2 ))
+        panic("Could not set uid to value -2");
     }
     else {
-      setegid( pws->pw_gid ); setgid( pws->pw_gid );
-      setuid( pws->pw_uid );  seteuid( pws->pw_uid );
+      if (setegid( pws->pw_gid ) || setgid( pws->pw_gid ) || setuid( pws->pw_uid ) || seteuid( pws->pw_uid ))
+        panic("Could not set uid to specified value");
     }
 
     if( geteuid() == 0 || getegid() == 0 )

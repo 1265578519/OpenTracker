@@ -29,7 +29,7 @@
 #include "ot_livesync.h"
 
 /* Forward declaration */
-size_t return_peers_for_torrent( ot_torrent *torrent, size_t amount, char *reply, PROTO_FLAG proto );
+size_t return_peers_for_torrent( struct ot_workstruct * ws, ot_torrent *torrent, size_t amount, char *reply, PROTO_FLAG proto );
 
 void free_peerlist( ot_peerlist *peer_list ) {
   if( peer_list->peers.data ) {
@@ -51,19 +51,19 @@ void add_torrent_from_saved_state( ot_hash hash, ot_time base, size_t down_count
 
   if( !accesslist_hashisvalid( hash ) )
     return mutex_bucket_unlock_by_hash( hash, 0 );
-  
+
   torrent = vector_find_or_insert( torrents_list, (void*)hash, sizeof( ot_torrent ), OT_HASH_COMPARE_SIZE, &exactmatch );
   if( !torrent || exactmatch )
     return mutex_bucket_unlock_by_hash( hash, 0 );
 
   /* Create a new torrent entry, then */
   memcpy( torrent->hash, hash, sizeof(ot_hash) );
-    
+
   if( !( torrent->peer_list = malloc( sizeof (ot_peerlist) ) ) ) {
     vector_remove_torrent( torrents_list, torrent );
     return mutex_bucket_unlock_by_hash( hash, 0 );
   }
-    
+
   byte_zero( torrent->peer_list, sizeof( ot_peerlist ) );
   torrent->peer_list->base = base;
   torrent->peer_list->down_count = down_count;
@@ -178,7 +178,7 @@ size_t add_peer_to_torrent_and_return_peers( PROTO_FLAG proto, struct ot_workstr
   }
 #endif
 
-  ws->reply_size = return_peers_for_torrent( torrent, amount, ws->reply, proto );
+  ws->reply_size = return_peers_for_torrent( ws, torrent, amount, ws->reply, proto );
   mutex_bucket_unlock_by_hash( *ws->hash, delta_torrentcount );
   return ws->reply_size;
 }
@@ -200,7 +200,7 @@ static size_t return_peers_all( ot_peerlist *peer_list, char *reply ) {
     while( peer_count-- ) {
       if( OT_PEERFLAG(peers) & PEER_FLAG_SEEDING ) {
         r_end-=OT_PEER_COMPARE_SIZE;
-        memcpy(r_end,peers++,OT_PEER_COMPARE_SIZE);      
+        memcpy(r_end,peers++,OT_PEER_COMPARE_SIZE);
       } else {
         memcpy(reply,peers++,OT_PEER_COMPARE_SIZE);
         reply+=OT_PEER_COMPARE_SIZE;
@@ -210,7 +210,7 @@ static size_t return_peers_all( ot_peerlist *peer_list, char *reply ) {
   return result;
 }
 
-static size_t return_peers_selection( ot_peerlist *peer_list, size_t amount, char *reply ) {
+static size_t return_peers_selection( struct ot_workstruct *ws, ot_peerlist *peer_list, size_t amount, char *reply ) {
   unsigned int bucket_offset, bucket_index = 0, num_buckets = 1;
   ot_vector  * bucket_list = &peer_list->peers;
   unsigned int shifted_pc = peer_list->peer_count;
@@ -218,7 +218,7 @@ static size_t return_peers_selection( ot_peerlist *peer_list, size_t amount, cha
   unsigned int shift = 0;
   size_t       result = OT_PEER_COMPARE_SIZE * amount;
   char       * r_end = reply + result;
-  
+
   if( OT_PEERLIST_HASBUCKETS(peer_list) ) {
     num_buckets = bucket_list->size;
     bucket_list = (ot_vector *)bucket_list->data;
@@ -232,7 +232,7 @@ static size_t return_peers_selection( ot_peerlist *peer_list, size_t amount, cha
 
   /* Initialize somewhere in the middle of peers so that
    fixpoint's aliasing doesn't alway miss the same peers */
-  bucket_offset = random() % peer_list->peer_count;
+  bucket_offset = nrand48(ws->rand48_state) % peer_list->peer_count;
 
   while( amount-- ) {
     ot_peer * peer;
@@ -240,7 +240,7 @@ static size_t return_peers_selection( ot_peerlist *peer_list, size_t amount, cha
     /* This is the aliased, non shifted range, next value may fall into */
     unsigned int diff = ( ( ( amount + 1 ) * shifted_step ) >> shift ) -
                         ( (   amount       * shifted_step ) >> shift );
-    bucket_offset += 1 + random() % diff;
+    bucket_offset += 1 + nrand48(ws->rand48_state) % diff;
 
     while( bucket_offset >= bucket_list[bucket_index].size ) {
       bucket_offset -= bucket_list[bucket_index].size;
@@ -249,7 +249,7 @@ static size_t return_peers_selection( ot_peerlist *peer_list, size_t amount, cha
     peer = ((ot_peer*)bucket_list[bucket_index].data) + bucket_offset;
     if( OT_PEERFLAG(peer) & PEER_FLAG_SEEDING ) {
       r_end-=OT_PEER_COMPARE_SIZE;
-      memcpy(r_end,peer,OT_PEER_COMPARE_SIZE);      
+      memcpy(r_end,peer,OT_PEER_COMPARE_SIZE);
     } else {
       memcpy(reply,peer,OT_PEER_COMPARE_SIZE);
       reply+=OT_PEER_COMPARE_SIZE;
@@ -262,7 +262,7 @@ static size_t return_peers_selection( ot_peerlist *peer_list, size_t amount, cha
    * reply must have enough space to hold 92+6*amount bytes
    * does not yet check not to return self
 */
-size_t return_peers_for_torrent( ot_torrent *torrent, size_t amount, char *reply, PROTO_FLAG proto ) {
+size_t return_peers_for_torrent( struct ot_workstruct * ws, ot_torrent *torrent, size_t amount, char *reply, PROTO_FLAG proto ) {
   ot_peerlist *peer_list = torrent->peer_list;
   char        *r = reply;
 
@@ -283,7 +283,7 @@ size_t return_peers_for_torrent( ot_torrent *torrent, size_t amount, char *reply
     if( amount == peer_list->peer_count )
       r += return_peers_all( peer_list, r );
     else
-      r += return_peers_selection( peer_list, amount, r );
+      r += return_peers_selection( ws, peer_list, amount, r );
   }
 
   if( proto == FLAG_TCP )
@@ -365,8 +365,8 @@ size_t remove_peer_from_torrent( PROTO_FLAG proto, struct ot_workstruct *ws ) {
   if( exactmatch ) {
     peer_list = torrent->peer_list;
     switch( vector_remove_peer( &peer_list->peers, &ws->peer ) ) {
-      case 2:  peer_list->seed_count--; /* Fall throughs intended */
-      case 1:  peer_list->peer_count--; /* Fall throughs intended */
+      case 2:  peer_list->seed_count--; /* Intentional fallthrough */
+      case 1:  peer_list->peer_count--; /* Intentional fallthrough */
       default: break;
     }
   }

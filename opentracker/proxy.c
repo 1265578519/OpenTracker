@@ -171,8 +171,8 @@ size_t remove_peer_from_torrent_proxy( ot_hash hash, ot_peer *peer ) {
   if( exactmatch ) {
     ot_peerlist *peer_list = torrent->peer_list;
     switch( vector_remove_peer( &peer_list->peers, peer ) ) {
-      case 2:  peer_list->seed_count--; /* Fall throughs intended */
-      case 1:  peer_list->peer_count--; /* Fall throughs intended */
+      case 2:  peer_list->seed_count--; /* Intentional fallthrough */
+      case 1:  peer_list->peer_count--; /* Intentional fallthrough */
       default: break;
     }
   }
@@ -553,7 +553,11 @@ int main( int argc, char **argv ) {
   int scanon = 1, lbound = 0, sbound = 0;
 
   srandom( time(NULL) );
+#ifdef WANT_ARC4RANDOM
+  g_tracker_id = arc4random();
+#else
   g_tracker_id = random();
+#endif
   noipv6=1;
 
   while( scanon ) {

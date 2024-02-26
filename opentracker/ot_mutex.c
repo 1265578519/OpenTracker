@@ -25,65 +25,14 @@
 
 /* Our global all torrents list */
 static ot_vector all_torrents[OT_BUCKET_COUNT];
+static pthread_mutex_t bucket_mutex[OT_BUCKET_COUNT];
 static size_t    g_torrent_count;
-
-/* Bucket Magic */
-static int bucket_locklist[ OT_MAX_THREADS ];
-static int bucket_locklist_count = 0;
-static pthread_mutex_t bucket_mutex;
-static pthread_cond_t bucket_being_unlocked;
 
 /* Self pipe from opentracker.c */
 extern int g_self_pipe[2];
 
-static int bucket_check( int bucket ) {
-  /* C should come with auto-i ;) */
-  int i;
-
-  /* No more space to acquire lock to bucket -- should not happen */
-  if( bucket_locklist_count == OT_MAX_THREADS ) {
-    fprintf( stderr, "More lock requests than mutexes. Consult source code.\n" );
-    return -1;
-  }
-
-  /* See, if bucket is already locked */
-  for( i=0; i<bucket_locklist_count; ++i )
-    if( bucket_locklist[ i ] == bucket ) {
-      stats_issue_event( EVENT_BUCKET_LOCKED, 0, 0 );
-      return -1;
-    }
-
-  return 0;
-}
-
-static void bucket_push( int bucket ) {
-  bucket_locklist[ bucket_locklist_count++ ] = bucket;
-}
-
-static void bucket_remove( int bucket ) {
-  int i = 0;
-
-  while( ( i < bucket_locklist_count ) && ( bucket_locklist[ i ] != bucket ) )
-    ++i;
-
-  if( i == bucket_locklist_count ) {
-    fprintf( stderr, "Request to unlock bucket that was never locked. Consult source code.\n" );
-    return;
-  }
-
-  for( ; i < bucket_locklist_count - 1; ++i )
-    bucket_locklist[ i ] = bucket_locklist[ i + 1 ];
-
-  --bucket_locklist_count;
-}
-
-/* Can block */
 ot_vector *mutex_bucket_lock( int bucket ) {
-  pthread_mutex_lock( &bucket_mutex );
-  while( bucket_check( bucket ) )
-    pthread_cond_wait( &bucket_being_unlocked, &bucket_mutex );
-  bucket_push( bucket );
-  pthread_mutex_unlock( &bucket_mutex );
+  pthread_mutex_lock(bucket_mutex + bucket );
   return all_torrents + bucket;
 }
 
@@ -92,11 +41,8 @@ ot_vector *mutex_bucket_lock_by_hash( ot_hash hash ) {
 }
 
 void mutex_bucket_unlock( int bucket, int delta_torrentcount ) {
-  pthread_mutex_lock( &bucket_mutex );
-  bucket_remove( bucket );
+  pthread_mutex_unlock(bucket_mutex + bucket);
   g_torrent_count += delta_torrentcount;
-  pthread_cond_broadcast( &bucket_being_unlocked );
-  pthread_mutex_unlock( &bucket_mutex );
 }
 
 void mutex_bucket_unlock_by_hash( ot_hash hash, int delta_torrentcount ) {
@@ -104,11 +50,7 @@ void mutex_bucket_unlock_by_hash( ot_hash hash, int delta_torrentcount ) {
 }
 
 size_t mutex_get_torrent_count( ) {
-  size_t torrent_count;
-  pthread_mutex_lock( &bucket_mutex );
-  torrent_count = g_torrent_count;
-  pthread_mutex_unlock( &bucket_mutex );
-  return torrent_count;
+  return g_torrent_count;
 }
 
 /* TaskQueue Magic */
@@ -184,7 +126,7 @@ void mutex_workqueue_canceltask( int64 sock ) {
 
     /* Free task's iovec */
     for( i=0; i<(*task)->iovec_entries; ++i )
-      munmap( iovec[i].iov_base, iovec[i].iov_len );
+      free( iovec[i].iov_base );
 
     *task = (*task)->next;
     free( ptask );
@@ -318,16 +260,18 @@ int64 mutex_workqueue_popresult( int *iovec_entries, struct iovec ** iovec ) {
 }
 
 void mutex_init( ) {
+  int i;
   pthread_mutex_init(&tasklist_mutex, NULL);
   pthread_cond_init (&tasklist_being_filled, NULL);
-  pthread_mutex_init(&bucket_mutex, NULL);
-  pthread_cond_init (&bucket_being_unlocked, NULL);
+  for (i=0; i < OT_BUCKET_COUNT; ++i)
+      pthread_mutex_init(bucket_mutex + i, NULL);
   byte_zero( all_torrents, sizeof( all_torrents ) );
 }
 
 void mutex_deinit( ) {
-  pthread_mutex_destroy(&bucket_mutex);
-  pthread_cond_destroy(&bucket_being_unlocked);
+  int i;
+  for (i=0; i < OT_BUCKET_COUNT; ++i)
+      pthread_mutex_destroy(bucket_mutex + i);
   pthread_mutex_destroy(&tasklist_mutex);
   pthread_cond_destroy(&tasklist_being_filled);
   byte_zero( all_torrents, sizeof( all_torrents ) );

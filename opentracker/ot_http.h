@@ -14,7 +14,8 @@ typedef enum {
 
 struct http_data {
   array            request;
-  io_batch         batch;
+  io_batch        *batch;
+  size_t           batches;
   ot_ip6           ip;
   STRUCT_HTTP_FLAG flag;
 };

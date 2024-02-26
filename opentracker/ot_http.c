@@ -31,6 +31,7 @@
 #include "ot_accesslist.h"
 
 #define OT_MAXMULTISCRAPE_COUNT 64
+#define OT_BATCH_LIMIT (1024*1024*16)
 extern char *g_redirecturl;
 
 char   *g_stats_path;
@@ -75,7 +76,13 @@ static void http_senddata( const int64 sock, struct ot_workstruct *ws ) {
     }
 
     memcpy( outbuf, ws->reply + written_size, ws->reply_size - written_size );
-    iob_addbuf_free( &cookie->batch, outbuf, ws->reply_size - written_size );
+    if ( !cookie->batch ) {
+        cookie->batch = malloc( sizeof(io_batch) );
+        memset( cookie->batch, 0, sizeof(io_batch) );
+        cookie->batches = 1;
+    }
+
+    iob_addbuf_free( cookie->batch, outbuf, ws->reply_size - written_size );
 
     /* writeable short data sockets just have a tcp timeout */
     if( !ws->keep_alive ) {
@@ -118,7 +125,7 @@ ssize_t http_sendiovecdata( const int64 sock, struct ot_workstruct *ws, int iove
   struct http_data *cookie = io_getcookie( sock );
   char *header;
   int i;
-  size_t header_size, size = iovec_length( &iovec_entries, &iovector );
+  size_t header_size, size = iovec_length( &iovec_entries, (const struct iovec **)&iovector );
   tai6464 t;
 
   /* No cookie? Bad socket. Leave. */
@@ -152,12 +159,29 @@ ssize_t http_sendiovecdata( const int64 sock, struct ot_workstruct *ws, int iove
   else
     header_size = sprintf( header, "HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %zd\r\n\r\n", size );
 
-  iob_reset( &cookie->batch );
-  iob_addbuf_free( &cookie->batch, header, header_size );
+  if (!cookie->batch ) {
+    cookie->batch = malloc( sizeof(io_batch) );
+    memset( cookie->batch, 0, sizeof(io_batch) );
+    cookie->batches = 1;
+  }
+  iob_addbuf_free( cookie->batch, header, header_size );
 
-  /* Will move to ot_iovec.c */
-  for( i=0; i<iovec_entries; ++i )
-    iob_addbuf_munmap( &cookie->batch, iovector[i].iov_base, iovector[i].iov_len );
+  /* Split huge iovectors into separate io_batches */
+  for( i=0; i<iovec_entries; ++i ) {
+    io_batch *current = cookie->batch + cookie->batches - 1;
+
+    /* If the current batch's limit is reached, try to reallocate a new batch to work on */
+    if( current->bytesleft > OT_BATCH_LIMIT ) {
+        io_batch * new_batch = realloc( current, (cookie->batches + 1) * sizeof(io_batch) );
+        if( new_batch ) {
+            cookie->batches++;
+            current = cookie->batch = new_batch;
+            memset( current, 0, sizeof(io_batch) );
+        }
+    }
+
+    iob_addbuf_free( current, iovector[i].iov_base, iovector[i].iov_len );
+  }
   free( iovector );
 
   /* writeable sockets timeout after 10 minutes */
