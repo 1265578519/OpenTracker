@@ -9,7 +9,7 @@
 /* for strlen */
 #include <string.h>
 
-#include <libowfat/compiler.h>
+#include <compiler.h>
 
 #ifdef __cplusplus
 extern "C" {

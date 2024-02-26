@@ -2,8 +2,8 @@
 #ifndef IP6_H
 #define IP6_H
 
-#include <libowfat/byte.h>
-#include <libowfat/uint32.h>
+#include <byte.h>
+#include <uint32.h>
 
 #ifdef __cplusplus
 extern "C" {

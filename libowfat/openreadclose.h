@@ -2,8 +2,8 @@
 #ifndef OPENREADCLOSE_H
 #define OPENREADCLOSE_H
 
-#include <libowfat/compiler.h>
-#include <libowfat/stralloc.h>
+#include <compiler.h>
+#include <stralloc.h>
 
 #ifdef __cplusplus
 extern "C" {

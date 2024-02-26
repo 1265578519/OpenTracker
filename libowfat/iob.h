@@ -13,9 +13,9 @@
  * frames as possible.  On Linux it will also use the TCP_CORK socket
  * option. */
 
-#include <libowfat/io.h>
-#include <libowfat/array.h>
-#include <libowfat/compiler.h>
+#include <io.h>
+#include <array.h>
+#include <compiler.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-#include <libowfat/compiler.h>
+#include <compiler.h>
 
 /* open filename for reading and return the file handle or -1 on error */
 att_read(1)

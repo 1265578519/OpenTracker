@@ -16,7 +16,7 @@
  * - meant for long-running processes, destruction is provided only as an afterthought for completeness
  */
 
-#include <libowfat/uint64.h>
+#include <uint64.h>
 #include <stddef.h>
 #ifdef _WIN32
 #include <windows.h>

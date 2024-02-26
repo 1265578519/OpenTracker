@@ -2,9 +2,9 @@
 #ifndef DNS_H
 #define DNS_H
 
-#include <libowfat/stralloc.h>
-#include <libowfat/iopause.h>
-#include <libowfat/taia.h>
+#include <stralloc.h>
+#include <iopause.h>
+#include <taia.h>
 
 #ifdef __cplusplus
 extern "C" {

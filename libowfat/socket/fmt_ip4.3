@@ -2,7 +2,7 @@
 .SH NAME
 fmt_ip4 \- write a formatted ASCII representation of an IPv4 number
 .SH SYNTAX
-.B #include <libowfat/ip4.h>
+.B #include <ip4.h>
 
 unsigned int \fBfmt_ip4\fP(char *\fIdest\fR,const char \fIip\fR[4]);
 .SH DESCRIPTION
@@ -18,7 +18,7 @@ fmt_ip4 does not append \\0.
 For convenience, ip4.h defines the integer IP4_FMT to be big enough to
 contain every possible fmt_ip4 output plus \\0.
 .SH EXAMPLE
-#include <libowfat/ip4.h>
+#include <ip4.h>
 
   char buf[IP4_FMT];
   char ip[4];

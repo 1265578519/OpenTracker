@@ -8,9 +8,9 @@
 
 /* http://cr.yp.to/lib/io.html */
 
-#include <libowfat/uint64.h>
-#include <libowfat/taia.h>
-#include <libowfat/compiler.h>
+#include <uint64.h>
+#include <taia.h>
+#include <compiler.h>
 
 #ifdef __cplusplus
 extern "C" {

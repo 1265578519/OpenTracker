@@ -2,7 +2,7 @@
 .SH NAME
 socket_listen \- attempt to make a TCP connection
 .SH SYNTAX
-.B #include <libowfat/socket.h>
+.B #include <socket.h>
 
 int \fBsocket_listen\fP(int \fIs\fR,int \fIn\fR);
 .SH DESCRIPTION
@@ -15,7 +15,7 @@ If anything goes wrong, socket_listen returns -1, setting errno
 appropriately.
 
 .SH EXAMPLE
-  #include <libowfat/socket.h>
+  #include <socket.h>
 
   int \fIs\fR;
   char \fIip\fR[16];

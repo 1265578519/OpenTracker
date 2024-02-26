@@ -2,7 +2,7 @@
 .SH NAME
 socket_fastopen \- enable TCP Fast Open on a server-side TCP socket
 .SH SYNTAX
-.B #include <libowfat/socket.h>
+.B #include <socket.h>
 
 int \fBsocket_fastopen\fP(int \fIs\fR);
 .SH DESCRIPTION
@@ -15,7 +15,7 @@ Normally socket_fastopen returns 0. If anything goes wrong, socket_fastopen
 returns -1, setting errno appropriately.
 
 .SH EXAMPLE
-  #include <libowfat/socket.h>
+  #include <socket.h>
 
   int \fIs\fR;
   char \fIip\fR[4];

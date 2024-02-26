@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-#include <libowfat/compiler.h>
+#include <compiler.h>
 
 /* byte_chr returns the smallest integer i between 0 and len-1
  * inclusive such that one[i] equals needle, or len if not found. */

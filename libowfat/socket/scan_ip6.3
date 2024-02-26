@@ -2,7 +2,7 @@
 .SH NAME
 scan_ip6 \- parse an IPv6 number in ASCII representation
 .SH SYNTAX
-.B #include <libowfat/ip6.h>
+.B #include <ip6.h>
 
 int \fBscan_ip6\fP(const char *\fIsrc\fR,char \fIip\fR[16]);
 .SH DESCRIPTION
@@ -22,9 +22,9 @@ Unlike many other IP parsing routines, scan_ip6 does not recognize octal
 (like \fB0177.0.0.1\fR) or hexadecimal numbers (like \fB0x7f000001\fR)
 in the IPv4 part.
 .SH EXAMPLE
-#include <libowfat/str.h>
+#include <str.h>
 .br
-#include <libowfat/ip6.h>
+#include <ip6.h>
 
   char buf[]="::1";
   char ip[16];

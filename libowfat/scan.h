@@ -13,7 +13,7 @@
 /* for struct timespec: */
 #include <time.h>
 
-#include <libowfat/compiler.h>
+#include <compiler.h>
 
 #ifdef __cplusplus
 extern "C" {

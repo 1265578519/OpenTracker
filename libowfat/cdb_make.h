@@ -2,9 +2,9 @@
 #ifndef CDB_MAKE_H
 #define CDB_MAKE_H
 
-#include <libowfat/buffer.h>
-#include <libowfat/uint64.h>
-#include <libowfat/uint32.h>
+#include <buffer.h>
+#include <uint64.h>
+#include <uint32.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -3,9 +3,9 @@
 #define CDB_H
 
 #include <stddef.h>
-#include <libowfat/uint32.h>
-#include <libowfat/uint64.h>
-#include <libowfat/compiler.h>
+#include <uint32.h>
+#include <uint64.h>
+#include <compiler.h>
 
 #ifdef __cplusplus
 extern "C" {

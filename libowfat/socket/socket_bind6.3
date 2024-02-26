@@ -2,7 +2,7 @@
 .SH NAME
 socket_bind6 \- set the local IP address and port of a socket
 .SH SYNTAX
-.B #include <libowfat/socket.h>
+.B #include <socket.h>
 
 int \fBsocket_bind6\fP(int \fIs\fR, char \fIip\fR[16], uint16 \fIport\fR,
                  uint32 \fIscope_id\fR);
@@ -21,7 +21,7 @@ it specifies the interface number on which to bind.  The interface
 number for a given network interface name can be found with
 \fBsocket_getifidx\fR.
 .SH EXAMPLE
-  #include <libowfat/socket.h>
+  #include <socket.h>
 
   int \fIs\fR;
   char \fIip\fR[16];

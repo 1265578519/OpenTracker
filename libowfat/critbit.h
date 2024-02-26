@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include <libowfat/compiler.h>
+#include <compiler.h>
 
 typedef struct {
   void *root;

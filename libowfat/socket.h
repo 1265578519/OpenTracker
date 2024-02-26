@@ -4,9 +4,9 @@
 
 #include <sys/types.h>
 
-#include <libowfat/compiler.h>
-#include <libowfat/uint16.h>
-#include <libowfat/uint32.h>
+#include <compiler.h>
+#include <uint16.h>
+#include <uint32.h>
 
 #ifdef __cplusplus
 extern "C" {

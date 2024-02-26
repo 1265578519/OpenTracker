@@ -4,7 +4,7 @@
 
 /* Times with 1 second precision */
 
-#include <libowfat/uint64.h>
+#include <uint64.h>
 
 #ifdef __cplusplus
 extern "C" {

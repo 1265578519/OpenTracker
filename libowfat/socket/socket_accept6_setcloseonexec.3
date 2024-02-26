@@ -2,7 +2,7 @@
 .SH NAME
 socket_accept6_setcloseonexec \- accept an IPv6 TCP connection on a socket
 .SH SYNTAX
-.B #include <libowfat/socket.h>
+.B #include <socket.h>
 
 int \fBsocket_accept6_setcloseonexec\fP(int \fIs\fR,char \fIip\fR[16],uint16 *\fIport\fR,uint32 *\fIscope_id\fR);
 .SH DESCRIPTION
@@ -13,7 +13,7 @@ However, if may save a syscall or two and in the process avoid a race
 condition.
 
 .SH EXAMPLE
-  #include <libowfat/socket.h>
+  #include <socket.h>
 
   int \fIs\fR;
   char \fIip\fR[16];

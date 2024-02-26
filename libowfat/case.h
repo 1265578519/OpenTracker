@@ -3,7 +3,7 @@
 #define CASE_H
 
 #include <stddef.h>
-#include <libowfat/compiler.h>
+#include <compiler.h>
 
 #ifdef __cplusplus
 extern "C" {

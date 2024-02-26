@@ -7,13 +7,13 @@
 /* for uint32_t: */
 #include <stdint.h>
 
-#include <libowfat/compiler.h>
+#include <compiler.h>
 
-#include <libowfat/buffer.h>
+#include <buffer.h>
 
-#include <libowfat/uint16.h>
-#include <libowfat/uint32.h>
-#include <libowfat/uint64.h>
+#include <uint16.h>
+#include <uint32.h>
+#include <uint64.h>
 
 #ifdef __cplusplus
 extern "C" {

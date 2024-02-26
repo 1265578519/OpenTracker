@@ -3,8 +3,8 @@
 #define ARRAY_H
 
 #include <stddef.h>
-#include <libowfat/compiler.h>
-#include <libowfat/uint64.h>
+#include <compiler.h>
+#include <uint64.h>
 
 #ifdef __cplusplus
 extern "C" {

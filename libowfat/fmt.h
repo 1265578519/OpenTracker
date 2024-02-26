@@ -15,8 +15,8 @@
 #include <sys/types.h>
 #endif
 /* for byte_copy */
-#include <libowfat/byte.h>
-#include <libowfat/compiler.h>
+#include <byte.h>
+#include <compiler.h>
 
 #ifdef __cplusplus
 extern "C" {

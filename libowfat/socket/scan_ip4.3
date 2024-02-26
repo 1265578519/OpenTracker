@@ -2,7 +2,7 @@
 .SH NAME
 scan_ip4 \- parse an IPv4 number in dotted-decimal notation
 .SH SYNTAX
-.B #include <libowfat/ip4.h>
+.B #include <ip4.h>
 
 int \fBscan_ip4\fP(const char *\fIsrc\fR,char \fIip\fR[4]);
 .SH DESCRIPTION
@@ -13,9 +13,9 @@ number of bytes read from \fIsrc\fR or 0 if the parsing failed.
 Unlike many other IP parsing routines, scan_ip4 does not recognize octal
 (like \fB0177.0.0.1\fR) or hexadecimal numbers (like \fB0x7f000001\fR).
 .SH EXAMPLE
-#include <libowfat/str.h>
+#include <str.h>
 .br
-#include <libowfat/ip4.h>
+#include <ip4.h>
 
   char buf[]="160.45.40.10";
   char ip[4];
