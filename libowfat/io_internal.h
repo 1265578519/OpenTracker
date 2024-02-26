@@ -46,6 +46,8 @@ typedef struct {
   unsigned int kernelwantread:1;	/* did we tell the kernel we want to read/write? */
   unsigned int kernelwantwrite:1;
   unsigned int epolladded:1;
+  unsigned int closed:1;	/* io_close called, but close deferred because of outstanding events */
+  unsigned int zerocopy:1;	/* linux: setsockopt SO_ZEROCOPY done */
 #ifdef __MINGW32__
   unsigned int readqueued:2;
   unsigned int writequeued:2;
@@ -56,6 +58,7 @@ typedef struct {
 #endif
   long next_read;
   long next_write;
+  long next_defer;
   void* cookie;
   void* mmapped;
   long maplen;
@@ -79,6 +82,8 @@ my_extern array io_pollfds;
 
 my_extern long first_readable;
 my_extern long first_writeable;
+
+my_extern long first_deferred;
 
 my_extern enum __io_waitmode {
   UNDECIDED,
@@ -107,8 +112,8 @@ my_extern int io_master;
 my_extern int io_signum;
 my_extern sigset_t io_ss;
 
-my_extern long alt_firstread;
-my_extern long alt_firstwrite;
+my_extern long alt_firstread, alt_firstwrite;
+my_extern long alt_curread, alt_curwrite;
 #endif
 
 int64 io_waituntil2(int64 milliseconds);
@@ -128,3 +133,7 @@ struct eventpacket {
 };
 
 #define debug_printf(x)
+
+struct iom_entry {
+  void* cookie;
+};

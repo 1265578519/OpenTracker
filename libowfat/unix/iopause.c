@@ -2,6 +2,7 @@
 #include "iopause.h"
 #ifdef __MINGW32__
 #include <winsock2.h>
+#include <windows.h>
 #else
 #include "select.h"
 #endif

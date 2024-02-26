@@ -2,7 +2,7 @@
 .SH NAME
 socket_connect4 \- attempt to make a TCP connection
 .SH SYNTAX
-.B #include <socket.h>
+.B #include <libowfat/socket.h>
 
 int \fBsocket_connect4\fP(int \fIs\fR,const char \fIip\fR[4],uint16 \fIport\fR);
 .SH DESCRIPTION
@@ -34,7 +34,7 @@ You can call socket_connect4 without calling socket_bind4.  This has the
 effect as first calling socket_bind4 with IP address 0.0.0.0 and port 0.
 
 .SH EXAMPLE
-  #include <socket.h>
+  #include <libowfat/socket.h>
 
   int \fIs\fR;
   char \fIip\fR[4];

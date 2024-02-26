@@ -1,6 +1,6 @@
 /* this header file comes from libowfat, http://www.fefe.de/libowfat/ */
-#ifndef _SAFEMULT_H
-#define _SAFEMULT_H
+#ifndef SAFEMULT_H
+#define SAFEMULT_H
 
 #include "uint16.h"
 #include "uint32.h"

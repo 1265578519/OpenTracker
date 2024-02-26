@@ -29,3 +29,17 @@ size_t scan_ushort(const char* src,unsigned short* dest) {
     (void)compileerror;
   }
 }
+
+#ifdef UNITTEST
+#include <assert.h>
+
+int main() {
+  unsigned short i;
+  assert(scan_ushort("1234",&i)==4 && i==1234);
+  assert(scan_ushort("-1",&i)==0);
+  if (sizeof(short)==2) {
+    assert(scan_ushort("123456",&i)==5 && i==12345);
+  }
+  return 0;
+}
+#endif

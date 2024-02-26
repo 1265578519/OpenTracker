@@ -11,15 +11,8 @@ int io_passfd(int64 sock,int64 fd) {
 #define _NETBSD_SOURCE
 #endif
 
-#ifdef __OpenBSD__
-#warning This is a HORRIBLE kludge around yet another thing OpenBSD broke
-#warning If they make it possible to do file descriptor passing with
-#warning _XOPEN_SOURCE defined, please send me an email so I can remove this.
-#warning _XOPEN_SOURCE needs to be defined for this to work on Solaris.
-#else
 #define _XOPEN_SOURCE
 #define _XOPEN_SOURCE_EXTENDED 1
-#endif
 #include <stddef.h>
 #include <sys/types.h>
 #include <sys/time.h>

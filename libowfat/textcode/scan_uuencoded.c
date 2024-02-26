@@ -4,7 +4,7 @@ size_t scan_uuencoded(const char *src,char *dest,size_t *destlen) {
   size_t len;
   size_t tmp;
   register const unsigned char* s=(const unsigned char*) src;
-  const char* orig=dest;
+  size_t i=0;
   if ((len=*s-' ')>64) return 0;
   len&=63;
   ++s;
@@ -15,10 +15,28 @@ size_t scan_uuencoded(const char *src,char *dest,size_t *destlen) {
         (((s[2]-' ')&077) << (1*6)) +
         (((s[3]-' ')&077));
     s+=4;
-    if (len) { *dest=tmp>>16; ++dest; --len; }
-    if (len) { *dest=tmp>>8; ++dest; --len; }
-    if (len) { *dest=tmp&0xff; ++dest; --len; }
+    if (len) { if (dest) dest[i++]=tmp>>16; --len; }
+    if (len) { if (dest) dest[i++]=tmp>>8; --len; }
+    if (len) { if (dest) dest[i++]=tmp&0xff; --len; }
   }
-  *destlen=dest-orig;
+  if (destlen) *destlen=i;
   return (const char*)s-src;
 }
+
+#ifdef UNITTEST
+
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+  char buf[100];
+  size_t i;
+  memset(buf,0,100);
+  assert(scan_uuencoded("&9FYO<F0*",buf,&i)==9 && i==6 && !memcmp(buf,"fnord\n",7));
+  memset(buf,0,100);
+  assert(scan_uuencoded("%9FYO<F0`",buf,&i)==9 && i==5 && !memcmp(buf,"fnord",6));
+  return 0;
+}
+
+#endif

@@ -2,7 +2,7 @@
 .SH NAME
 buffer.h \- generic read/write buffering
 .SH SYNTAX
-.B #include <buffer.h>
+.B #include <libowfat/buffer.h>
 
   buffer* buffer_0;   /* like stdio's stdin */
   buffer* buffer_1;   /* like stdio's stdout */
@@ -25,7 +25,7 @@ program termination; you must manually call \fBbuffer_flush\fR,
 See buffer_init(3) for example read buffer code.  Here is typical code
 for printing an error message on stderr:
 
-  #include <buffer.h>
+  #include <libowfat/buffer.h>
 
   buffer_puts(buffer_2,"error: got only ");
   buffer_putulong(buffer_2,got);

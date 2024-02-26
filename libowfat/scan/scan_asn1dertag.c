@@ -25,3 +25,18 @@ size_t scan_asn1dertag(const char* src,size_t len,unsigned long long* length) {
   return 0;
 }
 
+#ifdef UNITTEST
+#include <assert.h>
+
+int main() {
+  unsigned long long i;
+  assert(scan_asn1dertag("\x00",1,&i)==1 && i==0);
+  assert(scan_asn1dertag("\x05",1,&i)==1 && i==5);
+  assert(scan_asn1dertag("\x81\x42",2,&i)==2 && i==0xc2);
+  assert(scan_asn1dertag("\x05",0,&i)==0);	// truncated
+  assert(scan_asn1dertag("\x81\x42",1,&i)==0);	// truncated
+  assert(scan_asn1dertag("\x80\x05",2,&i)==0);	// non-minimal encoding
+  assert(scan_asn1dertag("\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff",10,&i)==0);	// value does not fit
+  return 0;
+}
+#endif

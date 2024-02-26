@@ -99,6 +99,8 @@ int64 io_trywrite(int64 d,const char* buf,int64 len) {
   if (!e->nonblock) {
     setitimer(ITIMER_REAL,&old,0);
   }
+  if (r==-1 && errno==EAGAIN)
+    io_eagain_write(d);
   if (r==-1) {
     if (errno==EINTR) errno=EAGAIN;
     if (errno!=EAGAIN)
@@ -106,11 +108,20 @@ int64 io_trywrite(int64 d,const char* buf,int64 len) {
   }
   if (r!=len) {
     e->canwrite=0;
+    io_eagain_write(d);
 #if defined(HAVE_SIGIO)
     if (d==alt_firstwrite) {
+#if 0
       debug_printf(("io_trywrite: dequeueing %ld from alt write queue (next is %ld)\n",d,e->next_write));
       alt_firstwrite=e->next_write;
       e->next_write=-1;
+#else
+      if (d==alt_curwrite) alt_curwrite=-1;
+    } else {
+      debug_printf(("io_trywrite: enqueueing %ld into alt write queue (next is %ld)\n",d,alt_firstwrite));
+      e->next_write=alt_firstwrite;
+      alt_firstwrite=d;
+#endif
     }
 #endif
   }

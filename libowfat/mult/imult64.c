@@ -32,3 +32,18 @@ int imult64(int64 a,int64 b,int64* c) {
 #endif
 
 #endif
+
+#ifdef UNITTEST
+#include <assert.h>
+
+int main() {
+  int64 c;
+
+  assert(imult64(0x4000000000000000ll,2,&c)==0);
+  assert(imult64(-0x4000000000000000ll,2,&c)==1 && c==(int64)-0x8000000000000000ll);
+  assert(imult64(0x3fffffffffffffffll,2,&c)==1 && c==0x7ffffffffffffffell);
+
+  return 0;
+}
+
+#endif

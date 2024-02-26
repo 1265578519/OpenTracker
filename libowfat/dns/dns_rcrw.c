@@ -7,6 +7,7 @@
 #include "dns.h"
 #ifdef __MINGW32__
 #include <winsock2.h>
+#include <windows.h>
 #endif
 
 static stralloc data;

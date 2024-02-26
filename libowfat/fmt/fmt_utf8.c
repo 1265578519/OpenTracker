@@ -6,7 +6,7 @@ size_t fmt_utf8(char *dest,uint32_t n) {
     if (dest) *dest=(char)n;
     return 1;
   }
-  for (i=0x3f,j=1; i<0x7fffffff; i=(i<<5)|0x1f, ++j) {
+  for (i=0x3f,j=1; i<=0x7fffffff; i=(i<<5)|0x1f, ++j) {
     if (i>=n) {
       --j;
       if (dest) {
@@ -19,8 +19,10 @@ size_t fmt_utf8(char *dest,uint32_t n) {
       }
       return j+1;
     }
+    if (i==0x7fffffff) return 0;
   }
   /* we were asked to encode a value that cannot be encoded */
   return 0;
 }
 
+/* unit tested via scan/scan_utf8.c */

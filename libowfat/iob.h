@@ -1,6 +1,6 @@
 /* this header file comes from libowfat, http://www.fefe.de/libowfat/ */
-#ifndef _IOB_H
-#define _IOB_H
+#ifndef IOB_H
+#define IOB_H
 
 /* These functions can be used to create a queue of small (or large)
  * buffers and parts of files to be sent out over a socket.  It is meant
