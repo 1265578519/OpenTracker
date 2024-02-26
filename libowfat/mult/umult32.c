@@ -16,16 +16,3 @@ int umult32(uint32 a,uint32 b,uint32* c) {
 }
 
 #endif
-
-#ifdef UNITTEST
-#include <assert.h>
-
-int main() {
-  uint32 a;
-  assert(umult32(4,0x80000000,&a)==0);
-  assert(umult32(16,0x45000000,&a)==0);		// make sure we don't fall for "if a*b<a && a*b<b"
-  assert(umult32(5,10,&a)==1 && a==50);
-  assert(umult32(6,0x10000000,&a)==1 && a==0x60000000);
-  return 0;
-}
-#endif

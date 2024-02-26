@@ -20,18 +20,3 @@ size_t scan_8int(const char* src,unsigned int* dest) {
   *dest=l;
   return (size_t)(tmp-src);
 }
-
-#ifdef UNITTEST
-#include <assert.h>
-
-int main() {
-  unsigned int i;
-  assert(scan_8int("1234",&i)==4 && i==01234);
-  assert(scan_8int("12345678",&i)==7 && i==01234567);
-  assert(scan_8int("37777777777",&i)==11 && i==0xffffffff);
-  assert(scan_8int("40000000000",&i)==10 && i==04000000000);
-  assert(scan_8int("-4",&i)==0 && i==0);
-  assert(scan_8int("01234",&i)==5 && i==01234);
-  return 0;
-}
-#endif

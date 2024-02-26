@@ -2,9 +2,9 @@
 #ifndef DNS_H
 #define DNS_H
 
-#include <stralloc.h>
-#include <iopause.h>
-#include <taia.h>
+#include "stralloc.h"
+#include "iopause.h"
+#include "taia.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,7 +45,7 @@ struct dns_transmit {
   char qtype[2];
 } ;
 
-void dns_random_init(const char data[128]);
+void dns_random_init(const char *);
 unsigned int dns_random(unsigned int);
 
 void dns_sortip(char *,unsigned int);
@@ -64,13 +64,13 @@ unsigned int dns_packet_copy(const char *,unsigned int,unsigned int,char *,unsig
 unsigned int dns_packet_getname(const char *,unsigned int,unsigned int,char **);
 unsigned int dns_packet_skipname(const char *,unsigned int,unsigned int);
 
-int dns_transmit_start(struct dns_transmit *,const char servers[256],int,const char *q,const char qtype[2],const char localip[16]);
+int dns_transmit_start(struct dns_transmit *,const char *,int,const char *,const char *,const char *);
 void dns_transmit_free(struct dns_transmit *);
 void dns_transmit_io(struct dns_transmit *,iopause_fd *,struct taia *);
 int dns_transmit_get(struct dns_transmit *,const iopause_fd *,const struct taia *);
 
-int dns_resolvconfip(char servers[256]);
-int dns_resolve(const char *q,const char qtype[2]);
+int dns_resolvconfip(char *);
+int dns_resolve(const char *,const char *);
 extern struct dns_transmit dns_resolve_tx;
 
 int dns_ip4_packet(stralloc *,const char *,unsigned int);
@@ -78,9 +78,9 @@ int dns_ip4(stralloc *,const stralloc *);
 int dns_ip6_packet(stralloc *,const char *,unsigned int);
 int dns_ip6(stralloc *,stralloc *);
 int dns_name_packet(stralloc *,const char *,unsigned int);
+void dns_name4_domain(char *,const char *);
 #define DNS_NAME4_DOMAIN 31
-void dns_name4_domain(char name[DNS_NAME4_DOMAIN],const char ip[4]);
-int dns_name4(stralloc *,const char ip[4]);
+int dns_name4(stralloc *,const char *);
 int dns_txt_packet(stralloc *,const char *,unsigned int);
 int dns_txt(stralloc *,const stralloc *);
 int dns_mx_packet(stralloc *,const char *,unsigned int);
@@ -92,9 +92,9 @@ int dns_ip4_qualify(stralloc *,stralloc *,const stralloc *);
 int dns_ip6_qualify_rules(stralloc *,stralloc *,const stralloc *,const stralloc *);
 int dns_ip6_qualify(stralloc *,stralloc *,const stralloc *);
 
+void dns_name6_domain(char *,const char *);
 #define DNS_NAME6_DOMAIN (4*16+11)
-void dns_name6_domain(char name[DNS_NAME6_DOMAIN],const char ip[16]);
-int dns_name6(stralloc *,const char ip[16]);
+int dns_name6(stralloc *,const char *);
 
 #ifdef __cplusplus
 }

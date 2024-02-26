@@ -57,7 +57,7 @@ int64 io_mmapwritefile(int64 out,int64 in,uint64 off,uint64 bytes,io_write_callb
       while (left>0) {
 	m=writecb(out,c,left);
 	if (m<0) {
-	  io_eagain_write(out);
+	  io_eagain(out);
 	  if (errno!=EAGAIN) {
 #ifdef __MINGW32__
 	    UnmapViewOfFile(e->mmapped);

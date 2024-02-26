@@ -1,6 +1,6 @@
 #include "likely.h"
 #include <stdlib.h>
-#ifndef _WIN32
+#ifndef __MINGW32__
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -13,7 +13,7 @@
 #endif
 
 static iarray_page* new_page(size_t pagesize) {
-#ifdef _WIN32
+#ifdef __MINGW32__
   void* x=malloc(pagesize);
   if (x==0) return 0;
 #else
@@ -49,7 +49,7 @@ void* iarray_allocate(iarray* ia,size_t pos) {
     p=&(*p)->next;
   }
   if (newpage)
-#ifdef _WIN32
+#ifdef __MINGW32__
     free(newpage);
 #else
     munmap(newpage,ia->bytesperpage);

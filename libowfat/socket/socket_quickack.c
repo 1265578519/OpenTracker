@@ -10,8 +10,6 @@ int socket_quickack(int s,int value) {
 #ifdef TCP_QUICKACK
   return setsockopt(s, SOL_TCP, TCP_QUICKACK, &value, sizeof(int));
 #else
-  (void)s;	// shut up unused variable warnings
-  (void)value;
 #ifdef ENOPROTOOPT
   errno=ENOPROTOOPT;
 #else

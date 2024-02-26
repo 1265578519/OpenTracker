@@ -1,7 +1,7 @@
 #include <errno.h>
 #include "buffer.h"
 
-ssize_t buffer_stubborn(ssize_t (*op)(),int fd,const char* buf, size_t len,void* cookie) {
+int buffer_stubborn(ssize_t (*op)(),int fd,const char* buf, size_t len,void* cookie) {
   ssize_t w;
   errno=0;
   while (len) {

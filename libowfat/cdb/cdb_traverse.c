@@ -27,7 +27,7 @@ int cdb_nextkey(struct cdb *c,uint32 *kpos) {
   return doit(c,kpos);
 }
 
-int cdb_successor(struct cdb *c,const unsigned char *key,size_t klen) {
+int cdb_successor(struct cdb *c,const unsigned char *key,unsigned long int klen) {
   int r;
   uint32 kpos;
   if (key) {

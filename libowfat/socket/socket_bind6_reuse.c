@@ -5,7 +5,7 @@
 #include "socket.h"
 #include "windoze.h"
 
-int socket_bind6_reuse(int s,const char ip[16],uint16 port,uint32 scope_id) {
+int socket_bind6_reuse(int s,const char *ip,uint16 port,uint32 scope_id) {
   int one=1;
   setsockopt(s,SOL_SOCKET,SO_REUSEADDR,&one,sizeof one);
 #ifdef SO_REUSEPORT

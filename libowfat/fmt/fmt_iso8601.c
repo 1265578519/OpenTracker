@@ -9,13 +9,7 @@ static unsigned int fmt_2digits(char* dest,int i) {
 }
 
 size_t fmt_iso8601(char* dest,time_t t) {
-#ifdef _WIN32
-  struct tm tmp;
-  struct tm* x=&tmp;
-  gmtime_s(&tmp,&t);	// can't recover from when this fails
-#else
   struct tm* x=gmtime(&t);
-#endif
   size_t i;
 
   if (dest==0) return sizeof("2014-05-27T19:22:16Z")-1;

@@ -22,7 +22,7 @@ int buffer_putflush(buffer* b,const char* x,size_t len) {
   if (!b->p)	/* if the buffer is empty, just call buffer_stubborn directly */
     return buffer_stubborn(b->op,b->fd,x,len,b);
 #ifndef __MINGW32__
-  if (b->op==write && len>sizeof(struct iovec)*2) {
+  if (b->op==write) {
     struct iovec v[2];
     ssize_t w;
     size_t cl=b->p+len;

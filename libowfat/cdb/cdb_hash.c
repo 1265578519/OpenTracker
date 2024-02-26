@@ -6,7 +6,7 @@ uint32 cdb_hashadd(uint32 h,unsigned char c) {
   return h ^ c;
 }
 
-uint32 cdb_hash(const unsigned char *buf,size_t len) {
+uint32 cdb_hash(const unsigned char *buf,unsigned long int len) {
   uint32 h;
 
   h = CDB_HASHSTART;

@@ -1,10 +1,10 @@
 /* this header file comes from libowfat, http://www.fefe.de/libowfat/ */
-#ifndef SAFEMULT_H
-#define SAFEMULT_H
+#ifndef _SAFEMULT_H
+#define _SAFEMULT_H
 
-#include <uint16.h>
-#include <uint32.h>
-#include <uint64.h>
+#include "uint16.h"
+#include "uint32.h"
+#include "uint64.h"
 
 #ifdef __cplusplus
 extern "C" {

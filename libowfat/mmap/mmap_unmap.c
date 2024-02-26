@@ -1,15 +1,15 @@
 #include <sys/types.h>
-#ifdef _WIN32
+#include <unistd.h>
+#ifdef __MINGW32__
 #include <windows.h>
 #else
-#include <unistd.h>
 #include <sys/mman.h>
-#include "open.h"
 #endif
+#include "open.h"
 #include "mmap.h"
 
 int mmap_unmap(const char* mapped,size_t maplen) {
-#ifdef _WIN32
+#ifdef __MINGW32__
   (void)maplen;
   return UnmapViewOfFile(mapped)?0:-1;
 #else

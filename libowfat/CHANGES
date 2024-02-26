@@ -1,26 +1,3 @@
-0.33:
-  add byte_start, byte_starts
-  add a man page for byte_equal_notimingattack
-  buffer_seek is no longer limited to the current buffer contents
-  add automated way to run unit test: make check
-  add parse.h
-  add bytestream abstraction for parsing data from a buffer or a file
-  add compiler.h to abstract gcc attributes
-  add fmt_strm_malloc
-  add cross references to open_* and mmap_* man pages
-  add fmt_strm_alloca and fmt_strm_malloc man pages
-  add buffer_init_allocbuf, buffer_init_read, buffer_init_write, buffer_init_read_allocbuf, buffer_init_write_allocbuf
-  fix buffer overread for len=0 in scan_longn (Martin Castillo)
-  add iob_write2 with sendfile callback so caller can use OpenSSL's SSL_sendfile
-
-0.32:
-  remove OpenBSD #warning (obsd maintainer says no longer needed)
-  move headers to <libowfat/> upon install
-  fix fmt_ip6 (Erwin Hoffmann)
-  add MSG_ZEROCOPY support (only used for buffers >8k)
-  use writev in buffer_put for a slight perf improvement
-  add experimental iom API for multithreaded I/O multiplexing (in io.h)
-
 0.31:
   special case buffer_get_token with token length 1 through memccpy (almost 4x speedup)
   test for pread and use it instead of lseek+read in cdb and io_mmapwritefile

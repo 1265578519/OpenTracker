@@ -1,15 +1,15 @@
 #include <sys/types.h>
-#ifdef _WIN32
+#include <unistd.h>
+#ifdef __MINGW32__
 #include <windows.h>
 #else
-#include <unistd.h>
 #include <sys/mman.h>
-#include "open.h"
 #endif
+#include "open.h"
 #include "mmap.h"
 
 extern char* mmap_shared(const char* filename,size_t * filesize) {
-#ifdef _WIN32
+#ifdef __MINGW32__
   HANDLE fd,m;
   char* map;
   fd=CreateFile(filename,GENERIC_READ|GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,0,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);

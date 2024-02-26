@@ -5,8 +5,6 @@ scan_utf8 \- decode an unsigned integer from UTF-8 encoding
 .B #include <scan.h>
 
 size_t \fBscan_utf8\fP(const char *\fIsrc\fR,size_t \fIlen\fR,uint32_t *\fIdest\fR);
-
-size_t \fBscan_utf8_sem\fP(const char *\fIsrc\fR,size_t \fIlen\fR,uint32_t *\fIdest\fR);
 .SH DESCRIPTION
 scan_utf8 decodes an unsigned integer in UTF-8 encoding from a memory
 area holding binary data.  It writes the decode value in \fIdest\fR and
@@ -16,15 +14,13 @@ scan_utf8 never reads more than \fIlen\fR bytes from \fIsrc\fR.  If the
 sequence is longer than that, or the memory area contains an invalid
 sequence, scan_utf8 returns 0 and does not touch \fIdest\fR.
 
-The length of the longest valid UTF-8 sequence is 6.
-
-scan_utf8 will reject syntactically invalid encodings, but not
-semantically invalid ones. scan_utf8_sem will additionally reject
-surrogates.
+The length of the longest UTF-8 sequence is 5.  If the buffer is longer
+than that, and scan_utf8 fails, then the data was not a valid UTF-8
+encoded sequence.
 .SH NOTE
 fmt_utf8 and scan_utf8 implement the encoding from UTF-8, but are meant
 to be able to store integers, not just Unicode code points.  Values
 above 0x10ffff are not valid UTF-8.  If you are using this function to
 parse UTF-8, you need to reject them (see RFC 3629).
 .SH "SEE ALSO"
-fmt_utf8(3), scan_utf8_sem(3)
+fmt_utf8(3)

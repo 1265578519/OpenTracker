@@ -50,29 +50,3 @@ size_t scan_asn1derlength(const char* src,size_t len,unsigned long long* value) 
   *value=l;
   return i;
 }
-
-#ifdef UNITTEST
-#include <assert.h>
-
-int main() {
-  unsigned long long i;
-  /* first check actual parsing */
-  assert(scan_asn1derlengthvalue("\x05",1,&i)==1 && i==5);
-  assert(scan_asn1derlengthvalue("\x81\xc2",2,&i)==2 && i==0xc2);
-  assert(scan_asn1derlengthvalue("\x82\x01\x23",3,&i)==3 && i==0x123);
-  assert(scan_asn1derlengthvalue("\x83\x01\x23\x45",4,&i)==4 && i==0x12345);
-  assert(scan_asn1derlengthvalue("\x83\x01\x23\x45",5,&i)==4 && i==0x12345);
-  assert(scan_asn1derlengthvalue("\x80",1,&i)==0);	// reject indefinite length encoding
-  assert(scan_asn1derlengthvalue("\x81\x05",2,&i)==0);	// reject non-minimal encoding
-  assert(scan_asn1derlengthvalue("\x81\xc2",1,&i)==0);	// reject truncated message
-  assert(scan_asn1derlengthvalue("\x82\xc2",2,&i)==0);	// reject truncated message
-  assert(scan_asn1derlengthvalue("\x82\x00\xc2",3,&i)==0);	// reject non-minimal encoding
-  assert(scan_asn1derlengthvalue("\x89\x01\x02\x03\x04\x05\x06\x07\x08\x09",10,&i)==0);	// value does not fit in target integer
-
-  /* now check buffer length checking in scan_asn1derlength */
-  assert(scan_asn1derlength("\x01",2,&i)==1 && i==1);	// ok
-  assert(scan_asn1derlength("\x02",2,&i)==0);		// buffer too small
-  assert(scan_asn1derlength("\x88\xff\xff\xff\xff\xff\xff\xff\xff",9,&i)==0);		// buffer too small, and integer overflow in naive check
-  return 0;
-}
-#endif

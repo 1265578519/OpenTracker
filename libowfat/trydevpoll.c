@@ -11,7 +11,7 @@
 #include <netinet/in.h>
 #include <sys/devpoll.h>
 
-int main() {
+main() {
   int fd=open("/dev/poll",O_RDWR);
   struct pollfd p[100];
   int i,r;

@@ -31,7 +31,7 @@ static int posplus(struct cdb_make *c,uint32 len) {
   return 0;
 }
 
-int cdb_make_addend(struct cdb_make *c,size_t keylen,size_t datalen,uint32 h) {
+int cdb_make_addend(struct cdb_make *c,unsigned long int keylen,unsigned long int datalen,uint32 h) {
   struct cdb_hplist *head;
 
   head = c->head;
@@ -46,16 +46,13 @@ int cdb_make_addend(struct cdb_make *c,size_t keylen,size_t datalen,uint32 h) {
   head->hp[head->num].p = c->pos;
   ++head->num;
   ++c->numentries;
-  if (posplus(c,8) == -1 ||
-      posplus(c,keylen) == -1 ||
-      posplus(c,datalen) == -1) {
-    free(head);
-    return -1;
-  }
+  if (posplus(c,8) == -1) return -1;
+  if (posplus(c,keylen) == -1) return -1;
+  if (posplus(c,datalen) == -1) return -1;
   return 0;
 }
 
-int cdb_make_addbegin(struct cdb_make *c, size_t keylen, size_t datalen) {
+int cdb_make_addbegin(struct cdb_make *c,unsigned long int keylen,unsigned long int datalen) {
   char buf[8];
 
   if (keylen > 0xffffffff) { errno = ENOMEM; return -1; }
@@ -67,7 +64,7 @@ int cdb_make_addbegin(struct cdb_make *c, size_t keylen, size_t datalen) {
   return 0;
 }
 
-int cdb_make_add(struct cdb_make *c, const unsigned char *key, size_t keylen, const unsigned char *data, size_t datalen)
+int cdb_make_add(struct cdb_make *c,const unsigned char *key,unsigned long int keylen,const unsigned char *data,unsigned long int datalen)
 {
   if (cdb_make_addbegin(c,keylen,datalen) == -1) return -1;
   if (buffer_putalign(&c->b,(char*)key,keylen) == -1) return -1;

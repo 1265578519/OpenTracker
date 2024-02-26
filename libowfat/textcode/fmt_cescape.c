@@ -27,7 +27,7 @@ size_t fmt_cescape2(char* dest,const char* src,size_t len,const char* escapeme) 
 	written+=2;
 	break;
     default:
-	if (s[i]<' ' || s[i]>=127 || escapeme[str_chr(escapeme,s[i])]==s[i]) {
+	if (s[i]<' ' || escapeme[str_chr(escapeme,s[i])]==s[i]) {
 	  if (dest) {
 	    dest[written]='\\';
 	    dest[written+1]='x';

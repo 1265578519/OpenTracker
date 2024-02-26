@@ -11,7 +11,7 @@ size_t scan_double(const char *in, double *dest) {
   register const char *c=in;
   char neg=0;
   switch (*c) {
-  case '-': neg=1; /* fall through */
+  case '-': neg=1;
   case '+': c++; break;
   default: break;
   }
@@ -31,7 +31,7 @@ size_t scan_double(const char *in, double *dest) {
     char neg=0;
     if (c[1]<'0') {
       switch (*c) {
-      case '-': neg=1; /* fall through */
+      case '-': neg=1;
       case '+': c++; break;
       default:
 	d=0;

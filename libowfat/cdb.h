@@ -2,22 +2,16 @@
 #ifndef CDB_H
 #define CDB_H
 
-#include <stddef.h>
-#include <uint32.h>
-#include <uint64.h>
-#include <compiler.h>
+#include "uint32.h"
+#include "uint64.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define CDB_HASHSTART 5381
-att_const
-uint32 cdb_hashadd(uint32 h, unsigned char c);
-
-att_pure
-att_read(1)
-uint32 cdb_hash(const unsigned char *buf, size_t len);
+extern uint32 cdb_hashadd(uint32 h,unsigned char c);
+extern uint32 cdb_hash(const unsigned char *buf,unsigned long int len);
 
 struct cdb {
   char *map; /* 0 if no map is available */
@@ -32,19 +26,19 @@ struct cdb {
   uint32 dlen; /* initialized if cdb_findnext() returns 1 */
 } ;
 
-void cdb_free(struct cdb *);
-void cdb_init(struct cdb *, int64 fd);
+extern void cdb_free(struct cdb *);
+extern void cdb_init(struct cdb *,int64 fd);
 
-int cdb_read(struct cdb * restrict, unsigned char * restrict, size_t, uint32);
+extern int cdb_read(struct cdb *,unsigned char *,unsigned long int,uint32);
 
 extern void cdb_findstart(struct cdb *);
-extern int cdb_findnext(struct cdb *, const unsigned char *, size_t);
-extern int cdb_find(struct cdb *, const unsigned char *, size_t);
+extern int cdb_findnext(struct cdb *,const unsigned char *,unsigned long int);
+extern int cdb_find(struct cdb *,const unsigned char *,unsigned long int);
 
 extern int cdb_firstkey(struct cdb *c,uint32 *kpos);
 extern int cdb_nextkey(struct cdb *c,uint32 *kpos);
 
-extern int cdb_successor(struct cdb *c, const unsigned char *, size_t);
+extern int cdb_successor(struct cdb *c,const unsigned char *,unsigned long int);
 
 #define cdb_datapos(c) ((c)->dpos)
 #define cdb_datalen(c) ((c)->dlen)

@@ -1,6 +1,5 @@
 #include <sys/param.h>
 #include <sys/types.h>
-#include <string.h>
 #ifndef __MINGW32__
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -21,7 +20,7 @@
 #include "io_internal.h"
 #endif
 
-int socket_accept6(int s,char ip[16],uint16* port,uint32* scope_id)
+int socket_accept6(int s,char* ip,uint16* port,uint32* scope_id)
 {
 #ifdef LIBC_HAS_IP6
   struct sockaddr_in6 sa;

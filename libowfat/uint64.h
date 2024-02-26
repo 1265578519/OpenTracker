@@ -2,8 +2,7 @@
 #ifndef UINT64_H
 #define UINT64_H
 
-#include <inttypes.h>	// uint64_t, int64_t
-#include <stddef.h>	// size_t
+#include <inttypes.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,28 +28,6 @@ uint64 uint64_read(const char *in);
 uint64 uint64_read_big(const char *in);
 
 #endif
-
-static inline size_t fmt_uint64(char* out, uint64 in) {
-  if (out) uint64_pack(out,in);
-  return 8;
-}
-
-static inline size_t fmt_uint64_big(char* out, uint64 in) {
-  if (out) uint64_pack_big(out,in);
-  return 8;
-}
-
-static inline size_t scan_uint64(const char* in, size_t len, uint64_t* b) {
-  if (len<8) return 0;
-  *b = uint64_read(in);
-  return 8;
-}
-
-static inline size_t scan_uint64_big(const char* in, size_t len, uint64_t* b) {
-  if (len<8) return 0;
-  *b = uint64_read_big(in);
-  return 8;
-}
 
 #ifdef __cplusplus
 }

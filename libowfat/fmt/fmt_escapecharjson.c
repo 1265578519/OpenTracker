@@ -1,11 +1,5 @@
 #include "fmt.h"
 
-#ifdef UNITTEST
-#undef UNITTEST
-#include "fmt_tohex.c"
-#define UNITTEST
-#endif
-
 static void fmt_hex4(char* dest,uint16_t w) {
   dest[3]=fmt_tohex(w&0xf); w>>=4;
   dest[2]=fmt_tohex(w&0xf); w>>=4;
@@ -51,21 +45,3 @@ simple:
   }
   return n+6;
 }
-
-#ifdef UNITTEST
-#include <assert.h>
-#include <string.h>
-
-int main() {
-  char buf[100];
-  assert(fmt_escapecharjson(buf,'f')==6 && !memcmp(buf,"\\u0066",6));
-  assert(fmt_escapecharjson(buf,'\b')==2 && !memcmp(buf,"\\b",2));
-  assert(fmt_escapecharjson(buf,'\n')==2 && !memcmp(buf,"\\n",2));
-  assert(fmt_escapecharjson(buf,'\r')==2 && !memcmp(buf,"\\r",2));
-  assert(fmt_escapecharjson(buf,'"')==2 && !memcmp(buf,"\\\"",2));
-  assert(fmt_escapecharjson(buf,'\\')==2 && !memcmp(buf,"\\\\",2));
-  assert(fmt_escapecharjson(buf,'/')==2 && !memcmp(buf,"\\/",2));	/* I'm baffled as well */
-  assert(fmt_escapecharjson(buf,0x1d11e)==12 && !memcmp(buf,"\\ud834\\udd1e",12));	/* utf-16 surrogate pairs */
-  return 0;
-}
-#endif

@@ -4,10 +4,10 @@ io_appendfile \- open a file for appending
 .SH SYNTAX
 .B #include <io.h>
 
-int \fBio_appendfile\fP(int64* d,const char* filename);
+int \fBio_appendfile\fP(int64* d,const char* s);
 .SH DESCRIPTION
 io_appendfile sets d to the number of a new descriptor writing to the
-end of the disk file named \fIfilename\fR, and returns 1.  If the file does not
+end of the disk file named \fIs\fR, and returns 1.  If the file does not
 exist, it will be created with mode 0600.
 
 If something goes wrong, io_appendfile sets \fIerrno\fR to indicate the error, and

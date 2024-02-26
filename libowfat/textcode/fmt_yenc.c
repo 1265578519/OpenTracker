@@ -16,7 +16,6 @@ size_t fmt_yenc(char* dest,const char* src,size_t len) {
       goto dontescape;
     case 'F':	/* escape "^From " */
       if (s[i+1]+42!='r' || s[i+2]+42!='o' || s[i+3]+42!='m' || s[i+4]+42!=' ') goto dontescape;
-      /* fall through */
     case '.':	/* dot at start of line needs to be escaped */
       if (!linelen) goto dontescape;
       /* fall through */

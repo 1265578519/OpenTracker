@@ -1,6 +1,5 @@
 #ifdef __MINGW32__
 #include <winsock2.h>
-#include <windows.h>
 #include <errno.h>
 #include <stdio.h>
 #include "socket.h"

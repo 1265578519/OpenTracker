@@ -3,7 +3,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #endif
-#include <string.h>
 #include "windoze.h"
 #include "socket.h"
 #include "havesl.h"
@@ -16,7 +15,7 @@
 #include "io_internal.h"
 #endif
 
-int socket_accept4(int s,char ip[4],uint16 *port) {
+int socket_accept4(int s,char *ip,uint16 *port) {
   struct sockaddr_in si;
   socklen_t len = sizeof si;
   int fd;
@@ -42,7 +41,7 @@ incoming:
       fd=e->next_accept;
       e->next_accept=0;
       if (e->nonblock) {
-	if (io_fd_canwrite(fd)) {
+	if (io_fd(fd)) {
 	  io_entry* f=array_get(&io_fds,sizeof(io_entry),fd);
 	  if (f) {
 	    f->nonblock=1;

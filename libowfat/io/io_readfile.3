@@ -4,12 +4,12 @@ io_readfile \- open a file for reading
 .SH SYNTAX
 .B #include <io.h>
 
-int \fBio_readfile\fP(int64* d,const char* filename);
+int \fBio_readfile\fP(int64* d,const char* s);
 .SH DESCRIPTION
 io_readfile sets d to the number of a new descriptor reading from the
-disk file named \fIfilename\fR, and returns 1.
+disk file named \fIs\fR, and returns 1.
 
 If something goes wrong, io_readfile sets \fIerrno\fR to indicate the error, and
 returns 0; it does not create a new descriptor, and it does not touch d.
 .SH "SEE ALSO"
-io_createfile(3), io_appendfile(3), io_readwritefile(3)
+io_createfilefile(3), io_appendfile(3), io_readwritefile(3)

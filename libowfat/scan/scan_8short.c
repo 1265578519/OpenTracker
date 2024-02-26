@@ -22,18 +22,3 @@ size_t scan_8short(const char* src,unsigned short* dest) {
   *dest=l;
   return (size_t)(tmp-src);
 }
-
-#ifdef UNITTEST
-#include <assert.h>
-
-int main() {
-  unsigned short i;
-  assert(scan_8short("1234",&i)==4 && i==01234);
-  assert(scan_8short("5678",&i)==3 && i==0567);
-  assert(scan_8short("177777",&i)==6 && i==0xffff);
-  assert(scan_8short("200000",&i)==5 && i==020000);
-  assert(scan_8short("-4",&i)==0 && i==0);
-  assert(scan_8short("01234",&i)==5 && i==01234);
-  return 0;
-}
-#endif

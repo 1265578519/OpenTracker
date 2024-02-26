@@ -4,7 +4,7 @@ cdb_successor \- find next record
 .SH SYNTAX
 .B #include <cdb.h>
 
-int cdb_successor(struct cdb *\fIc\fR, char *\fIkey\fR, size_t \fIklen\fR);
+int cdb_successor(struct cdb *\fIc\fR,char *\fIkey\fR,unsigned long int \fIklen\fR);
 
 .SH DESCRIPTION
 \fBcdb_successor\fR finds the record that follows \fIkey\fR.  If

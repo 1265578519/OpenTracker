@@ -4,7 +4,7 @@ mmap_readat \- memory map a file for reading
 .SH SYNTAX
 .B #include <mmap.h>
 
-const char* \fBmmap_readat\fP(const char* \fIfilename\fR,size_t* \fIfilesize\fR,int \fIdirfd\fR);
+char* \fBmmap_readat\fP(const char* \fIfilename\fR,size_t* \fIfilesize\fR,int \fIdirfd\fR);
 .SH DESCRIPTION
 mmap_readat opens \fIfilename\fR for reading, maps the whole file into
 memory, closes the file, writes the length of the file to \fIfilesize\fR
@@ -21,4 +21,4 @@ It can also be manually unmapped by calling \fBmunmap\fR from
 
 If the file could not be opened or mapped, (void*)0 is returned.
 .SH "SEE ALSO"
-mmap_unmap(3), mmap_private(3), mmap_read(3), mmap_shared(3)
+mmap_unmap(3)
