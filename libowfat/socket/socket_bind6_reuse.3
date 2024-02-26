@@ -2,7 +2,7 @@
 .SH NAME
 socket_bind6_reuse \- set the local IP address and port of a socket
 .SH SYNTAX
-.B #include <socket.h>
+.B #include <libowfat/socket.h>
 
 int \fBsocket_bind6_reuse\fP(int \fIs\fR,char \fIip\fR[16],uint16 \fIport\fR,
                        uint32 \fIscope_id\fR);
@@ -25,7 +25,7 @@ Unlike socket_bind6 this function will also tell the operating system
 that the address is to be reused soon, which turns off the normal pause
 before this IP and port can be bound again.
 .SH EXAMPLE
-  #include <socket.h>
+  #include <libowfat/socket.h>
 
   int \fIs\fR;
   char \fIip\fR[16];

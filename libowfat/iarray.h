@@ -7,11 +7,18 @@
  * - the elements are small (many fit on one page),
  * - the platform has an atomic compare-and-swap instruction
  * - the compiler supports it via __sync_val_compare_and_swap
+ *
+ * Implementation parameters:
+ * - once an element is allocated, it stays allocated and at the same place
+ * - there is no deleting elements or moving elements around
+ * - we are not coordinating access to elements, only providing pointers to them
+ * - new elements are allocated upwards, not arbitrarily (like file descriptors on Unix)
+ * - meant for long-running processes, destruction is provided only as an afterthought for completeness
  */
 
-#include "uint64.h"
+#include <libowfat/uint64.h>
 #include <stddef.h>
-#ifdef __MINGW32__
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <pthread.h>

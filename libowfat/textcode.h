@@ -11,48 +11,92 @@ extern "C" {
 /* These take len bytes from src and write them in encoded form to
  * dest (if dest != NULL), returning the number of bytes written. */
 
+/* dietlibc defines these in sys/cdefs.h, which is included from stddef.h */
+#ifndef __readmemsz__
+#define __readmemsz__(a,b)
+#endif
+
+#ifndef __writemem__
+#define __writemem__(a)
+#endif
+
 /* Needs len/3*4 bytes */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_uuencoded(char* dest,const char* src,size_t len);
+
 /* Needs len/3*4 bytes */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_base64(char* dest,const char* src,size_t len);
+
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_base64url(char* dest,const char* src,size_t len);
+
 /* Worst case: len*3 */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_quotedprintable(char* dest,const char* src,size_t len);
+
 /* Worst case: len*3 */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_quotedprintable2(char* dest,const char* src,size_t len,const char* escapeme);
+
 /* Worst case: len*3 */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_urlencoded(char* dest,const char* src,size_t len);
+
 /* Worst case: len*3 */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_urlencoded2(char* dest,const char* src,size_t len,const char* escapeme);
+
 /* Worst case: len*2 */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_yenc(char* dest,const char* src,size_t len);
+
 /* Needs len*2 bytes */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_hexdump(char* dest,const char* src,size_t len);
+
 /* Change '<' to '&lt;' and '&' to '&amp;' and '\n' to '<br>'; worst case: len*5 */
 /* This is meant for outputting text that goes between tags */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_html(char* dest,const char* src,size_t len);
+
 /* Change '<' to '&lt;' and '&' to '&amp;' and '"' to '&quot;'; worst case: len*6 */
 /* This is meant for outputting text that goes in a tag argument between double quotes*/
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_html_tagarg(char* dest,const char* src,size_t len);
+
 /* Change '<' to '&lt;' and '&' to '&amp;'; worst case: len*5 */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_xml(char* dest,const char* src,size_t len);
 
 /* Change '\' to "\\", '\n' to "\n", ^A to "\x01" etc; worst case: len*4 */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_cescape(char* dest,const char* src,size_t len);
+
 /* Worst case: len*4 */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_cescape2(char* dest,const char* src,size_t len,const char* escapeme);
+
 /* Fold whitespace to '_'; this is great for writing fields with
  * white spaces to a log file and still allow awk to do log analysis */
 /* Worst case: same size */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_foldwhitespace(char* dest,const char* src,size_t len);
+
 /* Worst case: len*3 */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_ldapescape(char* dest,const char* src,size_t len);
+
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_ldapescape2(char* dest,const char* src,size_t len,const char* escapeme);
+
 /* Encode JSON string from UTF-8; will backslash-escape the bare minimum.
- * Will not verify that the input is valid UTF-8!
+ * Invalid UTF-8 in input will output as valid UTF-8 for each byte
  * Worst case: len*6 */
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_jsonescape(char* dest,const char* src,size_t len);
 
+__writemem__(1) __readmemsz__(2,3)
 size_t fmt_base85(char* dest,const char* src,size_t len);
 
 /* These read one line from src, decode it, and write the result to
@@ -72,8 +116,13 @@ size_t scan_html(const char* src,char* dest,size_t* destlen);
 /* decodes all html5-standardized &foo; escapes, but leaves all tags
  * alone */
 size_t scan_html_tagarg(const char* src,char* dest,size_t* destlen);
+/* Decodes escaped C string text, turning e.g. \n into newline */
 size_t scan_cescape(const char* src,char* dest,size_t* destlen);
+/* Decodes escaped LDIF text, turning e.g. \5C into \ */
 size_t scan_ldapescape(const char* src,char* dest,size_t* destlen);
+/* Decodes escaped JSON strings (like \"\r\n\u0013), turns escaped
+ * surrogate pairs into UTF-8. Expects input to be valid UTF-8. Ends at
+ * \0 or unescaped double quote. */
 size_t scan_jsonescape(const char* src,char* dest,size_t* destlen);
 
 size_t scan_base85(const char* src,char* dest,size_t* destlen);

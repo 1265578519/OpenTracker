@@ -1,5 +1,5 @@
-#ifndef _CAS_H
-#define _CAS_H
+#ifndef CAS_H
+#define CAS_H
 
 #include <stddef.h>
 

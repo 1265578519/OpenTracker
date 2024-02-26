@@ -1,15 +1,15 @@
 #include <sys/types.h>
-#include <unistd.h>
-#ifdef __MINGW32__
+#ifdef _WIN32
 #include <windows.h>
 #else
+#include <unistd.h>
 #include <sys/mman.h>
-#endif
 #include "open.h"
+#endif
 #include "mmap.h"
 
 extern const char* mmap_read(const char* filename,size_t * filesize) {
-#ifdef __MINGW32__
+#ifdef _WIN32
   HANDLE fd,m;
   char* map;
   fd=CreateFile(filename,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,0,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);

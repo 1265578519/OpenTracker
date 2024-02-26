@@ -10,7 +10,7 @@
 #include "uint16.h"
 #include "uint32.h"
 
-int socket_connect4(int s,const char *ip,uint16 port) {
+int socket_connect4(int s,const char ip[4],uint16 port) {
   struct sockaddr_in si;
   byte_zero(&si,sizeof(si));
   si.sin_family=AF_INET;

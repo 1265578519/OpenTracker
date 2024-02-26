@@ -16,3 +16,16 @@ int imult32(int32 a,int32 b,int32* c) {
 }
 
 #endif
+
+#ifdef UNITTEST
+#include <assert.h>
+
+int main() {
+  int32 b;
+
+  assert(imult32(0x40000000,2,&b)==0);
+  assert(imult32(-0x40000000,2,&b)==1 && b==-0x80000000ll);
+  assert(imult32(0x3fffffff,2,&b)==1 && b==0x7ffffffe);
+  return 0;
+}
+#endif

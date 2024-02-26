@@ -3,7 +3,7 @@
 #include "fmt.h"
 #include "socket.h"
 
-size_t fmt_ip6if(char* dest,const char* ip,uint32 scope_id) {
+size_t fmt_ip6if(char* dest,const char ip[16],uint32 scope_id) {
   size_t i=fmt_ip6(dest,ip);
   if (scope_id) {
     if (dest) {

@@ -2,7 +2,7 @@
 .SH NAME
 buffer_mmapread \- create read-only memory-mapped file buffer
 .SH SYNTAX
-.B #include <buffer.h>
+.B #include <libowfat/buffer.h>
 
 int \fBbuffer_mmapread\fR(buffer &\fIb\fR,const char* \fIfilename\fR);
 .SH DESCRIPTION
@@ -11,8 +11,8 @@ that the contents of the file can be read from it.  Using mmap is more
 efficient than reading through a real buffer, but you have to call
 buffer_close to unmap the memory in the end.
 .SH EXAMPLE
-  #include <buffer.h>
-  #include <open.h>
+  #include <libowfat/buffer.h>
+  #include <libowfat/open.h>
 
   buffer input;
   char x;

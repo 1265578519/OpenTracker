@@ -58,7 +58,7 @@ void cdb_init(struct cdb *c,int64 fd) {
 #endif
 }
 
-int cdb_read(struct cdb *c,unsigned char *buf,unsigned long len,uint32 pos) {
+int cdb_read(struct cdb *c, unsigned char *buf, size_t len, uint32 pos) {
   if (c->map) {
     if ((pos > c->size) || (c->size - pos < len)) goto FORMAT;
     byte_copy(buf,len,c->map + pos);
@@ -96,7 +96,7 @@ int cdb_read(struct cdb *c,unsigned char *buf,unsigned long len,uint32 pos) {
   return -1;
 }
 
-static int match(struct cdb *c,const unsigned char *key,unsigned long int len,uint32 pos) {
+static int match(struct cdb * restrict c, const unsigned char * restrict key, size_t len, uint32 pos) {
   unsigned char buf[32];
   unsigned long n;
 
@@ -112,7 +112,7 @@ static int match(struct cdb *c,const unsigned char *key,unsigned long int len,ui
   return 1;
 }
 
-int cdb_findnext(struct cdb *c,const unsigned char *key,unsigned long int len) {
+int cdb_findnext(struct cdb *c, const unsigned char *key, size_t len) {
   unsigned char buf[8];
   uint32 pos;
   uint32 u;
@@ -156,7 +156,7 @@ int cdb_findnext(struct cdb *c,const unsigned char *key,unsigned long int len) {
   return 0;
 }
 
-int cdb_find(struct cdb *c,const unsigned char *key,unsigned long int len) {
+int cdb_find(struct cdb *c, const unsigned char *key, size_t len) {
   cdb_findstart(c);
   return cdb_findnext(c,key,len);
 }

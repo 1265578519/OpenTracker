@@ -2,18 +2,17 @@
 #define _ATFILE_SOURCE
 
 #include <sys/types.h>
-#include <unistd.h>
-#ifndef __MINGW32__
+#ifndef _WIN32
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/mman.h>
-#endif
 #include "open.h"
+#endif
 #include "mmap.h"
 
 extern const char* mmap_readat(const char* filename,size_t * filesize,int dirfd) {
-#ifdef __MINGW32__
+#ifdef _WIN32
   return 0;
 #else
   int fd=openat(dirfd,filename,O_RDONLY);

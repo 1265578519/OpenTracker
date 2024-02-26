@@ -13,11 +13,19 @@ LIBS=byte.a fmt.a scan.a str.a uint.a open.a stralloc.a unix.a socket.a \
 buffer.a mmap.a taia.a tai.a dns.a case.a mult.a array.a io.a \
 textcode.a cdb.a critbit.a
 
-all: ent $(LIBS) libowfat.a libsocket t
+all: headers ent $(LIBS) libowfat.a libsocket t
+
+pic pie:
+	$(MAKE) CC="gcc -fPIC" LDFLAGS="-fpie"
+
+picx32 piex32:
+	$(MAKE) CC="gcc -mx32 -fPIC" LDFLAGS="-fpie"
 
 CROSS=
 #CROSS=i686-mingw-
-CC=gcc
+CC?=gcc
+AR?=ar
+RANLIB?=ranlib
 CCC=$(CROSS)$(CC)
 WERROR=
 WARN=-W -Wall -Wextra $(WERROR)
@@ -166,8 +174,8 @@ $(TAIA_OBJS) $(TAI_OBJS) $(CASE_OBJS) $(ARRAY_OBJS) $(MULT_OBJS) \
 $(IO_OBJS) $(CDB_OBJS) $(CRITBIT_OBJS)
 
 libowfat.a: $(ALL_OBJS)
-	$(CROSS)ar cru $@ $(ALL_OBJS)
-	-$(CROSS)ranlib $@
+	$(CROSS)$(AR) cru $@ $(ALL_OBJS)
+	-$(CROSS)$(RANLIB) $@
 
 CFLAGS+=-I.
 CFLAGS_OPT+=-I.
@@ -179,8 +187,8 @@ CFLAGS_OPT+=-I.
 	$(DIET) $(CCC) -c $< $(CFLAGS)
 
 %.a:
-	$(CROSS)ar cru $@ $^
-	-$(CROSS)ranlib $@
+	$(CROSS)$(AR) cru $@ $^
+	-$(CROSS)$(RANLIB) $@
 
 t.o: t.c fmt.h scan.h str.h uint16.h uint32.h stralloc.h socket.h \
   buffer.h ip4.h ip6.h byte.h mmap.h open.h textcode.h dns.h iopause.h \
@@ -189,24 +197,32 @@ t.o: t.c fmt.h scan.h str.h uint16.h uint32.h stralloc.h socket.h \
   havesigio.h CAS.h
 
 t: t.o libowfat.a libsocket
-	$(DIET) $(CCC) -g -o $@ t.o libowfat.a `cat libsocket` -lpthread
+	$(DIET) $(CCC) -g -o $@ t.o libowfat.a `cat libsocket` -lpthread $(LDFLAGS)
 
 .PHONY: all clean tar install rename
 clean:
-	rm -f *.o *.a *.da *.bbg *.bb core t haveip6.h haven2i.h \
+	rm -f *.o *.obj *.a *.lib *.da *.bbg *.bb core t haveip6.h haven2i.h \
 havesl.h haveinline.h iopause.h select.h havekqueue.h haveepoll.h \
 libepoll havesigio.h havebsdsf.h havesendfile.h havescope.h havedevpoll.h \
-dep libsocket havealloca.h haveuint128.h entities.h ent havepread.h
+dep libsocket havealloca.h haveuint128.h entities.h ent havepread.h haveaccept4.h \
+*.gcda *.gcno
 
 INCLUDES=buffer.h byte.h fmt.h ip4.h ip6.h mmap.h scan.h socket.h str.h stralloc.h \
 uint16.h uint32.h uint64.h open.h textcode.h tai.h taia.h dns.h iopause.h case.h \
 openreadclose.h readclose.h ndelay.h array.h io.h safemult.h iob.h havealloca.h \
 errmsg.h cdb.h cdb_make.h rangecheck.h iarray.h va_narg.h isset.h \
-compiletimeassert.h critbit.h
+compiletimeassert.h critbit.h parse.h compiler.h
+
+libowfat:
+	-mkdir libowfat
+
+.PHONY: headers
+headers: libowfat $(INCLUDES)
+	ln -f $(INCLUDES) libowfat/
 
 install-inc:
-	install -d $(DESTDIR)$(INCLUDEDIR)
-	install -m 644 $(INCLUDES) $(DESTDIR)$(INCLUDEDIR)
+	install -d $(DESTDIR)$(INCLUDEDIR)/libowfat
+	install -m 644 $(INCLUDES) $(DESTDIR)$(INCLUDEDIR)/libowfat
 
 install-lib: libowfat.a
 	install -d $(DESTDIR)$(LIBDIR)
@@ -216,10 +232,12 @@ install-man:
 	install -d $(DESTDIR)$(MAN3DIR)
 	install -m 644 $(wildcard */*.3) $(DESTDIR)$(MAN3DIR)
 
-install: install-inc install-man install-lib
+install: headers install-inc install-man install-lib
 
 uninstall:
 	rm -f $(patsubst %.h,$(INCLUDEDIR)/%.h,$(INCLUDES))
+	rm -f $(INCLUDEDIR)/libowfat/*.h
+	test -d $(INCLUDEDIR)/libowfat && rmdir $(INCLUDEDIR)/libowfat
 	rm -f $(patsubst %.3,$(MAN3DIR)/%.3,$(notdir $(wildcard */*.3)))
 	rm -f $(LIBDIR)/libowfat.a
 
@@ -319,6 +337,11 @@ select.h: select.h1 select.h2 trysysel.c
 	if $(DIET) $(CCC) $(CFLAGS) -c trysysel.c >/dev/null 2>&1; then cp select.h2 select.h; else cp select.h1 select.h; fi
 	-rm -f trysysel.o
 
+haveaccept4.h: tryaccept4.c
+	-rm -f $@
+	if $(DIET) $(CCC) $(CFLAGS) -c tryaccept4.c >/dev/null 2>&1; then echo "#define HAVE_ACCEPT4"; fi > $@
+	-rm -f tryaccept4.o
+
 libsocket: trysocket.c
 	if $(DIET) $(CCC) $(CFLAGS) -o trysocket trysocket.c >/dev/null 2>&1; then echo ""; else \
 	if $(DIET) $(CCC) $(CFLAGS) -o trysocket trysocket.c -lsocket >/dev/null 2>&1; then echo "-lsocket"; else \
@@ -332,22 +355,24 @@ libsocket: trysocket.c
 socket_accept6.o socket_bind6.o socket_connect6.o socket_local6.o \
 socket_mchopcount6.o socket_mcjoin6.o socket_mcleave6.o socket_mcloop6.o \
 socket_recv6.o socket_remote6.o socket_sctp6b.o socket_send6.o \
-socket_tcp6b.o socket_tcp6.o socket_udp6.o: haveip6.h
+socket_tcp6b.o socket_tcp6.o socket_udp6.o socket_accept6_flags.o: haveip6.h
+
+socket_accept4_flags.o socket_accept6_flags.o: haveaccept4.h
 
 socket_accept6.o socket_connect6.o socket_local6.o socket_recv6.o \
-socket_remote6.o socket_send6.o: havescope.h
+socket_remote6.o socket_send6.o socket_accept6_flags.o: havescope.h
 
 socket_getifidx.o socket_getifname.o: haven2i.h
 
 socket_accept4.o socket_accept6.o socket_connected.o socket_local4.o \
 socket_local6.o socket_recv4.o socket_recv6.o socket_remote4.o \
-socket_remote6.o: havesl.h
+socket_remote6.o socket_accept4_flags.o socket_accept6_flags.o: havesl.h
 
 dns_nd6.o fmt_xlong.o scan_xlong.o fmt_ip6_flat.o $(TEXTCODE_OBJS): haveinline.h
 
 iob_send.o scan_ip6if.o: havealloca.h
 
-dep: haveip6.h haven2i.h havesl.h haveinline.h iopause.h select.h haveepoll.h havekqueue.h havedevpoll.h havescope.h havesigio.h havebsdsf.h havesendfile.h havealloca.h haveuint128.h entities.h havepread.h
+dep: haveip6.h haven2i.h havesl.h haveinline.h iopause.h select.h haveepoll.h havekqueue.h havedevpoll.h havescope.h havesigio.h havebsdsf.h havesendfile.h havealloca.h haveuint128.h entities.h havepread.h haveaccept4.h
 	$(CC) -I. -MM `ls */*.c | grep -v test` t.c | sed -e 's@ \./@ @g' > dep
 
 libdep:
@@ -366,7 +391,7 @@ windoze:
 	$(MAKE) DIET= CROSS=i686-mingw32-
 
 windoze64:
-	$(MAKE) DIET= CROSS=x86_64-mingw32-
+	$(MAKE) DIET= CROSS=x86_64-w64-mingw32-
 
 update:
 	dl -n http://www.w3.org/TR/html5/entities.json
@@ -375,3 +400,26 @@ entities.h: entities.json ent
 	./ent
 
 scan_html.o: entities.h
+
+sa1:
+	$(MAKE) clean
+	scan-build $(MAKE) DIET= -j8
+
+sa2:
+	$(MAKE) clean
+	$(MAKE) DIET= CC="gcc -fanalyzer" -j8
+
+UNITTESTS=$(shell grep -l UNITTEST */*.c)
+TESTS=$(patsubst %.c,test_%,$(notdir $(UNITTESTS)))
+
+test_%: %.c
+	$(CC) -g -o $@ $< -DUNITTEST -I. -fprofile-arcs -ftest-coverage $(LDFLAGS)
+	./$@
+	rm -f $@
+
+test_scan_html: entities.h
+
+check2: haveuint128.h haveinline.h entities.h
+	for i in $(UNITTESTS); do $(CC) -Wall -fprofile-arcs -ftest-coverage -g -o t -DUNITTEST $$i -I. $(LDFLAGS) && ./t || echo FAIL $$i ; done
+
+check: haveuint128.h haveinline.h $(TESTS)

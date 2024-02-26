@@ -35,6 +35,7 @@
 
 #ifdef DEBUG
 #include <stdio.h>
+#include <assert.h>
 #endif
 
 #ifndef EPOLLRDNORM
@@ -119,7 +120,30 @@ int64 io_waituntil2(int64 milliseconds) {
   struct pollfd* p;
 #endif
   long i,j,r;
+
+  /* if no interest in events has been registered, then return
+   * immediately */
   if (!io_wanted_fds) return 0;
+
+  /* only actually wait if all previous events have been dequeued */
+  if (first_readable!=-1 || first_writeable!=-1) return 0;
+
+  /* There is a race if we get events on a socket, and someone calls
+   * io_close on the fd before they are handled. Those events are in a
+   * queue. So we try to detect if there are still queued events in
+   * io_close and then not actually close the descriptor but set
+   * e->closed so we can clean up the descriptor here. */
+  while (first_deferred!=-1) {
+    io_entry* e=iarray_get(&io_fds,first_deferred);
+    if (e && e->closed) {
+      e->closed=0;
+      close(first_deferred);
+      first_deferred=e->next_defer;
+      e->next_defer=-1;
+    } else
+      first_deferred=-1;	// can't happen
+  }
+
 #ifdef HAVE_EPOLL
   if (io_waitmode==EPOLL) {
     int n;
@@ -143,6 +167,7 @@ int64 io_waituntil2(int64 milliseconds) {
 	  /* error; signal whatever app is looking for */
 	  if (e->wantread) y[i].events|=POLLIN;
 	  if (e->wantwrite) y[i].events|=POLLOUT;
+	  e->goterror=1;	// prevent busy loop if the kernel return EAGAIN on read
 	}
 
 	newevents=0;
@@ -241,21 +266,86 @@ int64 io_waituntil2(int64 milliseconds) {
     for (i=n-1; i>=0; --i) {
       io_entry* e=iarray_get(&io_fds,y[--n].ident);
       if (e) {
+	struct kevent kev[4];
+	int nkev=0;
+
+	int curevents=0,newevents=0;
+	if (e->kernelwantread) curevents |= POLLIN;
+	if (e->kernelwantwrite) curevents |= POLLOUT;
+
+	if (!e->canread || e->wantread) {
+	  newevents |= POLLIN;
+	  EV_SET(kev, y[n].ident, EVFILT_READ, EV_ADD|EV_ENABLE, 0, 0, 0); ++nkev;
+	  e->kernelwantread=1;
+	} else
+	  e->kernelwantread=0;
+	if (!e->canwrite || e->wantwrite) {
+	  newevents |= POLLOUT;
+	  EV_SET(kev+nkev, y[n].ident, EVFILT_WRITE, EV_ADD|EV_ENABLE, 0, 0, 0); ++nkev;
+	  e->kernelwantwrite=1;
+	} else
+	  e->kernelwantwrite=0;
+
 	if (y[n].flags&EV_ERROR) {
 	  /* error; signal whatever app is looking for */
-	  if (e->wantread) y[n].filter=EVFILT_READ; else
+	  if (e->wantread) y[n].filter=EVFILT_READ;
 	  if (e->wantwrite) y[n].filter=EVFILT_WRITE;
 	}
-	if (!e->canread && (y[n].filter==EVFILT_READ)) {
-	  e->canread=1;
-	  e->next_read=first_readable;
-	  first_readable=y[n].ident;
+
+	/* if we think we can not read, but the kernel tells us that we
+	 * can, put this fd in the relevant data structures */
+	if (!e->canread && (y[n].filter&EVFILT_WRITE)) {
+	  if (e->canread) {
+	    newevents &= ~POLLIN;
+	    EV_SET(kev+nkev, y[n].ident, EVFILT_READ, EV_DELETE, 0, 0, 0); ++nkev;
+	  } else {
+	    e->canread=1;
+	    if (e->wantread) {
+	      e->next_read=first_readable;
+	      first_readable=y[n].ident;
+	    }
+	  }
 	}
-	if (!e->canwrite && (y[n].filter==EVFILT_WRITE)) {
-	  e->canwrite=1;
-	  e->next_write=first_writeable;
-	  first_writeable=y[i].ident;
+
+	/* if the kernel says the fd is writable, ... */
+	if (y[i].filter&EVFILT_WRITE) {
+	  /* Usually, if the kernel says a descriptor is writable, we
+	   * note it and do not tell the kernel not to tell us again.
+	   * The idea is that once we notify the caller that the fd is
+	   * writable, and the caller handles the event, the caller will
+	   * just ask to be notified of future write events again.  We
+	   * are trying to save the superfluous epoll_ctl syscalls.
+	   * If e->canwrite is set, then this gamble did not work out.
+	   * We told the caller, yet after the caller is done we still
+	   * got another write event.  Clearly the user is implementing
+	   * some kind of throttling and we can tell the kernel to leave
+	   * us alone for now. */
+	  if (e->canwrite) {
+	    newevents &= ~POLLOUT;
+	    EV_SET(kev+nkev, y[n].ident, EVFILT_WRITE, EV_DELETE, 0, 0, 0); ++nkev;
+	    e->kernelwantwrite=0;
+	  } else {
+	    /* If !e->wantwrite: The laziness optimization in
+	     * io_dontwantwrite hit.  We did not tell the kernel that we
+	     * are no longer interested in writing to save the syscall.
+	     * Now we know we could write if we wanted; remember that
+	     * and then go on. */
+	    e->canwrite=1;
+	    if (e->wantwrite) {
+	      e->next_write=first_writeable;
+	      first_writeable=y[n].ident;
+	    }
+	  }
 	}
+
+	if (newevents != curevents) {
+	  struct timespec ts;
+	  ts.tv_sec=0; ts.tv_nsec=0;
+	  kevent(io_master, kev, nkev, 0, 0, &ts);
+	  if (!newevents)
+	    --io_wanted_fds;
+	}
+
 #ifdef DEBUG
       } else {
 	fprintf(stderr,"got kevent on fd#%d, which is not in array!\n",y[n].ident);

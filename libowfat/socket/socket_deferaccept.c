@@ -1,6 +1,7 @@
 #include "socket.h"
 
 #include <sys/types.h>
+#include <string.h>
 #ifndef __MINGW32__
 #include <sys/socket.h>
 #include <netinet/in.h>

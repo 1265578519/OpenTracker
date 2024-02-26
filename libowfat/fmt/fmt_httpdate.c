@@ -11,7 +11,13 @@ static unsigned int fmt_2digits(char* dest,int i) {
 size_t fmt_httpdate(char* dest,time_t t) {
   static const char days[] = "SunMonTueWedThuFriSat";
   static const char months[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
+#ifdef _WIN32
+  struct tm tmp;
+  struct tm* x=&tmp;
+  gmtime_s(&tmp,&t);	// can't recover from when this fails
+#else
   struct tm* x=gmtime(&t);
+#endif
   size_t i;
 
   if (dest==0) return 29;

@@ -2,9 +2,9 @@
 .SH NAME
 buffer_feed \- low-level component of buffer_get
 .SH SYNTAX
-.B #include <buffer.h>
+.B #include <libowfat/buffer.h>
 
-int \fBbuffer_feed\fP(buffer* \fIb\fR);
+ssize_t \fBbuffer_feed\fP(buffer* \fIb\fR);
 .SH DESCRIPTION
 If the string is nonempty, buffer_feed returns the length of the string.
 If the string is empty, buffer_feed uses the read operation to feed data

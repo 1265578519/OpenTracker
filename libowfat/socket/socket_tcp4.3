@@ -2,7 +2,7 @@
 .SH NAME
 socket_tcp4 \- create a non-blocking TCP/IP stream socket
 .SH SYNTAX
-.B #include <socket.h>
+.B #include <libowfat/socket.h>
 
 int \fBsocket_tcp4\fP();
 .SH DESCRIPTION
@@ -12,7 +12,7 @@ socket_tcp4 returns -1, setting errno appropriately, without allocating
 any resources.
 
 .SH EXAMPLE
-  #include <socket.h>
+  #include <libowfat/socket.h>
 
   int \fIs\fR;
   char \fIip\fR[4];

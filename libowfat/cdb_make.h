@@ -2,9 +2,9 @@
 #ifndef CDB_MAKE_H
 #define CDB_MAKE_H
 
-#include "buffer.h"
-#include "uint64.h"
-#include "uint32.h"
+#include <libowfat/buffer.h>
+#include <libowfat/uint64.h>
+#include <libowfat/uint32.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,9 +35,9 @@ struct cdb_make {
 } ;
 
 extern int cdb_make_start(struct cdb_make *,int64);
-extern int cdb_make_addbegin(struct cdb_make *,unsigned long int,unsigned long int);
-extern int cdb_make_addend(struct cdb_make *,unsigned long int,unsigned long int,uint32);
-extern int cdb_make_add(struct cdb_make *,const unsigned char *,unsigned long int,const unsigned char *,unsigned long int);
+extern int cdb_make_addbegin(struct cdb_make *, size_t, size_t);
+extern int cdb_make_addend(struct cdb_make *, size_t, size_t, uint32);
+extern int cdb_make_add(struct cdb_make *, const unsigned char *, size_t, const unsigned char *, size_t);
 extern int cdb_make_finish(struct cdb_make *);
 
 #ifdef __cplusplus

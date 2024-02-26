@@ -119,15 +119,17 @@ int64 iob_send(int64 s,io_batch* b) {
 #include <unistd.h>
 #include <string.h>
 #include "havealloca.h"
+#include "io_internal.h"
 #include "iob_internal.h"
 
 int64 iob_send(int64 s,io_batch* b) {
   iob_entry* e,* last;
+  io_entry* E;
   struct iovec* v;
   uint64 total;
   int64 sent;
-  long i;
-  long headers;
+  size_t i;
+  size_t headers;
 #ifdef MSG_MORE
   int docork;
 #endif
@@ -137,8 +139,13 @@ int64 iob_send(int64 s,io_batch* b) {
 #ifdef TCP_CORK
   int corked=0;
 #endif
+#ifdef MSG_ZEROCOPY
+  size_t sum=0;
+#endif
 
   if (b->bytesleft==0) return 0;
+  E=iarray_get(&io_fds,s);
+  if (!E) { errno=EBADF; return -3; }
   last=(iob_entry*)(((char*)array_start(&b->b))+array_bytes(&b->b));
   v=alloca(b->bufs*sizeof(struct iovec));
   total=0;
@@ -154,10 +161,15 @@ int64 iob_send(int64 s,io_batch* b) {
       if (e[i].type==FROMFILE) break;
       v[i].iov_base=(char*)(e[i].buf+e[i].offset);
       v[i].iov_len=e[i].n;
+#ifdef MSG_ZEROCOPY
+      if (sum + v[i].iov_len > sum) sum += v[i].iov_len; else sum=-1;
+#endif
     }
     headers=i;
 #ifdef HAVE_BSDSENDFILE
-    if (e[i].type==FROMFILE) {
+    if (e+i<last && e[i].type==FROMFILE) {
+
+#ifdef DEBUGONLINUX
       off_t sbytes;
       struct sf_hdtr hdr;
       int r;
@@ -179,6 +191,9 @@ int64 iob_send(int64 s,io_batch* b) {
 	}
       } else
 	sent=-3;
+
+#endif // DEBUGONLINUX
+
     } else {
       if (headers==1)	/* cosmetics for strace */
 	sent=write(s,v[0].iov_base,v[0].iov_len);
@@ -210,20 +225,77 @@ eagain:
       corked=1;
     }
     if (headers) {
-      if (docork<0) {	/* write+writev */
+      int ZEROCOPY=0;
+#ifdef MSG_ZEROCOPY
+      static int nozerocopy;
+      int dozerocopy=1;
+#else
+      const int nozerocopy=0;
+      const int dozerocopy=1;
+#endif
+      if (nozerocopy && dozerocopy==0 && docork<0) {	/* write+writev */
 	if (headers==1)	/* cosmetics for strace */
 	  sent=write(s,v[0].iov_base,v[0].iov_len);
 	else
 	  sent=writev(s,v,headers);
       } else {
+#if defined(MSG_ZEROCOPY) && defined(SO_ZEROCOPY)
+	  if (!nozerocopy && sum>=8*1024) {
+	    /* MSG_ZEROCOPY has page table management overhead,
+	     * it only pays off after 8k or so */
+	    if (E->zerocopy==0) {
+	      if (setsockopt(s, SOL_SOCKET, SO_ZEROCOPY, (int[]){ 1 },sizeof(int)) == 0) {
+		E->zerocopy=1;
+		ZEROCOPY=MSG_ZEROCOPY;
+	      } else
+		nozerocopy=1;
+	    } else
+	      ZEROCOPY=MSG_ZEROCOPY;
+	  }
+#endif
 	if (headers==1)	/* cosmetics for strace */
-	  sent=sendto(s,v[0].iov_base,v[0].iov_len,MSG_MORE, NULL, 0);
+	  sent=sendto(s, v[0].iov_base, v[0].iov_len, MSG_MORE|ZEROCOPY, NULL, 0);
 	else {
 	  struct msghdr msg;
 	  memset(&msg,0,sizeof(msg));
 	  msg.msg_iov=v;
 	  msg.msg_iovlen=headers;
-	  sent=sendmsg(s,&msg,MSG_MORE);
+	  /* Difficulty: sendmsg has a built-in limit on the cmsgdata on
+	   * Linux, net.core.optmem_max with a 20k default size. So we
+	   * need to do a little song and dance here to not trigger it */
+	  if (headers > 50) {
+	    size_t skip=0, totalsent=0;
+	    for (skip=0; skip<headers; skip+=50) {
+	      size_t i,n;
+	      int64 l=0;
+	      n = headers-skip; if (n > 50) n=50;
+	      for (i=0; i<n; ++i) l += v[skip+i].iov_len;
+//	      printf("writing %d records from offset %d, %d bytes\n", skip, n, l);
+	      msg.msg_iov=v + skip;
+	      msg.msg_iovlen=n;
+	      sent=sendmsg(s,&msg,MSG_MORE|ZEROCOPY);
+	      if (sent > 0) totalsent += sent;
+	      if (sent == l) continue;	// we sent as much as we wanted, go for next batch
+	      if (sent >= 0) {	// we wrote something but not the whole batch
+		sent = totalsent;
+		break;
+	      }
+	      // we got an error, maybe EAGAIN
+	      if (errno==EAGAIN) {
+		if (totalsent == 0) {
+		  io_eagain_write(s);
+		  return -1;
+		}
+		// fall through
+	      }
+	      // actual error
+	      break;
+	    }
+	    // if we get here, we wrote it all or we got an EAGAIN after
+	    // writing something. Treat as regular partial write.
+	    sent = totalsent;
+	  } else
+	    sent=sendmsg(s,&msg,MSG_MORE|ZEROCOPY);
 	}
       }
       if (sent==-1) {
@@ -282,6 +354,7 @@ eagain:
 	}
       }
       io_eagain_write(s);
+      return total;
     } else break;
   }
 abort:

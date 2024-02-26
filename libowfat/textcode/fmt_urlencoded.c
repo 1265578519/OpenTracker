@@ -4,7 +4,7 @@
 #include "haveinline.h"
 
 static inline int issafe(unsigned char c) {
-  const char safe[] = "$/.=~";
+  const char safe[] = "$/.=~-_";
   return ((c>='A' && c<='Z') ||
 	  (c>='a' && c<='z') ||
 	  (c>='0' && c<='9') ||

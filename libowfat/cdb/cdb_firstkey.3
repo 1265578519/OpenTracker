@@ -2,11 +2,11 @@
 .SH NAME
 cdb_firstkey \- find first physical record in constant database
 .SH SYNTAX
-.B #include <cdb.h>
+.B #include <libowfat/cdb.h>
 .br
-.B #include <uint32.h>
+.B #include <libowfat/uint32.h>
 
-int cdb_firstkey(struct cdb *\fIc\fR,uint32 *\fIkpos\fR);
+int cdb_firstkey(struct cdb *\fIc\fR, uint32 *\fIkpos\fR);
 
 .SH DESCRIPTION
 \fBcdb_firstkey\fR finds the physically first record in the constant

@@ -2,7 +2,7 @@
 .SH NAME
 mmap_shared \- memory map a file for reading and writing
 .SH SYNTAX
-.B #include <mmap.h>
+.B #include <libowfat/mmap.h>
 
 char* \fBmmap_shared\fP(const char* \fIfilename\fR,size_t* \fIfilesize\fR);
 .SH DESCRIPTION
@@ -23,4 +23,4 @@ To write changes to disk immediately, you can use msync from
 
 If the file could not be opened or mapped, (void*)0 is returned.
 .SH "SEE ALSO"
-mmap_unmap(3), msync(2)
+msync(2), mmap_unmap(3), mmap_private(3), mmap_read(3), mmap_readat(3)

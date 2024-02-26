@@ -2,7 +2,7 @@
 .SH NAME
 open_append \- open a file for appending
 .SH SYNTAX
-.B #include <open.h>
+.B #include <libowfat/open.h>
 
 int \fBopen_append\fP(const char *\fIfilename\fR);
 .SH DESCRIPTION
@@ -15,4 +15,4 @@ All write operations will append after the last byte, regardless of
 previous calls to lseek(2) or other processes also appending to the
 same file.
 .SH "SEE ALSO"
-open(2)
+open(2), open_excl(3), open_read(3), open_rw(3), open_trunc(3), open_write(3), openreadclose(3), readclose(3), readclose_append(3)

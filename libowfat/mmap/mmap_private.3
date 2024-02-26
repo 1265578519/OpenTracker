@@ -2,11 +2,11 @@
 .SH NAME
 mmap_private \- memory map a file for reading and writing
 .SH SYNTAX
-.B #include <mmap.h>
+.B #include <libowfat/mmap.h>
 
 char* \fBmmap_private\fP(const char* \fIfilename\fR,size_t* \fIfilesize\fR);
 .SH DESCRIPTION
-mmap_private opens \fIfilename\fR for reading and writing, maps the
+mmap_private opens \fIfilename\fR for reading, maps the
 whole file into memory, closes the file, writes the length of the file
 to \fIfilesize\fR and returns a pointer to the mapped file.
 
@@ -19,4 +19,4 @@ It can also be manually unmapped by calling \fBmunmap\fR from
 
 If the file could not be opened or mapped, (void*)0 is returned.
 .SH "SEE ALSO"
-mmap_unmap(3)
+mmap_unmap(3), mmap_read(3), mmap_readat(3), mmap_shared(3)

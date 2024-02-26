@@ -2,17 +2,17 @@
 .SH NAME
 cdb_find \- look up a key in a constant database
 .SH SYNTAX
-.B #include <cdb.h>
+.B #include <libowfat/cdb.h>
 .br
-.B #include <uint32.h>
+.B #include <libowfat/uint32.h>
 
-int cdb_find(struct cdb *\fIc\fR,char *\fIkey\fR,unsigned long int \fIkeylen\fR);
+int cdb_find(struct cdb *\fIc\fR, char *\fIkey\fR, size_t \fIkeylen\fR);
 .br
 int cdb_datalen(struct cdb *\fIc\fR);
 .br
 int cdb_datapos(struct cdb *\fIc\fR);
 .br
-int cdb_findnext(struct cdb *\fIc\fR,char *\fIkey\fR,unsigned long int \fIkeylen\fR);
+int cdb_findnext(struct cdb *\fIc\fR, char *\fIkey\fR, size_t \fIkeylen\fR);
 
 .SH DESCRIPTION
 \fBcdb_find\fR looks for \fIkey\fR. If cdb_find returns 0, the database

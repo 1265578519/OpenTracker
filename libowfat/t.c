@@ -25,6 +25,8 @@
 #include "iarray.h"
 #include "critbit.h"
 #include <assert.h>
+#include "compiletimeassert.h"
+#include "parse.h"
 
 #include "CAS.h"
 
@@ -35,7 +37,9 @@
 
 // #define atomic_add(mem,val) asm volatile ("lock; add%z0 %1, %0": "+m" (mem): "ir" (val))
 
-static int64 writecb(int64 fd,const void* buf,uint64 n) {
+// compiletimeassert(sizeof(long) == 2);
+
+int64 writecb(int64 fd,const void* buf,uint64 n) {
   (void)fd;
   (void)buf;
   (void)n;
@@ -49,13 +53,13 @@ static int64 writecb(int64 fd,const void* buf,uint64 n) {
   return -1;
 }
 
-static int ret0(const char* s,void* foo) {
+int ret0(const char* s,void* foo) {
   (void)foo;
   assert(strcmp(s,"fnord")==0);
   return 0;
 }
 
-static int ret1(const char* s,void* foo) {
+int ret1(const char* s,void* foo) {
   static int i;
   (void)foo;
   switch (i) {
@@ -68,7 +72,103 @@ static int ret1(const char* s,void* foo) {
 }
 
 int main(int argc,char* argv[]) {
+  (void)argc;
+  (void)argv;
+
+  int64 pfd[2];
+  size_t i;
+  io_socketpair(pfd);
+  io_fd(pfd[0]);
+  io_fd(pfd[1]);
+  io_batch* b = iob_new(1024);
+  // first write 1024 blocks (to activate the splitting code path)
+  for (i=0; i<1024; ++i) {
+    if ((i%50) == 0) {
+      static char c = 0;
+      char* s = alloca(1);
+      *s = c;
+      iob_addbuf(b, s, 1);
+      ++c;
+    } else
+      iob_addbuf(b, "a", 1);
+  }
+  assert(iob_send(pfd[0], b) == 1024);
+  {
+    char buf[1024];
+    assert(read(pfd[1], buf, 1024) == 1024);
+    // drain the pipe
+  }
+
+  char boilerplate[]="Call me Ishmael. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time tozz get to sea as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the ship. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the ocean with me.";
+  // now try setting the socket to non-blocking and write more than
+  // fits, to check proper return value
+  io_nonblock(pfd[0]);
+  size_t total=0;
+  for (i=0; i<1024; ++i) {
+    if ((i%50) == 0) {
+      static char c = 0;
+      char* s = alloca(1);
+      *s = c;
+      iob_addbuf(b, s, 1);
+      total += 1;
+      ++c;
+    } else {
+      iob_addbuf(b, boilerplate, strlen(boilerplate));
+      total += strlen(boilerplate);
+    }
+  }
+  io_wantwrite(pfd[0]);
+  io_wantread(pfd[1]);
+  size_t totalread = 0;
+  size_t totalwrite = 0;
+  for (;;) {
+    io_wait();
+    int fd;
+    while ((fd = io_canwrite()) != -1) {
+//      printf("write event on fd %d\n", fd);
+      long r = iob_send(pfd[0], b);
+      if (r > 0) totalwrite += r;
+      if (r == 0)
+	io_dontwantwrite(pfd[0]);
+      printf("r = %ld (sum written %zu, total back size %zu)\n", r, totalwrite, total);
+    }
+    while ((fd = io_canread()) != -1) {
+      char buf[1024];
+      ssize_t r = read(fd, buf, sizeof buf);
+      if (r > 0) totalread += r;
+      if (r < (ssize_t)sizeof buf) io_eagain(fd);
+      if (r == 0 || totalread == total) {
+	printf("read %zu bytes total\n", totalread);
+	return totalread == total;
+      }
+    }
+  }
+
+#if 0
+  char buf[10];
+  buf[fmt_cescape(buf,"\003foo\xc0",5)]=0;
+  puts(buf);
+#endif
+#if 0
+  struct bytestream bs1 = BS_FROM_MEMBUF("fnord", 5);
+  struct bytestream bs2 = BS_FROM_BUFFER(buffer_0);
+#endif
+#if 0
+  compiletimeassert(sizeof(char) < sizeof(int));
+  io_wait();
+#endif
+#if 0
+  char buf[1024];
+  size_t n;
+
+  scan_base64("eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9",buf,&n);
+  write(1,buf,n); write(1,"\n",1);
+  scan_base64("eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ",buf,&n);
+  write(1,buf,n); write(1,"\n",1);
+#endif
+#if 0
   int s=socket_udp6();
+#endif
 #if 0
   char buf[100];
   assert(fmt_varint(buf,1)==1 && buf[0]==1);
@@ -111,15 +211,15 @@ int main(int argc,char* argv[]) {
   size_t l;
   unsigned char c;
   (void)writecb;
-  printf("%d\n",(c=scan_fromhex('.')));
   (void)argc;
   (void)argv;
-  assert(fmt_jsonescape(buf,"foo\nbar\\",8)==14 && byte_equal(buf,14,"foo\\u000abar\\\\"));
+  (void)c;
+  assert(fmt_jsonescape(buf,"foo\nbar\\",8)==10 && byte_equal(buf,10,"foo\\nbar\\\\"));
   memset(buf,0,sizeof(buf));
   assert(scan_jsonescape("foo\\u000abar\\\\",buf,&l)==14 && l==8 && byte_equal(buf,8,"foo\nbar\\"));
   memset(buf,0,sizeof(buf));
   /* example from the json spec: G clef U+1D11E encoded using UTF-16 surrogates*/
-  assert(scan_jsonescape("\\uD834\\uDD1Exyz",buf,&l)==15 && l==7 && byte_equal(buf,7,"\xf4\x8d\x84\x9exyz"));
+  assert(scan_jsonescape("\\uD834\\uDD1Exyz",buf,&l)==15 && l==7 && byte_equal(buf,7,"\xf0\x9d\x84\x9exyz"));
 
 /*
 	 1D11E -> 0001 1101 0001 0001 1110

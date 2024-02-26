@@ -2,11 +2,15 @@
 .SH NAME
 buffer_seek \- remove bytes from beginning of string in buffer
 .SH SYNTAX
-.B #include <buffer.h>
+.B #include <libowfat/buffer.h>
 
-void \fBbuffer_seek\fP(buffer* \fIb\fR,size_t \fIr\fR);
+ssize_t \fBbuffer_seek\fP(buffer* \fIb\fR,size_t \fIr\fR);
 .SH DESCRIPTION
 buffer_seek removes \fIr\fR bytes from the beginning of the string.
-\fIr\fR must be at most the current length of the string.
+
+\fIr\fR can not be larger than the maximum value that ssize_t can
+represent.
+.SH "RETURN VALUE"
+Returns r (or -1 on error).
 .SH "SEE ALSO"
 buffer_init(3), buffer_feed(3), buffer_peek(3), buffer_get(3), buffer(3)

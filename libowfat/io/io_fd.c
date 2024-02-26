@@ -48,8 +48,8 @@ int io_signum;
 sigset_t io_ss;
 #endif
 #if defined(HAVE_SIGIO)
-long alt_firstread;
-long alt_firstwrite;
+long alt_firstread, alt_firstwrite;
+long alt_curread, alt_curwrite;
 #endif
 
 /* put d on internal data structure, return 1 on success, 0 on error */
@@ -80,6 +80,7 @@ static io_entry* io_fd_internal(int64 d,int flags) {
   if (e->inuse) return e;
   byte_zero(e,sizeof(io_entry));
   e->inuse=1;
+  e->next_defer=-1;
 #ifdef __MINGW32__
   e->mh=0;
 #else
@@ -105,7 +106,7 @@ static io_entry* io_fd_internal(int64 d,int flags) {
     }
 #endif
 #if defined(HAVE_SIGIO)
-    alt_firstread=alt_firstwrite=-1;
+    alt_firstread=alt_firstwrite=alt_curread=alt_curwrite=-1;
     if (io_waitmode==UNDECIDED) {
       io_signum=SIGRTMIN+1;
       if (sigemptyset(&io_ss)==0 &&

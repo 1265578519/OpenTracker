@@ -12,3 +12,15 @@ size_t fmt_8longlong(char *dest,unsigned long long i) {
     }
   return len;
 }
+
+#ifdef UNITTEST
+#include <assert.h>
+#include <string.h>
+
+int main() {
+  char buf[100];
+  assert(fmt_8longlong(buf,0)==1 && !memcmp(buf,"0",1));
+  assert(fmt_8longlong(buf,0123456701234567)==15 && !memcmp(buf,"123456701234567",15));
+  return 0;
+}
+#endif

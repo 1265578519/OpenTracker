@@ -4,8 +4,8 @@
 
 /* Times with 1 attosecond precision */
 
-#include "tai.h"
-#include "uint32.h"
+#include <libowfat/tai.h>
+#include <libowfat/uint32.h>
 
 #ifdef __cplusplus
 extern "C" {

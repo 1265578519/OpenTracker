@@ -1,6 +1,6 @@
 /* this header file comes from libowfat, http://www.fefe.de/libowfat/ */
-#ifndef _ISSET_H
-#define _ISSET_H
+#ifndef ISSET_H
+#define ISSET_H
 
 /*
  How to check whether a preprocessor symbol is defined or not?

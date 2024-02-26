@@ -13,3 +13,19 @@ size_t fmt_asn1dertag(char* dest,unsigned long long l) {
   }
   return i;
 }
+
+#ifdef UNITTEST
+#include <assert.h>
+#include <string.h>
+
+char buf[100];
+void zap() { size_t i; for (i=0; i<sizeof(buf); ++i) buf[i]='_'; }
+
+int main() {
+  assert(fmt_asn1dertag(NULL,0)==1);
+  zap(); assert(fmt_asn1dertag(buf,0)==1 && !memcmp(buf,"\x00_",2));
+  assert(fmt_asn1dertag(NULL,0xc2)==2);
+  zap(); assert(fmt_asn1dertag(buf,0xc2)==2 && !memcmp(buf,"\x81\x42_",3));
+  return 0;
+}
+#endif

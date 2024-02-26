@@ -21,3 +21,6 @@ AIX: http://publib16.boulder.ibm.com/pseries/en_US/libs/commtrf2/send_file.htm
 Solaris 10: http://developers.sun.com/solaris/articles/event_completion.html
 
 Linux: vmsplice (not in main kernel right now)
+
+
+iob_send sendmsg path: cap iov, see https://sysctl-explorer.net/net/core/optmem_max/

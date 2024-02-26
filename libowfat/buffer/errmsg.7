@@ -1,0 +1,40 @@
+.TH errmsg 7
+.SH NAME
+errmsg \- print diagnostics and/or abort program
+.SH SYNTAX
+.B #include <libowfat/errmsg.h>
+
+  \fBerrmsg_iam\fP("my_program");    // or use argv[0]
+  \fBmsg\fP("entering phase 1");
+  \fBcarp\fP("there is a problem, but we'll soldier on");
+  \fBdie\fP(111,"fatal problem, program will abort");
+  \fBmsg\fP("failed to open ",filename," as expected");
+  \fBcarpsys\fP("failed to open ",filename);
+  \fBdiesys\fP(111,"error opening ",filename,", bailing out");
+
+.SH DESCRIPTION
+
+At the start of the program, call \fIerrmsg_iam\fP so the diagnostic messages
+will include the program name.
+
+\fImsg\fP will print to stdout (fd #1), \fIcarp\fP will print to stderr (fd #2), \fIdie\fP
+will print to stderr (fd #2) and then exit with the return code you
+specified.
+
+\fImsgsys\fP, \fIcarpsys\fP and \fIdiesys\fP will also include a string representation of
+the system error code in errno.
+
+By convention, fd #1 is for regular output and fd #2 is for error
+messages.
+
+These message are written directly to the corresponding file descriptor,
+without buffering. There is no need for flushing.
+
+.SH NOTE
+
+These functions do not synchronize with \fIbuffer_1\fP or \fIbuffer_2\fP.
+If you have pending output in a buffer, you need to flush manually first
+(see buffer_flush).
+
+.SH "SEE ALSO"
+buffer_flush(3)
