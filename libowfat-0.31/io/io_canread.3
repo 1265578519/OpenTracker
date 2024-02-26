@@ -1,0 +1,28 @@
+.TH io_canread 3
+.SH NAME
+io_canread \- return a file descriptor that can be read from
+.SH SYNTAX
+.B #include <io.h>
+
+int64 \fBio_canread\fP();
+.SH DESCRIPTION
+io_canread returns the next file descriptor that can be read from.
+You have to have used io_wantread() on the file descriptor earlier, and
+you have to have called io_wait() or io_waituntil().
+
+These functions then keep an internal data structure on which
+descriptors were reported readable by the operating system.
+
+Please note that there is no guarantee that there still is data that can
+be read from the descriptor, just that there was data when io_wait() or
+io_waituntil() were called.  Another process could have read the data
+before you.  Look at the result from io_tryread().
+
+If there are no more descriptors that you can write to without blocking,
+io_canwrite will return -1.  In this case you should call io_wait() or
+io_waituntil() again.
+
+You should use io_tryread(3) to read from the descriptor, not plain
+read(2).  If you use read(2) and you get EAGAIN, call io_eagain(3).
+.SH "SEE ALSO"
+io_wait(3), io_canwrite(3), io_eagain(3)

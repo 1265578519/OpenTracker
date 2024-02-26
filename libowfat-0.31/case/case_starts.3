@@ -1,0 +1,12 @@
+.TH case_starts 3
+.SH NAME
+case_starts \- compare prefixes of strings case-insensitively
+.SH SYNTAX
+.B #include <case.h>
+
+int \fBcase_starts\fP(const char* \fIa\fR,const char* \fIb\fR);
+.SH DESCRIPTION
+case_starts returns 1 if \fIb\fR is a prefix of \fIa\fR, 0 otherwise.
+For this comparison, 'A' == 'a', 'B' == 'b', ..., 'Z' == 'z'.
+.SH "SEE ALSO"
+str_start(3)

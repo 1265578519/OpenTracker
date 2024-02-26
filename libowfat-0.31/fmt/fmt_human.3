@@ -1,0 +1,22 @@
+.TH fmt_human 3
+.SH NAME
+fmt_human \- write a human readable ASCII representation of a long integer
+.SH SYNTAX
+.B #include <fmt.h>
+
+size_t \fBfmt_human\fP(char *\fIdest\fR,unsigned long long \fIsource\fR);
+.SH DESCRIPTION
+fmt_human writes a human readable ASCII representation of \fIsource\fR
+to \fIdest\fR and returns the number of bytes written.  The result
+resembles the file size output of "ls -H"; 1000 becomes "1.0k", 1000000
+becomes "1.0M" and so on for "G" and "T".
+
+fmt_human does not append \\0.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_human returns the number
+of bytes it would have written.
+
+The output of fmt_human can not exceed 11 (assuming unsigned long long
+has 64 bits).
+.SH "SEE ALSO"
+fmt_humank(3), scan_human(3)

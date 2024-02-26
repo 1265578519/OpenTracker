@@ -1,0 +1,36 @@
+.TH rangecheck 3
+.SH NAME
+rangecheck.h \- pointer range checking
+.SH SYNTAX
+.B #include <rangecheck.h>
+
+int \fBrange_validbuf\fR(const void* buf,size_t len);
+
+int \fBrange_ptrinbuf\fR(const void* buf,size_t len,const void* ptr);
+
+int \fBrange_bufinbuf\fR(const void* buf1,size_t len1,
+                   const void* buf2,size_t len2);
+
+int \fBrange_arrayinbuf\fR(const void* buf,size_t len,
+                     const void* arraystart,
+                     size_t elements,size_t membersize);
+
+int \fBrange_strinbuf\fP(const void* buf,size_t len,const void* string);
+
+int \fBrange_str2inbuf\fP(const void* buf,size_t len,const void* string);
+
+int \fBrange_str4inbuf\fP(const void* buf,size_t len,const void* string);
+
+.SH DESCRIPTION
+rangecheck.h provides several routines for range checking pointers.
+These routines are meant for code that has to validate the syntax and
+semantics of buffers coming in from untrusted sources (like a network
+connection or an input file).
+
+.SH "RETURN VALUE"
+The routines all return 0 on error, or 1 if the pointers were in range.
+
+.SH "SEE ALSO"
+range_validbuf(3), range_ptrinbuf(3), range_bufinbuf(3),
+range_arrayinbuf(3), range_strinbuf(3), range_str2inbuf(3),
+range_str4inbuf(3)

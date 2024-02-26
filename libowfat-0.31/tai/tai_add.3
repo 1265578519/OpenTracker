@@ -1,0 +1,13 @@
+.TH tai_add 3
+.SH NAME
+tai_add \- add two struct tai
+.SH SYNTAX
+.B #include <tai.h>
+
+extern int \fBtai_add\fP(struct tai* \fIt\fR,const struct tai* \fIa\fR,
+                   const struct tai* \fIb\fR);
+.SH DESCRIPTION
+\fBtai_add\fR adds \fIa\fR to \fIb\fR and writes the result to \fIt\fR.
+The inputs and output may overlap.
+.SH "SEE ALSO"
+taia_add(3), tai_sub(3)

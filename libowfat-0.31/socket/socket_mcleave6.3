@@ -1,0 +1,14 @@
+.TH socket_mcleave6 3
+.SH NAME
+socket_mcleave6 \- leave a multicast group
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_mcleave6\fP(int \fIs\fR, const char \fIgroupip\fR[16]);
+.SH DESCRIPTION
+socket_mcleave6 leaves the IPv6 multicast group \fIgroupip\fR.
+
+If something goes wrong, socket_mcleave6 returns -1, setting errno
+appropriately.
+.SH "SEE ALSO"
+socket_mcjoin6(3), socket_mcleave4(3), socket_getifidx(3)

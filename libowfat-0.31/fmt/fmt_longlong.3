@@ -1,0 +1,20 @@
+.TH fmt_longlong 3
+.SH NAME
+fmt_longlong \- write an ASCII representation of a long long integer
+.SH SYNTAX
+.B #include <fmt.h>
+
+size_t \fBfmt_longlong\fP(char *\fIdest\fR,long long \fIsource\fR);
+.SH DESCRIPTION
+fmt_longlong writes an ASCII representation ('-' and '0' to '9', base 10) of
+\fIsource\fR to \fIdest\fR and returns the number of bytes written.
+
+fmt_longlong does not append \\0.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_longlong returns the number
+of bytes it would have written.
+
+For convenience, fmt.h defines the integer FMT_LONG to be big enough to
+contain every possible fmt_longlong output plus \\0.
+.SH "SEE ALSO"
+scan_longlong(3)

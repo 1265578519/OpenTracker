@@ -1,0 +1,13 @@
+.TH scan_xint 3
+.SH NAME
+scan_xint \- parse an unsigned integer in hexadecimal ASCII representation
+.SH SYNTAX
+.B #include <scan.h>
+
+size_t \fBscan_xint\fP(const char *\fIsrc\fR,int *\fIdest\fR);
+.SH DESCRIPTION
+scan_xint parses an unsigned integer in hexadecimal ASCII representation
+from \fIsrc\fR and writes the result into \fIdest\fR. It returns the
+number of bytes read from \fIsrc\fR.
+.SH "SEE ALSO"
+scan_xlong(3), scan_xint(3), fmt_8int(3)

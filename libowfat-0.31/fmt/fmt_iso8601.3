@@ -1,0 +1,18 @@
+.TH fmt_iso8601 3
+.SH NAME
+fmt_iso8601 \- write a date in ASCII conforming to ISO-8601
+.SH SYNTAX
+.B #include <fmt.h>
+
+size_t \fBfmt_iso8601\fP(char *\fIdest\fR,time_t \fIsource\fR);
+.SH DESCRIPTION
+fmt_iso8601 writes a date in ASCII representation as ISO-8601 defines it:
+"2014-05-27T19:22:16Z". ISO-8601 also allows to store a sub-second part
+and a time zone, but fmt_iso8601 does not support that.
+
+fmt_iso8601 does not append \\0.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_iso8601 returns the number
+of bytes it would have written.
+
+The return value of fmt_iso8601 is 20 until Jan 1st 10000.

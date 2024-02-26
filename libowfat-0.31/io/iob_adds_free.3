@@ -1,0 +1,14 @@
+.TH iob_adds_free 3
+.SH NAME
+iob_adds_free \- add buffer to I/O batch
+.SH SYNTAX
+.B #include <iob.h>
+
+void \fBiob_adds_free\fP(io_batch* b,const char* s);
+.SH DESCRIPTION
+iob_adds_free schedules the ASCIIZ C string \fIs\fR to be written
+with the I/O batch \fIb\fR.
+
+\fBiob_reset\fR will deallocate the string automatically.
+.SH "SEE ALSO"
+iob_reset(3), iob_send(3), iob_addbuf(3), iob_adds(3), iob_addfile(3)

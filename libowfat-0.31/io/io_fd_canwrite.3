@@ -1,0 +1,22 @@
+.TH io_fd_canwrite 3
+.SH NAME
+io_fd_canwrite \- prepare descriptor for io_wait
+.SH SYNTAX
+.B #include <io.h>
+
+int \fBio_fd\fP(int64 fd);
+int \fBio_fd_canwrite\fP(int64 fd);
+.SH DESCRIPTION
+io_fd_canwrite is just like io_fd, except that it assumes the descriptor
+is writable, which may save a syscall or two.  This assumption is true
+in most cases, because the kernel buffers writes.  Noteworthy cases in
+which you need to use io_fd instead of io_fd_canwrite are unconnected
+sockets, i.e. when you queued a non-blocking connect() and want to ask
+for writability to get notified when it went through.
+
+It is OK to call this function on a descriptor that io_fd() has already
+been called on.
+.SH "RETURN VALUE"
+io_fd_canwrite returns 1 on success, 0 on error.
+.SH "SEE ALSO"
+io_wait(3), io_wantread(3), io_canread(3), io_eagain(3), io_nonblock(3), io_fd(3)

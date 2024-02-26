@@ -1,0 +1,24 @@
+.TH range_str4inbuf 3
+.SH NAME
+range_str4inbuf \- range check for string in buffer
+.SH SYNTAX
+.B #include <rangecheck.h>
+
+int \fBrange_str4inbuf\fP(const void* buf,size_t len,const void* string);
+.SH DESCRIPTION
+range_str4inbuf checks that the zero terminated UTF-32-string starting at
+\fIstring\fR starts and ends within the buffer
+\fIbuf\fR[0..\fIlen\fR-1].
+
+If the string is not 0-terminated but the length is known beforehand,
+use range_arrayinbuf instead.
+.SH "RETURN VALUE"
+If the buffer is implausible (buf is NULL or buf+len has an integer overflow), return 0.
+
+If \fIstring\fR points before or after the buffer, return 0.
+
+If there is no zero terminator within the buffer, return 0.
+
+Otherwise, return 1.
+.SH "SEE ALSO"
+rangecheck(3)

@@ -1,0 +1,18 @@
+.TH scan_nonwhitenskip 3
+.SH NAME
+scan_nonwhitenskip \- skip non-whitespace
+.SH SYNTAX
+.B #include <scan.h>
+
+size_t \fBscan_nonwhitenskip\fP(const char *\fIsrc\fR,size_t \fIlimit\fR);
+.SH DESCRIPTION
+scan_nonwhitenskip returns the length of the maximum prefix of \fIsrc\fR
+that consists solely of non-whitespace characters as defined by
+\fB!isspace\fR.
+
+Normally, this is everything but ' ', '\\f', '\\n', '\\r', '\\t', '\\v'.
+
+\fIsrc\fR is considered to end at \\0 or after \fIlimit\fR characters.
+
+.SH "SEE ALSO"
+scan_nonwhitenskip(3)

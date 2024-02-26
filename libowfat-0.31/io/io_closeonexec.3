@@ -1,0 +1,14 @@
+.TH io_closeonexec 3
+.SH NAME
+io_closeonexec \- mark a file descriptor non-inheritable
+.SH SYNTAX
+.B #include <io.h>
+
+void \fBio_closeonexec\fP(int64 fd);
+.SH DESCRIPTION
+io_closeonexec marks a file descriptor non-inheritable.  It will be
+automatically closed if the process executes a different one.  The
+descriptor will not be automatically closed when you fork() a new child
+process, though.
+.SH "SEE ALSO"
+io_wait(3), io_canwrite(3)

@@ -1,0 +1,14 @@
+.TH byte_copyr 3
+.SH NAME
+byte_copyr \- copy a string
+.SH SYNTAX
+.B #include <byte.h>
+
+void \fBbyte_copyr\fP(char *\fIout\fR,size_t \fIlen\fR,const char *\fIin\fR);
+.SH DESCRIPTION
+\fIbyte_copyr\fR copies \fIin\fR[\fIlen\fR-1] to \fIout\fR[\fIlen\fR-1], 
+\fIin\fR[\fIlen\fR-2] to \fIout\fR[\fIlen\fR-2], etc., and
+\fIin\fR[0] to \fIout\fR[0].
+
+.SH "SEE ALSO"
+byte_copy(3)

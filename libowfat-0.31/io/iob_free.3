@@ -1,0 +1,12 @@
+.TH iob_free 3
+.SH NAME
+iob_free \- free an I/O batch
+.SH SYNTAX
+.B #include <iob.h>
+
+void \fBiob_free\fP(io_batch* b);
+.SH DESCRIPTION
+iob_free frees all resources associated with \fIb\fR.  Calling iob_free
+is equivalent to calling iob_reset and free.
+.SH "SEE ALSO"
+iob_new(3), iob_reset(3)

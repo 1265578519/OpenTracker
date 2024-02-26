@@ -1,0 +1,15 @@
+.TH iob_bytesleft 3
+.SH NAME
+iob_bytesleft \- how many bytes are still to be sent?
+.SH SYNTAX
+.B #include <iob.h>
+
+uint64 \fBiob_bytesleft\fP(const io_batch* b);
+.SH DESCRIPTION
+iob_bytesleft returns the number of bytes that still need to be sent in
+this IO batch.  If you just want to see whether you need to call
+iob_send again, there is no advantage in this function to calling
+iob_send directly and looking whether it returned 0.
+
+.SH "SEE ALSO"
+iob_send(3)

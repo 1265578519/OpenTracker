@@ -1,0 +1,39 @@
+.TH socket_bind6_reuse 3
+.SH NAME
+socket_bind6_reuse \- set the local IP address and port of a socket
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_bind6_reuse\fP(int \fIs\fR,char \fIip\fR[16],uint16 \fIport\fR,
+                       uint32 \fIscope_id\fR);
+.SH DESCRIPTION
+socket_bind6_reuse sets the local IP address and TCP/UDP port of a
+TCP/UDP socket \fIs\fR to \fIip\fR and \fIport\fR respectively.
+
+If the IP address is ::, the operating system chooses a local IP
+address.  If \fIport\fR is 0, the operating system chooses a port.
+
+Normally socket_bind6_reuse returns 0. If anything goes wrong,
+socket_bind6_reuse returns -1, setting errno appropriately.
+
+The \fIscope_id\fR should normally be zero, but for link-local addresses
+it specifies the interface number on which to bind.  The interface
+number for a given network interface name can be found with
+\fBsocket_getifidx\fR.
+
+Unlike socket_bind6 this function will also tell the operating system
+that the address is to be reused soon, which turns off the normal pause
+before this IP and port can be bound again.
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[16];
+  uint16 \fIp\fR;
+
+  \fIs\fR = socket_tcp4();
+  socket_bind6_reuse(s,ip,p);
+  socket_connect4(s,ip,p);
+
+.SH "SEE ALSO"
+socket_bind6(3)

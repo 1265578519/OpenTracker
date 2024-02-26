@@ -1,0 +1,17 @@
+.TH stralloc_catlong0 3
+.SH NAME
+stralloc_catlong0 \- append an integer to a stralloc
+.SH SYNTAX
+.B #include <stralloc.h>
+
+int \fBstralloc_catlong0\fP(stralloc* \fIsa\fR, unsigned long int \fIin\fR, size_t \fIn\fR);
+.SH DESCRIPTION
+stralloc_catlong0 converts in to a string using \fBfmt_long0\fR and
+appends the result to \fIsa\fR, allocating memory as necessary.
+
+If there was a memory allocation failure, stralloc_catlong0 returns 0,
+else 1.
+.SH "RETURN VALUE"
+1 for success, 0 on memory allocation failure.
+.SH "SEE ALSO"
+fmt_long0(3)

@@ -1,0 +1,19 @@
+.TH byte_chr 3
+.SH NAME
+byte_chr \- search for a byte in a string
+.SH SYNTAX
+.B #include <byte.h>
+
+size_t \fBbyte_chr\fP(const char *\fIhaystack\fR,size_t \fIlen\fR,char \fIneedle\fR);
+.SH DESCRIPTION
+\fIbyte_chr\fR returns the smallest integer \fIi\fR between 0 and
+\fIlen\fR-1 inclusive such that \fIone\fR[\fIi\fR] equals \fIneedle\fR.
+
+If no such integer exists, byte_chr returns \fIlen\fR.
+
+byte_chr may read all bytes \fIone\fR[0], \fIone\fR[1], ...,
+\fIone\fR[\fIlen\fR-1], even if not all the bytes are relevant to the
+answer.
+
+.SH "SEE ALSO"
+byte_rchr(3)

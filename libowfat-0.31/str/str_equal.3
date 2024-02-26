@@ -1,0 +1,15 @@
+.TH str_equal 3
+.SH NAME
+str_equal \- compare two ASCIIZ strings
+.SH SYNTAX
+.B #include <str.h>
+
+size_t \fBstr_equal\fP(const char* \fIa\fR,const char* \fIb\fR);
+.SH DESCRIPTION
+\fBstr_equal\fR returns nonzero if \fIa\fR and \fIb\fR match up to and
+including the first occurrance of \\0.
+
+If the strings are different, str_equal does not read bytes past the
+first difference.
+.SH "SEE ALSO"
+strlen(3)

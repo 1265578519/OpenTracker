@@ -1,0 +1,17 @@
+.TH stralloc_init 3
+.SH NAME
+stralloc_init \- initialize a stralloc
+.SH SYNTAX
+.B #include <stralloc.h>
+
+void \fBstralloc_init\fP(stralloc* \fIsa\fR);
+.SH DESCRIPTION
+stralloc_init initializes a stralloc to the empty string.
+
+It does not free any memory previously associated with a stralloc.  Use
+stralloc_free(3) for that.  If you just want to empty a stralloc, use
+stralloc_zero(sa) instead.
+.SH "RETURN VALUE"
+none.
+.SH "SEE ALSO"
+stralloc_free(3), stralloc_copys(3)

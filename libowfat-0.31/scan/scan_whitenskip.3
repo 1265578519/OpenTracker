@@ -1,0 +1,15 @@
+.TH scan_whitenskip 3
+.SH NAME
+scan_whitenskip \- skip whitespace
+.SH SYNTAX
+.B #include <scan.h>
+
+size_t \fBscan_whitenskip\fP(const char *\fIsrc\fR,size_t \fIlimit\fR);
+.SH DESCRIPTION
+scan_whitenskip returns the length of the maximum prefix of \fIsrc\fR
+that consists solely of whitespace characters as defined by
+\fBisspace\fR.
+
+Normally, this is ' ', '\\f', '\\n', '\\r', '\\t', '\\v'.
+.SH "SEE ALSO"
+scan_nonwhitenskip(3)

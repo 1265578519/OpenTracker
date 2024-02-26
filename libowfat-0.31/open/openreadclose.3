@@ -1,0 +1,17 @@
+.TH openreadclose 3
+.SH NAME
+openreadclose \- read a whole file into a stralloc
+.SH SYNTAX
+.B #include <openreadclose.h>
+
+ssize_t \fBopenreadclose\fP(const char *\fIfilename\fR,
+           stralloc* \fIsa\fR,size_t \fIbufsize\fR);
+.SH DESCRIPTION
+openreadclose opens the file \fIfilename\fR for reading and reads the
+whole content into the stralloc \fIsa\fR.  The file is read in chunks of
+\fIbufsize\fR bytes size.  If everything worked fine, openreadclose
+returns 1.  If the file did not exist, openreadclose returns 0.  On
+every other error, openreadclose returns -1 and sets errno
+appropriately.
+.SH "SEE ALSO"
+open_read(3), readclose(3)

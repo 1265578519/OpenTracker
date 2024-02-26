@@ -1,0 +1,15 @@
+.TH io_block 3
+.SH NAME
+io_block \- switch to blocking I/O
+.SH SYNTAX
+.B #include <io.h>
+
+void \fBio_block\fP(int64 fd);
+.SH DESCRIPTION
+io_block puts UNIX descriptor fd into ``blocking mode.''
+
+File descriptors are normally in blocking mode, except if they come from
+accept() or io_accept() and the listening socket was in non-blocking
+mode.
+.SH "SEE ALSO"
+io_nonblock(3)

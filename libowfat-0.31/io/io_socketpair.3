@@ -1,0 +1,18 @@
+.TH io_socketpair 3
+.SH NAME
+io_socketpair \- create a pair of sockets
+.SH SYNTAX
+.B #include <io.h>
+
+int \fBio_socketpair\fP(int64 pfd[2]);
+.SH DESCRIPTION
+io_socketpair creates a new UNIX socket pair and writes both descriptors
+to \fId\fR.  The socket pair works much like a pipe, but it is
+bidirectional (i.e. both descriptors are for reading and writing).
+
+io_socketpair returns 1 to indicate success. If something goes wrong,
+io_socketpair returns 0, setting errno to indicate the error; in this
+case it frees any memory that it allocated for the new socketpair, and
+it leaves \fId\fR alone.
+.SH "SEE ALSO"
+io_readfile(3), io_createfile(3), io_pipe(3)

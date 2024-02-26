@@ -1,0 +1,19 @@
+.TH socket_getifidx 3
+.SH NAME
+socket_getifidx \- get interface number
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_getifidx\fP(const char* \fIifname\fR);
+.SH DESCRIPTION
+socket_getifidx returns the interface number for a symbolic network
+interface name (like "eth0" on Linux, for example).
+
+The interface number can be used as scope_id for IPv6 communications on
+link-local addresses.
+
+If something goes wrong, socket_getifidx returns -1, setting errno
+appropriately.
+
+.SH "SEE ALSO"
+socket_getifname(3), socket_connect6(3)

@@ -1,0 +1,13 @@
+.TH socket_connected 3
+.SH NAME
+socket_connected \- is a connection established on a socket?
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_connected\fP(int \fIs\fR);
+.SH DESCRIPTION
+socket_connected returns 1 if \fIs\fR is a socket and a
+connection is established, 0 otherwise.
+
+.SH "SEE ALSO"
+socket_remote4(3), socket_remote6(3)

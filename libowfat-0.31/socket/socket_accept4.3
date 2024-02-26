@@ -1,0 +1,34 @@
+.TH socket_accept4 3
+.SH NAME
+socket_accept4 \- accept an IPv4 TCP connection on a socket
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_accept4\fP(int \fIs\fR,char \fIip\fR[4],uint16 *\fIport\fR);
+.SH DESCRIPTION
+When a TCP connection arrives on a listening TCP socket \fIs\fR, the
+socket becomes readable.
+
+socket_accept4 accepts the connection.  It sets \fIip\fR and \fIport\fR
+to the client IP address and client TCP port.  It creates a new socket
+for the connection, and returns a file descriptor pointing to the new
+socket; you can use the read and write system calls to transmit data
+through that file descriptor.
+
+If something goes wrong, socket_accept4 returns -1, setting errno
+appropriately, without creating a new socket.
+
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[4];
+  uint16 \fIp\fR;
+
+  \fIs\fR = socket_tcp4();
+  socket_bind4(s,ip,p);
+  socket_listen(s,16);
+  socket_accept4(s,ip,&p);
+
+.SH "SEE ALSO"
+socket_accept6(3), socket_connected(3)

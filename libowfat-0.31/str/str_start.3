@@ -1,0 +1,11 @@
+.TH str_start 3
+.SH NAME
+str_start \- compare prefixes of strings
+.SH SYNTAX
+.B #include <str.h>
+
+size_t \fBstr_start\fP(const char* \fIa\fR,const char* \fIb\fR);
+.SH DESCRIPTION
+str_start returns 1 if \fIb\fR is a prefix of \fIa\fR, 0 otherwise.
+.SH "SEE ALSO"
+strncmp(3)

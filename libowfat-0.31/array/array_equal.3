@@ -1,0 +1,32 @@
+.TH array_equal 3
+.SH NAME
+array_equal \- compare two arrays for equality
+.SH SYNTAX
+.B #include <array.h>
+
+int \fBarray_equal\fP(array* \fIx\fR,array* \fIy\fR);
+
+  array \fIx\fR;
+  array \fIy\fR;
+  array_equal(&\fIx\fR,&\fIy\fR);
+
+.SH DESCRIPTION
+array_equal returns nonzero if x and y have the same contents: i.e.,
+
+.sp 1
+.IP \(bu
+\fIx\fR and \fIy\fR are both unallocated; or
+.IP \(bu
+\fIx\fR is unallocated, \fIy\fR is allocated, and \fIy\fR has no
+initialized bytes; or
+.IP \(bu
+\fIx\fR is allocated, \fIy\fR is unallocated, and \fIx\fR has no
+initialized bytes; or
+.IP \(bu
+\fIx\fR and \fIy\fR are both allocated and have the same sequence of
+initialized bytes.
+.PP
+
+Otherwise it returns 0.
+.SH "SEE ALSO"
+array_allocate(3), array_get(3), array_fail(3), array_reset(3)

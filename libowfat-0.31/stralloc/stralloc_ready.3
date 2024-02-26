@@ -1,0 +1,21 @@
+.TH stralloc_ready 3
+.SH NAME
+stralloc_ready \- provide space in a stralloc
+.SH SYNTAX
+.B #include <stralloc.h>
+
+int \fBstralloc_ready\fP(stralloc* \fIsa\fR,size_t \fIlen\fR);
+.SH DESCRIPTION
+stralloc_ready makes sure that \fIsa\fR has enough space allocated to hold
+\fIlen\fR bytes: If \fIsa\fR is not allocated, stralloc_ready allocates at least
+\fIlen\fR bytes of space, and returns 1. If \fIsa\fR is already allocated, but
+not enough to hold \fIlen\fR bytes, stralloc_ready allocates at least \fIlen\fR
+bytes of space, copies the old string into the new space, frees the
+old space, and returns 1. Note that this changes \fIsa\fR.s.
+
+If stralloc_ready runs out of memory, it leaves \fIsa\fR alone and
+returns 0.
+.SH "RETURN VALUE"
+1 for success, 0 on memory allocation failure.
+.SH "SEE ALSO"
+stralloc_readyplus(3)

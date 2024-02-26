@@ -1,0 +1,17 @@
+.TH io_createfile 3
+.SH NAME
+io_createfile \- create a file
+.SH SYNTAX
+.B #include <io.h>
+
+int \fBio_createfile\fP(int64* d,const char* s);
+.SH DESCRIPTION
+io_createfile sets d to the number of a new descriptor writing to the disk file
+named \fIs\fR, and returns 1. If \fIs\fR already existed, it is truncated to length 0;
+otherwise, it is created, with mode 0600.
+
+If something goes wrong, io_createfile sets \fIerrno\fR to indicate the error, and
+returns 0; it does not create a new descriptor, and it does not touch d.
+(However, it may have truncated or created the file.)
+.SH "SEE ALSO"
+io_readfile(3), io_appendfile(3), io_readwritefile(3)

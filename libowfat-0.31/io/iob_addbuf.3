@@ -1,0 +1,17 @@
+.TH iob_addbuf 3
+.SH NAME
+iob_addbuf \- add buffer to I/O batch
+.SH SYNTAX
+.B #include <iob.h>
+
+int \fBiob_addbuf\fP(io_batch* b,const void* buf,uint64 n);
+.SH DESCRIPTION
+iob_addbuf schedules \fIn\fR bytes starting at \fIbuf\fR to be written
+with the I/O batch \fIb\fR.
+
+Use \fBiob_addbuf_free\fR if you want the buffer to be deallocated
+automatically by \fBiob_reset\fR.
+.SH "RETURN VALUE"
+Returns 1 on success, 0 on failure.
+.SH "SEE ALSO"
+iob_reset(3), iob_send(3), iob_addbuf_free(3), iob_adds(3), iob_addfile(3)

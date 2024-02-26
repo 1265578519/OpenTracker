@@ -1,0 +1,20 @@
+.TH array_get 3
+.SH NAME
+array_get \- get pointer to nth element in array
+.SH SYNTAX
+.B #include <array.h>
+
+void* \fBarray_get\fP(array* \fIx\fR, uint64 \fImembersize\fR, int64 \fIpos\fR);
+
+  array \fIx\fR;
+  int64 \fIpos\fR;
+  \fIt\fR* p = array_get(&\fIx\fR,sizeof(\fIt\fR),\fIpos\fR);
+
+.SH DESCRIPTION
+array_get is similar to array_allocate, but it does not allocate any
+extra bytes, and it does not initialize any extra bytes.  It returns 0
+if \fIx\fR is unallocated, for example, or if fewer than
+(\fIpos\fR+1)*sizeof(\fIt\fR) bytes are initialized.
+
+.SH "SEE ALSO"
+array_allocate(3), array_fail(3), array_start(3)

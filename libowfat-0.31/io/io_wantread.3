@@ -1,0 +1,21 @@
+.TH io_wantread 3
+.SH NAME
+io_wantread \- signal that you want to read from a descriptor
+.SH SYNTAX
+.B #include <io.h>
+
+void \fBio_wantread\fP(int64 fd);
+.SH DESCRIPTION
+io_wantread tells the next io_wait() that you want to read from this
+descriptor.  Call io_dontwantread() again if you change your mind.
+
+The next time you call io_wait(), it will look whether this descriptor
+becomes readable, too.  You can then use io_canread() to check whether
+the descriptor has become readable.
+
+You have to have called io_fd on the descriptor first (io_pipe and
+io_socketpair do this for you).  Waiting on descriptors only works for
+sockets, fifos and pipes.  It may also work on devices and TTYs, but
+that is platform dependent -- you should not rely on that.
+.SH "SEE ALSO"
+io_wait(3), io_canread(3), io_wantread(3), io_fd(3)

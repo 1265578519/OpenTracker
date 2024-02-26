@@ -1,0 +1,16 @@
+.TH stralloc_catb 3
+.SH NAME
+stralloc_catb \- append data to a stralloc
+.SH SYNTAX
+.B #include <stralloc.h>
+
+int \fBstralloc_catb\fP(stralloc* \fIsa\fR,const char* \fIbuf\fR,size_t \fIlen\fR);
+.SH DESCRIPTION
+stralloc_catb adds the string \fIbuf\fR[0], \fIbuf\fR[1], ... \fIbuf\fR[\fIlen\fR-1] to the
+end of the string stored in \fIsa\fR, allocating space if necessary, and
+returns 1. If \fIsa\fR is unallocated, stralloc_catb is the same as
+stralloc_copyb. If it runs out of memory, stralloc_catb leaves \fIsa\fR
+alone and returns 0.
+
+.SH "RETURN VALUE"
+1 for success, 0 on memory allocation failure.

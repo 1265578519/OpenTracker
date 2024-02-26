@@ -1,0 +1,17 @@
+.TH fmt_minus 3
+.SH NAME
+fmt_minus \- write '-' for negative integers
+.SH SYNTAX
+.B #include <fmt.h>
+
+size_t \fBfmt_minus\fP(char *\fIdest\fR,signed int \fIsource\fR);
+.SH DESCRIPTION
+fmt_minus writes '-' if \fIsource\fR is negative, nothing otherwise.  It
+returns the number of bytes written.
+
+fmt_minus does not append \\0.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_minus returns the number
+of bytes it would have written.
+.SH "SEE ALSO"
+fmt_plusminus(3), scan_plusminus(3)

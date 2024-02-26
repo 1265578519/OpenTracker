@@ -1,0 +1,19 @@
+.TH iarray_init 3
+.SH NAME
+iarray_init \- initialize iarray data structure
+.SH SYNTAX
+.B #include <iarray.h>
+
+void \fBiarray_init\fP(array* \fIx\fR, size_t \fIelemsize\fR);
+
+  iarray \fIx\fR;
+  int64 \fIpos\fR;
+  \fIt\fR* p = iarray_init(&\fIx\fR,sizeof(\fIelement\fR));
+
+.SH DESCRIPTION
+iarray_init initializes an iarray so that it can hold elements of size
+\fIelemsize\fR.  iarray_init does not actually allocate anything, so it
+can not fail.
+
+.SH "SEE ALSO"
+iarray_allocate(3), iarray_get(3), iarray_free(3)

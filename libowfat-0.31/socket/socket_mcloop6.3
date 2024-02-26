@@ -1,0 +1,17 @@
+.TH socket_mcloop6 3
+.SH NAME
+socket_mcloop6 \- set multicast loopback
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_mcloop6\fP(int \fIs\fR,char \fIloop\fR);
+.SH DESCRIPTION
+socket_mcloop6 activates multicast loopback for the socket \fIs\fR if
+\fIloop\fR is non-zero, and deactivates it otherwise.  If loopback is
+activated, packets sent on this socket will be received on the same
+host.
+
+If something goes wrong, socket_mcloop6 returns -1, setting errno
+appropriately.
+.SH "SEE ALSO"
+socket_mcloop4(3), socket_mcjoin6(3), socket_mcleave6(3)

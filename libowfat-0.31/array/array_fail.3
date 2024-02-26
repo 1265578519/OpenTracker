@@ -1,0 +1,21 @@
+.TH array_fail 3
+.SH NAME
+array_fail \- switch array to have failed
+.SH SYNTAX
+.B #include <array.h>
+
+void \fBarray_fail\fP(array* \fIx\fR);
+
+  array \fIx\fR;
+  array_fail(&\fIx\fR);
+
+.SH DESCRIPTION
+If \fIx\fR is allocated, array_fail frees the region that \fIx\fR points
+to, and switches \fIx\fR to have failed.
+
+If \fIx\fR is unallocated, array_fail simply switches \fIx\fR to have
+failed.
+
+If \fIx\fR has already failed, array_fail has no effect.
+.SH "SEE ALSO"
+array_allocate(3), array_reset(3)

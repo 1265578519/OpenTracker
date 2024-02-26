@@ -1,0 +1,17 @@
+.TH str_diff 3
+.SH NAME
+str_diff \- compare two ASCIIZ strings
+.SH SYNTAX
+.B #include <str.h>
+
+int \fBstr_diff\fP(const char* \fIa\fR,const char* \fIb\fR);
+.SH DESCRIPTION
+\fBstr_diff\fR returns negative, 0, or positive, depending on whether the
+string \fIa\fR[0], \fIa\fR[1], ..., \fIa\fR[n]=='\\0' is
+lexicographically smaller than, equal to, or greater than the string
+\fIb\fR[0], \fIb\fR[1], ..., \fIb\fR[m-1]=='\\0'.
+
+If the strings are different, str_diff does not read bytes past the
+first difference.
+.SH "SEE ALSO"
+strlen(3)

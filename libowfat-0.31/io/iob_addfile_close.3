@@ -1,0 +1,19 @@
+.TH iob_addfile_close 3
+.SH NAME
+iob_addfile_close \- add file region to I/O batch
+.SH SYNTAX
+.B #include <iob.h>
+
+int \fBiob_addfile_close\fP(io_batch* b,int64 fd,uint64 off,uint64 n);
+.SH DESCRIPTION
+iob_addfile_close schedules \fIn\fR bytes from the file descriptor \fIfd\fR
+starting at offset \fIoff\fR to be written with the I/O batch \fIb\fR.
+
+You may not close \fIfd\fR before iob_send indicates it is done.
+
+\fBiob_reset\fR will call io_close(fd).
+.SH "RETURN VALUE"
+Returns 1 on success, 0 on failure.  In the failure case, the file
+descriptor has been closed.
+.SH "SEE ALSO"
+iob_reset(3), iob_send(3), iob_addbuf(3), iob_addfile(3)

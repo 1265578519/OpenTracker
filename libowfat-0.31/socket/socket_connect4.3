@@ -1,0 +1,48 @@
+.TH socket_connect4 3
+.SH NAME
+socket_connect4 \- attempt to make a TCP connection
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_connect4\fP(int \fIs\fR,const char \fIip\fR[4],uint16 \fIport\fR);
+.SH DESCRIPTION
+socket_connect4 attempts to make a connection from TCP socket \fIs\fR to
+TCP port \fIport\fR on IP address \fIip\fR.
+
+socket_connect4 may return
+.sp 1
+.IP \(bu
+0, to indicate that the connection succeeded (and succeeded immediately,
+if the socket is non-blocking)
+.IP \(bu
+-1, setting errno to error_inprogress or error_wouldblock, to indicate
+that the socket is non-blocking
+.IP \(bu
+-1, setting errno to something else, to indicate that the connection
+failed (and failed immediately, if the socket is non-blocking).
+.PP
+
+When a background connection succeeds or fails, \fIs\fR becomes
+writable; you can use socket_connected to see whether the connection
+succeeded.  If the connection failed, socket_connected returns 0,
+setting errno appropriately.
+
+Once a TCP socket is connected, you can use the read and write
+system calls to transmit data.
+
+You can call socket_connect4 without calling socket_bind4.  This has the
+effect as first calling socket_bind4 with IP address 0.0.0.0 and port 0.
+
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[4];
+  uint16 \fIp\fR;
+
+  \fIs\fR = socket_tcp4();
+  socket_bind4(s,ip,p);
+  socket_connect4(s,ip,p);
+
+.SH "SEE ALSO"
+socket_connect6(3), socket_fastopen_connect4(3)

@@ -1,0 +1,15 @@
+.TH stralloc_diffs 3
+.SH NAME
+stralloc_diffs \- compare two strallocs
+.SH SYNTAX
+.B #include <stralloc.h>
+
+int \fBstralloc_diff\fP(const stralloc* \fIa\fR,const stralloc* \fIb\fR);
+.SH DESCRIPTION
+stralloc_diff returns negative, 0, or positive, depending on whether
+\fIa\fR is lexicographically smaller than, equal to, or greater than the
+string \fIb\fR.
+.SH "RETURN VALUE"
+<0 if a<b, 0 if a==b, >0 if a>b.
+.SH "SEE ALSO"
+stralloc_diffs(3), stralloc_starts(3)

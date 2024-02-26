@@ -1,0 +1,13 @@
+.TH buffer_close 3
+.SH NAME
+buffer_close \- close buffer
+.SH SYNTAX
+.B #include <buffer.h>
+
+void \fBbuffer_close\fP(buffer* \fIb\fR);
+.SH DESCRIPTION
+buffer_close close the file associated with the buffer and frees/unmaps
+the memory associated with the buffer if buffer_init_free or
+buffer_mmapread were used.
+.SH "SEE ALSO"
+buffer_init(3), buffer_init_free(3), buffer_mmapread(3)

@@ -1,0 +1,15 @@
+.TH buffer_putm 3
+.SH NAME
+buffer_putm \- write ASCIIZ string(s) to buffer
+.SH SYNTAX
+.B #include <buffer.h>
+
+int \fBbuffer_putm\fP(buffer* \fIb\fR,const char* \fIx\fR,...);
+.SH DESCRIPTION
+buffer_putm is like buffer_puts, but it can be passed more than one
+string.
+.SH "RETURN VALUE"
+buffer_putm returns 0 if everything was fine, -1 on error (setting
+errno).
+.SH "SEE ALSO"
+buffer_putsalign(3), buffer_put(3), buffer_flush(3), buffer(3)

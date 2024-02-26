@@ -1,0 +1,20 @@
+.TH range_ptrinbuf 3
+.SH NAME
+range_ptrinbuf \- range check pointer in buffer
+.SH SYNTAX
+.B #include <rangecheck.h>
+
+int \fBrange_ptrinbuf\fR(const void* buf,size_t len,const void* ptr);
+
+.SH DESCRIPTION
+range_ptrinbuf checks if \fIptr\fR points to \fIbuf\fR[0..\fIlen\fR-1].
+.SH "RETURN VALUE"
+If the buffer is implausible (buf is NULL or buf+len has an integer
+overflow), return 0.
+
+If \fIptr\fR points to one of \fIbuf\fR[0], \fIbuf\fR[1], ... or
+\fIbuf\fR[\fIlen\fR-1], return 1.
+
+Otherwise, return 0.
+.SH "SEE ALSO"
+rangecheck(3)

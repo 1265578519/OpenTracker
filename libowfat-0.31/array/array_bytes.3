@@ -1,0 +1,19 @@
+.TH array_bytes 3
+.SH NAME
+array_bytes \- get number of allocated members in array
+.SH SYNTAX
+.B #include <array.h>
+
+int64 \fBarray_bytes\fP(array* \fIx\fR);
+
+  array \fIx\fR;
+  int64 bytes = array_bytes(&\fIx\fR);
+
+.SH DESCRIPTION
+array_bytes returns the number of initialized bytes in \fIx\fR, without
+regard to \fIt\fR.
+
+If \fIx\fR is unallocated, array_length and array_bytes return 0.
+
+.SH "SEE ALSO"
+array_allocate(3), array_get(3), array_fail(3), array_length(3)

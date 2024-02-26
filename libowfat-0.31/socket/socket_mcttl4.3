@@ -1,0 +1,17 @@
+.TH socket_mcttl4 3
+.SH NAME
+socket_mcttl4 \- set multicast ttl
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_mcttl4\fP(int \fIs\fR,char \fITTL\fR);
+.SH DESCRIPTION
+socket_mcttl4 sets the TTL of outgoing multicast packets on the socket
+\fIs\fR.  Each router decrements the packet TTL by one and discards the
+packet if the TTL reaches zero.  Setting the TTL to 1, for example, will
+limit the packet propagation to the LAN.
+
+If something goes wrong, socket_mcttl4 returns -1, setting errno
+appropriately.
+.SH "SEE ALSO"
+socket_mcttl6(3), socket_mcjoin4(3), socket_mcleave4(3)

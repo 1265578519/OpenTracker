@@ -1,0 +1,13 @@
+.TH buffer_putspace 3
+.SH NAME
+buffer_putspace \- write ASCII space to buffer
+.SH SYNTAX
+.B #include <buffer.h>
+
+int \fBbuffer_putspace\fP(buffer* \fIb\fR);
+.SH DESCRIPTION
+buffer_putspace writes a single ASCII space character to \fIb\fR.
+.SH "RETURN VALUE"
+0 if everything is fine, -1 on error (setting \fIerrno\fR).
+.SH "SEE ALSO"
+buffer_puts(3), buffer_put(3), buffer_flush(3), buffer(3)

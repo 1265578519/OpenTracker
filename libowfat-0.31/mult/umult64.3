@@ -1,0 +1,14 @@
+.TH umult64 3
+.SH NAME
+umult64 \- integer multiplication with overflow checking
+.SH SYNTAX
+.B #include <safemult.h>
+
+int \fBumult64\fP(uint64 a,uint64 b,uint64* c);
+.SH DESCRIPTION
+umult64 does c=a*b and returns 1.
+
+In case of an integer overflow, umult64 leaves \fIc\fR alone and returns
+0.
+.SH "SEE ALSO"
+imult16(3), imult32(3), imult64(3)

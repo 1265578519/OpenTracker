@@ -1,0 +1,23 @@
+.TH buffer_get_token_pred 3
+.SH NAME
+buffer_get_token_pred \- read token from buffer
+.SH SYNTAX
+.B #include <buffer.h>
+
+ssize_t \fBbuffer_get_token_pred\fP(buffer* \fIb\fR,char* \fIx\fR,size_t \fIlen\fR,
+                 int (*\fIpredicate\fR)(const char* \fIs\fR,size_t \fIlen\fR));
+.SH DESCRIPTION
+buffer_get_token_pred copies data from \fIb\fR to \fIx\fR[0],
+\fIx\fR[1], ..., \fIx\fR[\fIlen\fR-1] until \fIlen\fR bytes have been
+read or \fIpredicate\fR called on the destination string returns
+nonzero.
+
+\fIpredicate\fR can also return 0 (indicating further input is required
+to complete the token) or -1 (abort and return -1; use this if
+\fIpredicate\fR wants to enfore a maximum message size or does timeout
+handling or detects a malformed message).
+
+buffer_get_token_pred returns the number of bytes copied or -1 on
+error (setting \fIerrno\fR appropriately).
+.SH "SEE ALSO"
+buffer_init(3), buffer_feed(3), buffer_peek(3), buffer_seek(3), buffer(3)

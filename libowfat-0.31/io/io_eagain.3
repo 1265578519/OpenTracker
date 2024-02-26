@@ -1,0 +1,20 @@
+.TH io_eagain 3
+.SH NAME
+io_eagain \- tell io_wait that you got an EAGAIN
+.SH SYNTAX
+.B #include <io.h>
+
+void \fBio_eagain\fP(int64 fd);
+.SH DESCRIPTION
+If io_wait() said that you can read from a descriptor, you try to read
+from it, and you get EAGAIN, you need to tell io_wait().  This is
+important for edge triggered event notification schemes like Linux 2.4's
+SIGIO, or you will lose events.
+
+io_tryread(), io_trywrite() and io_sendfile() and iob_send() already
+take care of this for you.
+
+This function is only of interest if you integrate io_wait() with legacy
+code that uses read/write directly.
+.SH "SEE ALSO"
+io_wait(3)

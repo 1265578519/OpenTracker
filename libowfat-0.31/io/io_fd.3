@@ -1,0 +1,21 @@
+.TH io_fd 3
+.SH NAME
+io_fd \- prepare descriptor for io_wait
+.SH SYNTAX
+.B #include <io.h>
+
+int \fBio_fd\fP(int64 fd);
+.SH DESCRIPTION
+If you want to use io_canread() and io_canwrite() on a descriptor, you
+have to use io_wait() on it first, and io_wait() has to know which
+descriptors you are interested in.  Use io_fd() for this.
+
+io_pipe and io_socketpair already call io_fd for you.
+
+Waiting on descriptors only works for sockets, fifos and pipes.  It may
+also work on devices and TTYs, but that is platform dependent -- you
+should not rely on that.  It does not work on files.
+.SH "RETURN VALUE"
+io_fd returns 1 on success, 0 on error.
+.SH "SEE ALSO"
+io_wait(3), io_wantread(3), io_canread(3), io_eagain(3), io_nonblock(3)

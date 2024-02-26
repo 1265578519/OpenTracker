@@ -1,0 +1,18 @@
+.TH uint64_unpack_big 3
+.SH NAME
+uint64_unpack_big \- read an unsigned big-endian 64-bit integer
+.SH SYNTAX
+.B #include <uint64.h>
+
+uint64 \fIu\fR;
+
+void \fBuint64_unpack_big\fP(const char \fIs\fR[4],uint64 *\fIu\fR);
+.SH DESCRIPTION
+uint64 is a 64-bit unsigned integer type.
+
+uint64_unpack_big portably reads a uint64 as stored on a big-endian
+architecture (i.e. in network byte order) from \fIs\fR and writes it
+into \fIu\fR in the native byte order.
+
+.SH "SEE ALSO"
+uint64_pack_big(3), uint64_unpack(3)

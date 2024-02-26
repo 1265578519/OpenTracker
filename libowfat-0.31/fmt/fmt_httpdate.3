@@ -1,0 +1,17 @@
+.TH fmt_httpdate 3
+.SH NAME
+fmt_httpdate \- write a date in ASCII as in the HTTP protocol
+.SH SYNTAX
+.B #include <fmt.h>
+
+size_t \fBfmt_httpdate\fP(char *\fIdest\fR,time_t \fIsource\fR);
+.SH DESCRIPTION
+fmt_httpdate writes a date in ASCII representation as the HTTP protocol defines it:
+"Sun, 06 Nov 1994 08:49:37 GMT".
+
+fmt_httpdate does not append \\0.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_httpdate returns the number
+of bytes it would have written.
+
+The output of fmt_httpdate is 29 until Jan 1st 10000.

@@ -1,0 +1,26 @@
+.TH socket_tcp6b 3
+.SH NAME
+socket_tcp6b \- create a blocking IPv6 TCP/IP stream socket
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_tcp6b\fP();
+.SH DESCRIPTION
+socket_tcp6b creates a blocking IPv6 TCP/IP stream socket and returns a
+file descriptor pointing to that socket.  If something goes wrong,
+socket_tcp6b returns -1, setting errno appropriately, without allocating
+any resources.
+
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[16];
+  uint16 \fIp\fR;
+
+  \fIs\fR = socket_tcp6b();
+  socket_bind6(s,ip,p);
+  socket_connect6(s,ip,p,0);
+
+.SH "SEE ALSO"
+socket_tcp6(3), socket_bind4(3), socket_bind6(3)

@@ -1,0 +1,29 @@
+.TH socket_broadcast 3
+.SH NAME
+socket_broadcast \- set UDP socket to broadcast mode
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_broadcast\fP(int \fIs\fR);
+.SH DESCRIPTION
+socket_broadcast sets UDP socket \fIs\fR to broadcast mode.
+socket_send4 and socket_send6 will fail to send packets to the broadcast
+address unless socket_broadcast is called before.
+
+Normally socket_broadcast returns 0.
+
+If anything goes wrong, socket_broadcast returns -1, setting errno
+appropriately.
+
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+
+  if ((\fIs\fR=socket_udp6())==-1)
+    strerr_die2sys(111,FATAL,"unable to create UDP socket: ");
+  if (socket_broadcast(\fIs\fR) == -1)
+    strerr_die2sys(111,FATAL,"unable to set broadcast mode: ");
+
+.SH "SEE ALSO"
+socket_send4(3), socket_send6(3)

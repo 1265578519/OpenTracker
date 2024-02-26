@@ -1,0 +1,13 @@
+.TH scan_8short 3
+.SH NAME
+scan_8short \- parse an unsigned short integer in octal ASCII representation
+.SH SYNTAX
+.B #include <scan.h>
+
+size_t \fBscan_8short\fP(const char *\fIsrc\fR,unsigned short *\fIdest\fR);
+.SH DESCRIPTION
+scan_8short parses an unsigned short integer in octal ASCII representation
+from \fIsrc\fR and writes the result into \fIdest\fR. It returns the
+number of bytes read from \fIsrc\fR.
+.SH "SEE ALSO"
+scan_xshort(3)

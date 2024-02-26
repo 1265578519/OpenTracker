@@ -1,0 +1,17 @@
+.TH dns_name4 3
+.SH NAME
+dns_name4 \- look up host name
+.SH SYNTAX
+.B #include <dns.h>
+
+int \fBdns_name4\fP(stralloc* \fIout\fR,const char* \fIip\fR[4]);
+.SH DESCRIPTION
+dns_name4 looks up the domain name for the 4-byte IP address in \fIip\fR. It
+puts the (first) domain name into \fIout\fR and returns 0. If the relevant
+in-addr.arpa domain does not exist in DNS, or has no PTR records, \fIout\fR
+will be empty.
+
+If dns_name4 has trouble with the DNS lookup or runs out of memory, it returns
+-1, setting errno appropriately. It may or may not change \fIout\fR.
+.SH "SEE ALSO"
+dns_name_packet(3), dns_name4_domain(3), dns_name6(3), dns_ip4(3)

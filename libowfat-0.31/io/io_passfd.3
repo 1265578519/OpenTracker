@@ -1,0 +1,21 @@
+.TH io_passfd 3
+.SH NAME
+io_passfd \- pass a file descriptor over a Unix Domain socket
+.SH SYNTAX
+.B #include <io.h>
+
+int \fBio_passfd\fP(int64 sock,int64 fd);
+.SH DESCRIPTION
+io_passfd transfers the file descriptor \fIfd\fR over the Unix Domain
+socket \fIsock\fR.  This works much like dup(2), only that the copy of
+the descriptor appears not in this process but at the other end of the
+Unix Domain socket (which therefore must be a process on the same
+system).
+
+The peer can then use io_receivefd(3) to receive the file descriptor.
+
+Note that the passed descriptor stays open in the sending process.
+.SH "RETURN VALUE"
+io_passfd returns 0 on success, -1 on error (setting errno accordingly).
+.SH "SEE ALSO"
+io_receivefd(3)

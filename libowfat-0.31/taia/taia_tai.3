@@ -1,0 +1,11 @@
+.TH taia_tai 3
+.SH NAME
+taia_tai \- get current time
+.SH SYNTAX
+.B #include <taia.h>
+
+extern int \fBtaia_tai\fP(const struct taia* \fIt\fR,struct tai* \fIsec\fR);
+.SH DESCRIPTION
+taia_tai places into \fIsec\fR the integer part of \fIt\fR.  If \fIt\fR
+contains a TAI64NA label then \fIsec\fR will contain the corresponding
+TAI64 label.

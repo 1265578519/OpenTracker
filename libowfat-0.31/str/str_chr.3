@@ -1,0 +1,12 @@
+.TH str_chr 3
+.SH NAME
+str_chr \- find character in ASCIIZ string
+.SH SYNTAX
+.B #include <str.h>
+
+size_t \fBstr_chr\fP(const char* \fIhaystack\fR,char \fIneedle\fR);
+.SH DESCRIPTION
+str_chr returns the index of the first occurrance of \fIneedle\fR or \\0 in
+\fIstring\fR.
+.SH "SEE ALSO"
+strchr(3)

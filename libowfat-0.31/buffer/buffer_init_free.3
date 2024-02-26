@@ -1,0 +1,14 @@
+.TH buffer_init_free 3
+.SH NAME
+buffer_init_free \- initialize buffer structure
+.SH SYNTAX
+.B #include <buffer.h>
+
+void \fBbuffer_init_free\fR(buffer &\fIb\fR,
+                ssize_t (*\fIop\fR)(int,char*,size_t),
+                int \fIfd\fR, char* \fIy\fR, size_t \fIylen\fR);
+.SH DESCRIPTION
+buffer_init_free is like buffer_init except that the memory (\fIy\fR is
+marked to be freed by buffer_close().
+.SH "SEE ALSO"
+buffer_init(3), buffer_mmap_read(3), buffer(3)

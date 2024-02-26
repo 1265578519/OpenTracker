@@ -1,0 +1,22 @@
+.TH taia_now 3
+.SH NAME
+taia_now \- get current time
+.SH SYNTAX
+.B #include <taia.h>
+
+extern int \fBtaia_now\fP(struct taia* \fIt\fR);
+.SH DESCRIPTION
+taia_now puts the current time into \fIt\fR. More precisely: tai_now puts into
+\fIt\fR its best guess as to the TAI64NA label for the 1-attosecond interval that
+contains the current time.
+
+This implementation of taia_now assumes that the time_t returned from
+the time function represents the number of TAI seconds since 1970-01-01
+00:00:10 TAI. This matches the convention used by the Olson tz library
+in ``right'' mode.
+
+Beware that many clocks are not set accurately, and even the best
+scientific clocks are nowhere near 1-attosecond accuracy; however, an
+inaccurate clock may still produce reasonably accurate time differences.
+.SH "SEE ALSO"
+tai_now(3)

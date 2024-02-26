@@ -1,0 +1,19 @@
+.TH uint16_unpack_big 3
+.SH NAME
+uint16_unpack_big \- read an unsigned big-endian 16-bit integer
+.SH SYNTAX
+.B #include <uint16.h>
+
+uint16 \fIu\fR;
+
+void \fBuint16_unpack_big\fP(const char \fIs\fR[2],uint16 *\fIu\fR);
+.SH DESCRIPTION
+uint16 is a 16-bit unsigned integer type, normally either unsigned int
+or unsigned long.
+
+uint16_unpack_big portably reads a uint16 as stored on a big-endian
+architecture (i.e. in network byte order) from \fIs\fR and writes it
+into \fIu\fR in the native byte order.
+
+.SH "SEE ALSO"
+uint16_pack_big(3), uint16_unpack(3)

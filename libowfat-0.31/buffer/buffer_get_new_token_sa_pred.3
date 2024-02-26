@@ -1,0 +1,33 @@
+.TH buffer_get_new_token_sa_pred 3
+.SH NAME
+buffer_get_new_token_sa_pred \- read token from buffer
+.SH SYNTAX
+.nf
+.B #include <stralloc.h>
+.B #include <buffer.h>
+
+int \fBbuffer_get_new_token_sa_pred\fP(buffer* \fIb\fR,stralloc* \fIsa\fR,
+                 int (*\fIpredicate\fR)(stralloc* * \fIsa\fR));
+.SH DESCRIPTION
+buffer_get_token_sa_pred copies data from \fIb\fR to \fIsa\fR until
+\fIpredicate\fR(\fIsa\fR) returns 1 or -1.
+
+If \fIpredicate\fR returns 1 once a '\\n' was read, that new-line
+character is still appended to \fIsa\fR -- use stralloc_chop or
+stralloc_chomp to get rid of it.  \fIpredicate\fR can also return 0
+(indicating further input is required to complete the token) or -1
+(abort and return -1; use this if \fIpredicate\fR wants to enfore a
+maximum message size or does timeout handling or detects a malformed
+message).
+
+If reading from the buffer or allocating memory fails,
+buffer_get_new_token_sa_pred returns -1 and sets \fIerrno\fR
+appropriately.  At that point \fIsa\fR may already contain a partial
+token.
+
+On success, buffer_get_new_token_sa_pred returns 0.
+
+If you want to read from a non-blocking socket, use
+buffer_get_token_sa_pred instead.
+.SH "SEE ALSO"
+buffer_getline_sa(3), buffer_get_token(3), buffer(3)

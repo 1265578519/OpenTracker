@@ -1,0 +1,21 @@
+.TH sub_of 3
+.SH NAME
+sub_of \- subtract two integers, check for arithmetic overflow
+.SH SYNTAX
+.B #include <rangecheck.h>
+
+int \fBsub_of\fP(dest,a,b);
+.SH DESCRIPTION
+If calculating a-b is possible without causing undefined behavior or an
+arithmetic overflow in C, and the result fits into the destination
+integer type, do dest=a-b and return 0.
+
+Otherwise, return 1.
+
+Note: This is a macro, so dest does not have to be a pointer.
+.SH BUGS
+In the multiplication functions, a return value of 1 signals success and
+0 failure. In add_of, sub_of and assign it's the other way around.
+.SH "SEE ALSO"
+add_of(3), assign(3), imult16(3), umult16(3), imult32(3), umult32(3),
+imult64(3), umult64(3)

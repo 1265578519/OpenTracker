@@ -1,0 +1,24 @@
+.TH mmap_readat 3
+.SH NAME
+mmap_readat \- memory map a file for reading
+.SH SYNTAX
+.B #include <mmap.h>
+
+char* \fBmmap_readat\fP(const char* \fIfilename\fR,size_t* \fIfilesize\fR,int \fIdirfd\fR);
+.SH DESCRIPTION
+mmap_readat opens \fIfilename\fR for reading, maps the whole file into
+memory, closes the file, writes the length of the file to \fIfilesize\fR
+and returns a pointer to the mapped file.
+
+If \fIfilename\fR is a relative path and \fIdirfd\fR is not AT_FDCWD
+(defined in fcntl.h),
+\fIfilename\fR is interpreted relative to \fIdirfd\fR, which must be an
+open directory.
+
+The file is unmapped by the operating system if the process terminates.
+It can also be manually unmapped by calling \fBmunmap\fR from
+<sys/mman.h>.
+
+If the file could not be opened or mapped, (void*)0 is returned.
+.SH "SEE ALSO"
+mmap_unmap(3)

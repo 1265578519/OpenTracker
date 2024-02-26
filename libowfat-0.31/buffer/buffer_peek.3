@@ -1,0 +1,23 @@
+.TH buffer_peek 3
+.SH NAME
+buffer_peek \- return pointer to string in buffer
+.SH SYNTAX
+.B #include <buffer.h>
+
+char* \fBbuffer_peek\fP(buffer* \fIb\fR);
+.SH DESCRIPTION
+buffer_peek returns a pointer to the first byte of the string in the
+buffer.
+.SH EXAMPLE
+buffer_feed, buffer_peek and buffer_seek can be used for efficient reading
+loops, nearly the same speed as calling \fBop\fR directly:
+
+  for (;;) {
+    r = buffer_feed(&b);
+    if (r <= 0) return r;
+    x = buffer_peek(&b);
+    dosomething(x,r);
+    buffer_seek(&b,r);
+  }
+.SH "SEE ALSO"
+buffer_init(3), buffer_feed(3), buffer_get(3), buffer_seek(3), buffer(3)

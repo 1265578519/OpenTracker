@@ -1,0 +1,32 @@
+.TH range_arrayinbuf 3
+.SH NAME
+range_arrayinbuf \- range check for array in buffer
+.SH SYNTAX
+.B #include <rangecheck.h>
+
+int \fBrange_arrayinbuf\fR(const void* buf,size_t len,
+                     const void* arraystart,
+                     size_t elements,size_t membersize);
+
+.SH DESCRIPTION
+range_arrayinbuf checks that the array starting at
+\fIarraystart\fR consisting of \fIelements\fR members of size
+\fImembersize\fR each starts and ends within the buffer
+\fIbuf\fR[0..\fIlen\fR-1].
+
+If the array is 0-terminated and you don't know the length beforehand,
+use range_strinbuf, range_str2inbuf or range_str4inbuf instead.
+.SH "RETURN VALUE"
+If the buffer is implausible (buf is NULL or buf+len has an integer
+overflow), return 0.
+
+If the array is implausible (arraystart is NULL, elements*membersize
+overflows, or calculating the byte offset of the last element
+overflows), return 0.
+
+If the first or last element of the array points before or after the
+buffer, return 0.
+
+Otherwise, return 1.
+.SH "SEE ALSO"
+rangecheck(3)

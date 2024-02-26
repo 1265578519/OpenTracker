@@ -1,0 +1,17 @@
+.TH stralloc_cats 3
+.SH NAME
+stralloc_cats \- append data to a stralloc
+.SH SYNTAX
+.B #include <stralloc.h>
+
+int \fBstralloc_cats\fP(stralloc* \fIsa\fR,const char* \fIbuf\fR);
+.SH DESCRIPTION
+stralloc_cats appends a \\0-terminated string from \fIbuf\fR to the
+end of the string stored in \fIsa\fR, allocating space if necessary, and
+returns 1. If \fIsa\fR is unallocated, stralloc_cats is the same as
+stralloc_copys. If it runs out of memory, stralloc_cats leaves \fIsa\fR
+alone and returns 0.
+.SH "RETURN VALUE"
+1 for success, 0 on memory allocation failure.
+.SH "SEE ALSO"
+stralloc_copyb(3)

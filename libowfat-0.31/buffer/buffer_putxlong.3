@@ -1,0 +1,15 @@
+.TH buffer_putxlong 3
+.SH NAME
+buffer_putxlong \- write a hexidecimal ASCII representation of an unsigned
+long integer to buffer
+.SH SYNTAX
+.B #include <buffer.h>
+
+int \fBbuffer_putxlong\fP(buffer* \fIb\fR,unsigned long \fIx\fR);
+.SH DESCRIPTION
+buffer_putxlong is similar to passing the result of fmt_xlong to
+buffer_put.
+.SH "RETURN VALUE"
+0 if everything is fine, -1 on error (setting \fIerrno\fR).
+.SH "SEE ALSO"
+fmt_xlong(3), buffer_put(3), buffer_flush(3), buffer(3)

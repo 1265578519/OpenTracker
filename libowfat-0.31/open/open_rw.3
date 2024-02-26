@@ -1,0 +1,14 @@
+.TH open_rw 3
+.SH NAME
+open_rw \- open a file for reading and writing
+.SH SYNTAX
+.B #include <open.h>
+
+int \fBopen_rw\fP(const char *\fIfilename\fR);
+.SH DESCRIPTION
+open_rw opens the file \fIfilename\fR for reading and writing use and
+returns the file handle.  If the file does not exist, it will be created
+with mode 0644.  If there was an error opening or creating the file,
+open_rw returns -1 and sets errno accordingly.
+.SH "SEE ALSO"
+open(2)

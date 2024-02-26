@@ -1,0 +1,24 @@
+.TH fmt_utf8 3
+.SH NAME
+fmt_utf8 \- encode 31-bit unsigned integer using UTF-8 rules
+.SH SYNTAX
+.B #include <fmt.h>
+
+size_t \fBfmt_utf8\fP(char *\fIdest\fR,uint32_t \fIsource\fR);
+.SH DESCRIPTION
+fmt_utf8 encodes a 31-bit unsigned integer using the UTF-8 rules.  This
+can take from 1 byte (0-0x7f) up to 5 bytes (0x4000000-0x7fffffff).
+Values larger than 0x7fffffff cannot be represented in this encoding.
+
+If \fIdest\fR equals FMT_LEN (i.e. is NULL), fmt_utf8 returns the
+number of bytes it would have written.
+
+For convenience, fmt.h defines the integer FMT_UTF8 to be big enough to
+contain every possible fmt_utf8 output.
+.SH NOTE
+fmt_utf8 and scan_utf8 implement the encoding from UTF-8, but are meant
+to be able to store integers, not just Unicode code points.  Values
+larger than 0x10ffff are not valid UTF-8 (see RFC 3629) but can be
+represented in the encoding, so fmt_utf8 will allow them.
+.SH "SEE ALSO"
+scan_utf8(3)

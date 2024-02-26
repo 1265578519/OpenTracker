@@ -1,0 +1,37 @@
+.TH socket_send6 3
+.SH NAME
+socket_send6 \- send a UDP datagram
+.SH SYNTAX
+.B #include <socket.h>
+
+ssize_t \fBsocket_send6\fP(int \fIs\fR, const char* \fIbuf\fR, size_t \fIlen\fR,
+                     const char \fIip\fR[16], uint16 \fIport\fR, uint32 \fIscope_id\fR);
+.SH DESCRIPTION
+socket_send6 sends \fIlen\fR bytes starting at \fIbuf\fR in a UDP
+datagram over the socket \fIs\fR to UDP port \fIport\fR on IP address
+\fIip\fR.
+
+You can call socket_send6 without calling socket_bind6.  This has the
+effect as first calling socket_bind6 with IP address :: and port 0.
+
+The meaning of \fIscope_id\fR is dependent on the implementation and
+IPv6 IP.  On link-local IPv6 addresses it specifies the outgoing
+interface index.  The name (e.g. "eth0") for a given interface index can
+be queried with getifname.  \fIscope_id\fR should normally be set to 0.
+.SH RETURN VALUE
+socket_send6 returns 0 if the datagram was sent successfully.  If not,
+it returns -1 and sets errno appropriately.
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[16];
+  uint16 \fIp\fR;
+  uint32 \fIscope_id\fR;
+
+  \fIs\fR = socket_tcp4();
+  socket_bind6(s,ip,p);
+  socket_send6(s,"hello, world",12,ip,p,scope_id);
+
+.SH "SEE ALSO"
+socket_send4(3), socket_getifidx(3)

@@ -1,0 +1,14 @@
+.TH imult32 3
+.SH NAME
+imult32 \- integer multiplication with overflow checking
+.SH SYNTAX
+.B #include <safemult.h>
+
+int \fBimult32\fP(int32 a,int32 b,int32* c);
+.SH DESCRIPTION
+imult32 does c=a*b and returns 1.
+
+In case of an integer overflow, imult32 leaves \fIc\fR alone and returns
+0.
+.SH "SEE ALSO"
+imult16(3), umult32(3), imult64(3)

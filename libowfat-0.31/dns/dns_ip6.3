@@ -1,0 +1,25 @@
+.TH dns_ip6 3
+.SH NAME
+dns_ip6 \- look up IPv6 addresses
+.SH SYNTAX
+.B #include <dns.h>
+
+int \fBdns_ip6\fP(stralloc* \fIout\fR,stralloc* \fIfqdn\fR);
+.SH DESCRIPTION
+dns_ip6 looks up 16-byte IPv6 addresses for the fully-qualified domain name in
+\fIfqdn\fR. It puts the concatenation of the IPv6 addresses into \fIout\fR and
+returns 0. If the domain does not exist in DNS, or has no IP addresses,
+\fIout\fR will be empty.
+
+dns_ip6 also looks up 4-byte IPv4 addresses and converts them into
+IPv4-mapped IPv6 addresses (::ffff:1.2.3.4) to provide easy backwards
+compatibility for IPv6 applications.
+
+If dns_ip6 has trouble with the DNS lookup or runs out of memory, it returns
+-1, setting errno appropriately. It may or may not change \fIout\fR.
+
+If \fIfqdn\fR is an IPv6 address, dns_ip6 puts that IP address into
+\fIout\fR without checking DNS.  IPv4 addresses are also used directly
+without DNS lookup.
+.SH "SEE ALSO"
+dns_ip6_packet(3), dns_ip4(3), dns_name6(3)

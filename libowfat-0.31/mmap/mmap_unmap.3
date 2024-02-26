@@ -1,0 +1,12 @@
+.TH mmap_unmap 3
+.SH NAME
+mmap_unmap \- unmap an existing memory mapping
+.SH SYNTAX
+.B #include <mmap.h>
+
+int \fBmmap_unmap\fP(char* \fImapped\fR,size_t \fImaplen\fR);
+.SH DESCRIPTION
+mmap_unmap removes a memory mapping established by mmap_read,
+mmap_private or mmap_shared.
+.SH "SEE ALSO"
+munmap(2), mmap_read(3), mmap_private(3), mmap_shared(3)

@@ -1,0 +1,11 @@
+.TH io_check 3
+.SH NAME
+io_check \- check for new readable or writable descriptors
+.SH SYNTAX
+.B #include <io.h>
+
+int64 \fBio_check\fP();
+.SH DESCRIPTION
+io_check is like io_waituntil() with a deadline of now.
+.SH "SEE ALSO"
+io_wait(3), io_waituntil(3)

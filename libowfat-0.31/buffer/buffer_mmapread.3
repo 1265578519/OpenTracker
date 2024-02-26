@@ -1,0 +1,33 @@
+.TH buffer_mmapread 3
+.SH NAME
+buffer_mmapread \- create read-only memory-mapped file buffer
+.SH SYNTAX
+.B #include <buffer.h>
+
+int \fBbuffer_mmapread\fR(buffer &\fIb\fR,const char* \fIfilename\fR);
+.SH DESCRIPTION
+buffer_mmapread opens \fIfilename\fR for reading and fills \fIb\fR so
+that the contents of the file can be read from it.  Using mmap is more
+efficient than reading through a real buffer, but you have to call
+buffer_close to unmap the memory in the end.
+.SH EXAMPLE
+  #include <buffer.h>
+  #include <open.h>
+
+  buffer input;
+  char x;
+
+  buffer_mmapread(&input,"/etc/passwd");
+  while (buffer_get(&input,&x,1)==1) {
+    buffer_put(buffer_1,&x,1);
+    if (x=='\\n') break;
+  }
+  buffer_flush(buffer_1);
+  buffer_close(&input);
+
+.SH "RETURN VALUE"
+\fBbuffer_mmapread\fR returns 0 if everything was fine, -1 on error
+(setting \fIerrno\fR).
+
+.SH "SEE ALSO"
+buffer_flush(3), buffer(3)

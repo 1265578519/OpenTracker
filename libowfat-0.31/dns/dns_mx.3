@@ -1,0 +1,18 @@
+.TH dns_mx 3
+.SH NAME
+dns_mx \- look up Mail eXchanger
+.SH SYNTAX
+.B #include <dns.h>
+
+int \fBdns_mx\fP(stralloc* \fIout\fR,stralloc* \fIfqdn\fR);
+.SH DESCRIPTION
+dns_mx looks up MX records for the fully-qualified domain name in
+\fIfqdn\fR. It puts the MX records into \fIout\fR and returns 0. Each MX
+record is a two-byte MX distance (big endian) followed by a
+\\0-terminated dot-encoded domain name. If the domain does not exist in
+DNS, or has no MX records, \fIout\fR will be empty.
+
+If dns_mx has trouble with the DNS lookup or runs out of memory, it returns
+-1, setting errno appropriately. It may or may not change \fIout\fR.
+.SH "SEE ALSO"
+dns_mx_packet(3), dns_ip4(3), dns_ip6(3)

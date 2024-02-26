@@ -1,0 +1,23 @@
+.TH io_getcookie 3
+.SH NAME
+io_getcookie \- retrieve cookie
+.SH SYNTAX
+.B #include <io.h>
+
+void* \fBio_getcookie\fP(int64 fd);
+.SH DESCRIPTION
+io_getcookie retrieves a cookie (pointer to some anonymous data
+structure you associated with this descriptor).
+
+Use io_setcookie(3) to associate a cookie with a descriptor.
+
+If you did not associate a cookie with this descriptor, io_getcookie
+returns NULL.
+
+The idea is that you put the state associated with a TCP connection you
+serve in a common struct.  Then you do not need to have your own data
+structure to retrieve the state for a connection, you can just use the
+data structure io_wait already maintains.  The lookup works in constant
+time and should not cause any cache misses.
+.SH "SEE ALSO"
+io_wait(3), io_setcookie(3)

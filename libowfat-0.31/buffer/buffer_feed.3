@@ -1,0 +1,14 @@
+.TH buffer_feed 3
+.SH NAME
+buffer_feed \- low-level component of buffer_get
+.SH SYNTAX
+.B #include <buffer.h>
+
+int \fBbuffer_feed\fP(buffer* \fIb\fR);
+.SH DESCRIPTION
+If the string is nonempty, buffer_feed returns the length of the string.
+If the string is empty, buffer_feed uses the read operation to feed data
+into the string; it then returns the new length of the string, or 0 for
+end of input, or -1 for error.
+.SH "SEE ALSO"
+buffer_init(3), buffer_get(3), buffer_peek(3), buffer_feed(3), buffer(3)

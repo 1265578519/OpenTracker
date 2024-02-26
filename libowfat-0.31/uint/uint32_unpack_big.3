@@ -1,0 +1,19 @@
+.TH uint32_unpack_big 3
+.SH NAME
+uint32_unpack_big \- read an unsigned big-endian 32-bit integer
+.SH SYNTAX
+.B #include <uint32.h>
+
+uint32 \fIu\fR;
+
+void \fBuint32_unpack_big\fP(const char \fIs\fR[4],uint32 *\fIu\fR);
+.SH DESCRIPTION
+uint32 is a 32-bit unsigned integer type, normally either unsigned int
+or unsigned long.
+
+uint32_unpack_big portably reads a uint32 as stored on a big-endian
+architecture (i.e. in network byte order) from \fIs\fR and writes it
+into \fIu\fR in the native byte order.
+
+.SH "SEE ALSO"
+uint32_pack_big(3), uint32_unpack(3)

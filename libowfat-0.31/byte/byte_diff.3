@@ -1,0 +1,18 @@
+.TH byte_diff 3
+.SH NAME
+byte_diff \- compare two strings
+.SH SYNTAX
+.B #include <byte.h>
+
+int \fBbyte_diff\fP(const char *\fIone\fR,size_t \fIlen\fR,const char *\fItwo\fR);
+.SH DESCRIPTION
+\fIbyte_diff\fR returns negative, 0, or positive, depending on whether
+the string \fIone\fR[0], \fIone\fR[1], ..., \fIone\fR[\fIlen\fR-1] is
+lexicographically smaller than, equal to, or greater than the string
+\fIone\fR[0], \fIone\fR[1], ..., \fIone\fR[\fIlen\fR-1].
+
+When the strings are different, byte_diff does not read bytes past the
+first difference.
+
+.SH "SEE ALSO"
+byte_equal(3)

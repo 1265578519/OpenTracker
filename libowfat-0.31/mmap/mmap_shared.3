@@ -1,0 +1,26 @@
+.TH mmap_shared 3
+.SH NAME
+mmap_shared \- memory map a file for reading and writing
+.SH SYNTAX
+.B #include <mmap.h>
+
+char* \fBmmap_shared\fP(const char* \fIfilename\fR,size_t* \fIfilesize\fR);
+.SH DESCRIPTION
+mmap_shared opens \fIfilename\fR for reading and writing, maps the
+whole file into memory, closes the file, writes the length of the file
+to \fIfilesize\fR and returns a pointer to the mapped file.
+
+The file is mapped shared.  Changes done to the mapped region are
+written to disk and are visible to other processes reading from the file
+or mapping the same file into memory.
+
+The file is unmapped by the operating system if the process terminates.
+It can also be manually unmapped by calling \fBmunmap\fR from
+<sys/mman.h>.
+
+To write changes to disk immediately, you can use msync from
+<sys/mman.h>.
+
+If the file could not be opened or mapped, (void*)0 is returned.
+.SH "SEE ALSO"
+mmap_unmap(3), msync(2)

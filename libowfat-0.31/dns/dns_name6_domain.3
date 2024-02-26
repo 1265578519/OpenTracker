@@ -1,0 +1,19 @@
+.TH dns_name6_domain 3
+.SH NAME
+dns_name6_domain \- construct host name for reverse lookup
+.SH SYNTAX
+.B #include <dns.h>
+
+void \fBdns_name6_domain\fP(char \fIq\fR[DNS_NAME6_DOMAIN],
+                     const char* \fIip\fR[16]);
+.SH DESCRIPTION
+dns_name6_domain is a low-level component of dns_name6.  It converts an
+IP address such as 4321:0:1:2:3:4:567:89ab into a domain name such as
+b.a.9.8.7.6.5.0.4.0.0.0.3.0.0.0.2.0.0.0.1.0.0.0.0.0.0.0.1.2.3.4.IP6.ARPA
+and places the packet-encoded domain name into \fIq\fR.
+
+q is zero terminated.
+
+q must have space for DNS_NAME6_DOMAIN bytes.
+.SH "SEE ALSO"
+dns_name6(3), dns_name4_domain(3)

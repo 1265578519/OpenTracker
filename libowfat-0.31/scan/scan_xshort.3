@@ -1,0 +1,17 @@
+.TH scan_xshort 3
+.SH NAME
+scan_xshort \- parse an unsigned short integer in hexadecimal ASCII representation
+.SH SYNTAX
+.B #include <scan.h>
+
+size_t \fBscan_xshort\fP(const char *\fIsrc\fR,unsigned short *\fIdest\fR);
+.SH DESCRIPTION
+scan_xshort parses an unsigned short integer in hexadecimal ASCII
+representation from \fIsrc\fR and writes the result into \fIdest\fR. It
+returns the number of bytes read from \fIsrc\fR.
+
+scan_xshort understands both upper and lower case letters.
+
+scan_xshort does not expect or understand a "0x" prefix.
+.SH "SEE ALSO"
+fmt_xshort(3)

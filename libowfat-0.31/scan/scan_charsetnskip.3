@@ -1,0 +1,15 @@
+.TH scan_charsetnskip 3
+.SH NAME
+scan_charsetnskip \- skip characters from set
+.SH SYNTAX
+.B #include <scan.h>
+
+size_t \fBscan_charsetnskip\fP(const char* \fIsrc\fR, const char* \fIcharset\fR,
+       size_t \fIlimit\fR);
+.SH DESCRIPTION
+scan_charsetnskip returns the length of the maximum prefix of \fIsrc\fR
+that consists solely of characters that occur in \fIcharset\fR (up to
+and not including the \\0).  \fIsrc\fR is considered to end at \\0 or
+after \fIlimit\fR characters.
+.SH "SEE ALSO"
+scan_noncharsetnskip(3)

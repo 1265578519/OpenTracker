@@ -1,0 +1,13 @@
+.TH scan_int 3
+.SH NAME
+scan_int \- parse an integer in decimal ASCII representation
+.SH SYNTAX
+.B #include <scan.h>
+
+size_t \fBscan_int\fP(const char *\fIsrc\fR,int *\fIdest\fR);
+.SH DESCRIPTION
+scan_int parses an integer in decimal ASCII representation
+from \fIsrc\fR and writes the result into \fIdest\fR. It returns the
+number of bytes read from \fIsrc\fR.
+.SH "SEE ALSO"
+scan_long(3), scan_xint(3), scan_8int(3), fmt_int(3)

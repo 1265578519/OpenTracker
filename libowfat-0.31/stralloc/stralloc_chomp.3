@@ -1,0 +1,14 @@
+.TH stralloc_chomp 3
+.SH NAME
+stralloc_chomp \- remove trailing CR, LF or CRLF
+.SH SYNTAX
+.B #include <stralloc.h>
+
+int \fBstralloc_chomp\fP(stralloc* \fIsa\fR);
+.SH DESCRIPTION
+stralloc_chomp removes trailing CRLF, CR or LF from \fIsa\fR and returns
+the number of removed characters (i.e. 0, 1 or 2).
+.SH "RETURN VALUE"
+number of removed characters (0, 1, or 2).
+.SH "SEE ALSO"
+stralloc_chop(3)

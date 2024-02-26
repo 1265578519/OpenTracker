@@ -1,0 +1,17 @@
+.TH uint64_pack_big 3
+.SH NAME
+uint64_pack_big \- write an unsigned big-endian 64-bit integer
+.SH SYNTAX
+.B #include <uint64.h>
+
+uint64 \fIu\fR;
+
+void \fBuint64_pack_big\fP(char \fIs\fR[4],uint64 \fIu\fR);
+.SH DESCRIPTION
+uint64 is a 64-bit unsigned integer type.
+
+uint64_pack_big portably writes a uint64 \fIu\fR to \fIs\fR in
+big-endian (i.e. network) byte order.
+
+.SH "SEE ALSO"
+uint64_unpack_big(3), uint64_pack(3)

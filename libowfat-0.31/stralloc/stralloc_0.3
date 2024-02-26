@@ -1,0 +1,15 @@
+.TH stralloc_0 3
+.SH NAME
+stralloc_0 \- append \\0 to a stralloc
+.SH SYNTAX
+.B #include <stralloc.h>
+
+int \fBstralloc_0\fP(stralloc* \fIsa\fR);
+.SH DESCRIPTION
+stralloc_0 appends \\0 to a stralloc.
+
+It is a shortcut for stralloc_append(\fIsa\fR,"").
+.SH "RETURN VALUE"
+1 for success, 0 on memory allocation failure.
+.SH "SEE ALSO"
+stralloc_append(3)

@@ -1,0 +1,25 @@
+.TH io_setcookie 3
+.SH NAME
+io_setcookie \- associate cookie with descriptor
+.SH SYNTAX
+.B #include <io.h>
+
+void \fBio_setcookie\fP(int64 fd,void* cookie);
+.SH DESCRIPTION
+io_setcookie associates a cookie (pointer to some anonymous data
+structure) with this descriptor.  Only one cookie can be associated with
+a descriptor.
+
+Use io_getcookie(3) to retrieve the cookie for a descriptor (usually
+after io_canread or io_canwrite brought it to your attention).
+
+Please note that io_close does not deallocate your cookie.  You need to
+do that yourself.
+
+The idea is that you put the state associated with a TCP connection you
+serve in a common struct.  Then you do not need to have your own data
+structure to retrieve the state for a connection, you can just use the
+data structure io_wait already maintains.  The lookup works in constant
+time and should not cause any cache misses.
+.SH "SEE ALSO"
+io_wait(3), io_getcookie(3)

@@ -1,0 +1,18 @@
+.TH stralloc_copyb 3
+.SH NAME
+stralloc_copyb \- copy data into a stralloc
+.SH SYNTAX
+.B #include <stralloc.h>
+
+int \fBstralloc_copyb\fP(stralloc* \fIsa\fR,const char* \fIbuf\fR,size_t \fIlen\fR);
+.SH DESCRIPTION
+stralloc_copyb makes sure that \fIsa\fR has enough space allocated to hold
+\fIlen\fR bytes.  Then it copies the first \fIlen\fR bytes from
+\fIbuf\fR into the stralloc.
+
+The data that \fIsa\fR previously contained is overwritten and truncated.
+
+If stralloc_copys runs out of memory, stralloc_copys leaves \fIsa\fR
+alone and return 0, otherwise it returns 1.
+.SH "RETURN VALUE"
+1 for success, 0 on memory allocation failure.

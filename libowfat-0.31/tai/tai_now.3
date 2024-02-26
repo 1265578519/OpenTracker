@@ -1,0 +1,18 @@
+.TH tai_now 3
+.SH NAME
+tai_now \- get current time
+.SH SYNTAX
+.B #include <tai.h>
+
+extern int \fBtai_now\fP(struct tai* \fIt\fR);
+.SH DESCRIPTION
+tai_now puts the current time into \fIt\fR. More precisely: tai_now puts into
+\fIt\fR its best guess as to the TAI64 label for the 1-second interval that
+contains the current time.
+
+This implementation of tai_now assumes that the time_t returned from the
+time function represents the number of TAI seconds since 1970-01-01
+00:00:10 TAI. This matches the convention used by the Olson tz library
+in ``right'' mode.
+.SH "SEE ALSO"
+taia_now(3)

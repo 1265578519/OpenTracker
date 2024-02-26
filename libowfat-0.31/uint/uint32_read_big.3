@@ -1,0 +1,16 @@
+.TH uint32_read_big 3
+.SH NAME
+uint32_read_big \- read an unsigned big-endian 32-bit integer
+.SH SYNTAX
+.B #include <uint32.h>
+
+uint32 \fBuint32_read_big\fP(const char \fIs\fR[4]);
+.SH DESCRIPTION
+uint32 is a 32-bit unsigned integer type, normally either unsigned int
+or unsigned long.
+
+uint32_read_big portably reads a uint32 as stored on a big-endian
+architecture from \fIs\fR and returns it.
+
+.SH "SEE ALSO"
+uint32_unpack(3), uint32_unpack_big(3)

@@ -1,0 +1,16 @@
+.TH socket_remote4 3
+.SH NAME
+socket_remote4 \- get remote IP address of socket
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_remote4\fP(int \fIs\fR,char \fIip\fR[4],uint16 *\fIport\fR);
+.SH DESCRIPTION
+socket_remote4 returns the remote IP address and port for the UDP or TCP
+socket \fIs\fR and writes the IP address to \fIip\fR and the port to
+\fIport\fR.
+
+If something goes wrong, socket_remote4 returns -1, setting errno
+appropriately.
+.SH "SEE ALSO"
+socket_accept4(3), socket_local4(3)

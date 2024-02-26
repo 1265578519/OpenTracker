@@ -1,0 +1,22 @@
+.TH buffer_getn 3
+.SH NAME
+buffer_getn \- read binary data from buffer
+.SH SYNTAX
+.B #include <buffer.h>
+
+ssize_t \fBbuffer_getn\fP(buffer* \fIb\fR,char* \fIx\fR,size_t \fIlen\fR);
+.SH DESCRIPTION
+buffer_getn copies data to \fIx\fR[0], \fIx\fR[1], ...,
+\fIx\fR[\fIlen\fR-1] from the buffer, calling buffer_feed as needed, and
+returns \fIlen\fR.
+
+If a read error occurs, buffer_getn returns -1 and sets \fIerrno\fR
+appropriately.  It may then have put any number between 0 and \fIlen\fR
+in the buffer, you can't tell.  That makes this function only useful if
+you don't care when an error occurs.  Use buffer_get otherwise.
+
+If the read operation signals end-of-file before \fIlen\fR bytes were
+read, buffer_getn returns the number of bytes read from the buffer
+before end-of-file.
+.SH "SEE ALSO"
+buffer_init(3), buffer_get(3), buffer(3)

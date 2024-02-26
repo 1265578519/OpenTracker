@@ -1,0 +1,38 @@
+.TH socket_accept6 3
+.SH NAME
+socket_accept6 \- accept an IPv6 TCP connection on a socket
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_accept6\fP(int \fIs\fR,char \fIip\fR[16],uint16 *\fIport\fR,uint32 *\fIscope_id\fR);
+.SH DESCRIPTION
+When a TCP connection arrives on a listening TCP socket \fIs\fR, the
+socket becomes readable.
+
+socket_accept6 accepts the connection.  It sets \fIip\fR and \fIport\fR
+to the client IP address and client TCP port and \fIscope_id\fR to the
+IPv6 scope ID.  It creates a new socket for the connection, and returns
+a file descriptor pointing to the new socket; you can use the read and
+write system calls to transmit data through that file descriptor.
+
+If \fIscope_id\fR is the null pointer, socket_accept6 will discard the
+scope ID.
+
+If something goes wrong, socket_accept6 returns -1, setting errno
+appropriately, without creating a new socket.
+
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[16];
+  uint16 \fIport\fR;
+  uint32 \fIscope_id\fR;
+
+  \fIs\fR = socket_tcp6();
+  socket_bind6(s,ip,port,scope_id);
+  socket_listen(s,16);
+  socket_accept6(s,ip,&port,&scope_id);
+
+.SH "SEE ALSO"
+socket_accept4(3), socket_connected(3)

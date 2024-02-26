@@ -1,0 +1,15 @@
+.TH dns_mx_packet 3
+.SH NAME
+dns_mx_packet \- extract MX records from DNS answer packet
+.SH SYNTAX
+.B #include <dns.h>
+
+int \fBdns_mx_packet\fP(stralloc* \fIout\fR,const char* \fIbuf\fR,
+                  unsigned int \fIlen\fR);
+.SH DESCRIPTION
+dns_mx_packet is a low-level component of dns_mx, designed to support
+asynchronous DNS lookups. It reads a DNS packet of length \fIlen\fR from \fIbuf\fR,
+extracts the MX records from the answer section of the packet, puts the
+result into \fIout\fR, and returns 0 or -1 the same way as dns_mx.
+.SH "SEE ALSO"
+dns_mx(3), dns_ip4(3), dns_ip6(3)

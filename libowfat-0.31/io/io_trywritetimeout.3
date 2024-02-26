@@ -1,0 +1,23 @@
+.TH io_trywritetimeout 3
+.SH NAME
+io_trywritetimeout \- write to a descriptor without blocking
+.SH SYNTAX
+.B #include <io.h>
+
+int \fBio_trywritetimeout\fP(int64 fd,const char* buf,int64 len);
+.SH DESCRIPTION
+io_trywritetimeout is identical to io_trywrite, with the following
+exception: if
+
+.RS 0
+.IP \[bu] 3
+io_trywrite returns -1 (the descriptor is not ready for writing), and
+.IP \[bu]
+the descriptor has a timeout, and
+.IP \[bu]
+the write attempt was after the descriptor's timeout,
+.RE
+
+then io_trywritetimeout instead returns -2, with errno set to ETIMEDOUT.
+.SH "SEE ALSO"
+io_nonblock(3), io_waitwrite(3), io_trywrite(3)

@@ -1,0 +1,30 @@
+.TH socket_bind4 3
+.SH NAME
+socket_bind4 \- set the local IP address and port of a socket
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_bind4\fP(int \fIs\fR,char \fIip\fR[4],uint16 \fIport\fR);
+.SH DESCRIPTION
+socket_bind4 sets the local IP address and TCP/UDP port of a TCP/UDP
+socket \fIs\fR to \fIip\fR and \fIport\fR respectively.
+
+If the IP address is 0.0.0.0, the operating system chooses a local IP
+address.  If \fIport\fR is 0, the operating system chooses a port.
+
+Normally socket_bind4 returns 0. If anything goes wrong, socket_bind4
+returns -1, setting errno appropriately.
+
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[4];
+  uint16 \fIp\fR;
+
+  \fIs\fR = socket_tcp4();
+  socket_bind4(s,ip,p);
+  socket_connect4(s,ip,p);
+
+.SH "SEE ALSO"
+socket_bind6(3)

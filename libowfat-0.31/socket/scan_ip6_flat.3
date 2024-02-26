@@ -1,0 +1,27 @@
+.TH scan_ip6_flat 3
+.SH NAME
+scan_ip6_flat \- parse an IPv6 number in flat ASCII representation
+.SH SYNTAX
+.B #include <ip6.h>
+
+int \fBscan_ip6_flat\fP(const char *\fIsrc\fR,char \fIip\fR[16]);
+.SH DESCRIPTION
+scan_ip6_flat parses an IPv6 number in flat ASCII representation
+from \fIsrc\fR and writes the result into \fIip\fR. It returns the
+number of bytes read from \fIsrc\fR or 0 if the parsing failed.
+
+scan_ip6_flat accepts upper and lower case hex letters.
+
+The flat representation should have been output by fmt_ip6_flat.
+.SH EXAMPLE
+#include <str.h>
+.br
+#include <ip6.h>
+
+  char buf[]="00000000000000000000000000000001";
+  char ip[16];
+  if (scan_ip6_flat(buf,ip) != str_len(buf))
+    parse_error();
+
+.SH "SEE ALSO"
+fmt_ip6_flat(3), scan_ip6(3)

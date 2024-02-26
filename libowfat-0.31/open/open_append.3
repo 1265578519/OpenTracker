@@ -1,0 +1,18 @@
+.TH open_append 3
+.SH NAME
+open_append \- open a file for appending
+.SH SYNTAX
+.B #include <open.h>
+
+int \fBopen_append\fP(const char *\fIfilename\fR);
+.SH DESCRIPTION
+open_append opens the file \fIfilename\fR for appending write-only use
+and returns the file handle.  If it does not exist, it will be created
+with mode 0600.  If there was an error opening or creating the file,
+open_append returns -1 and sets errno accordingly.
+
+All write operations will append after the last byte, regardless of
+previous calls to lseek(2) or other processes also appending to the
+same file.
+.SH "SEE ALSO"
+open(2)

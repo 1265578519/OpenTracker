@@ -1,0 +1,27 @@
+.TH io_wait 3
+.SH NAME
+io_wait \- wait for events
+.SH SYNTAX
+.B #include <io.h>
+
+void \fBio_wait\fP();
+.SH DESCRIPTION
+io_wait() checks the descriptors that the program is interested in to
+see whether any of them are ready. If none of them are ready, io_wait()
+tries to pause until one of them is ready, so that it does not take time
+away from other programs running on the same computer.
+
+io_wait pays attention to timeouts: if a descriptor reaches its timeout,
+and the program is interested in reading or writing that descriptor,
+io_wait will return promptly.
+
+Under some circumstances, io_wait will return even though no interesting
+descriptors are ready. Do not assume that a descriptor is ready merely
+because io_wait has returned.
+
+io_wait is not interrupted by the delivery of a signal. Programs that
+expect interruption are unreliable: they will block if the same signal
+is delivered a moment before io_wait. The correct way to handle signals
+is with the self-pipe trick.
+.SH "SEE ALSO"
+io_waituntil(3), io_check(3), io_wantread(3), io_wantwrite(3), io_fd(3)

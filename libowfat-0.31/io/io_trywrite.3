@@ -1,0 +1,51 @@
+.TH io_trywrite 3
+.SH NAME
+io_trywrite \- write to a descriptor without blocking
+.SH SYNTAX
+.B #include <io.h>
+
+int \fBio_trywrite\fP(int64 fd,const char* buf,int64 len);
+.SH DESCRIPTION
+io_trywrite tries to write \fIlen\fR bytes of data from
+buf[0], buf[1], ..., buf[len-1] to descriptor \fIfd\fR. (The effects are
+undefined if \fIlen\fR is 0 or smaller.) There are several possible
+results:
+
+.RS 0
+.IP \[bu] 3
+o_trywrite returns an integer between 1 and \fIlen\fR: This number of bytes was
+immediately written from the beginning of \fIbuf\fR.
+Note that this number can be, and often is, smaller than \fIlen\fR;
+you must not assume that io_trywrite always succeeds in writing exactly
+\fIlen\fR bytes.
+.IP \[bu]
+io_trywrite returns -1, setting \fIerrno\fR to EAGAIN: No bytes were
+written, because the descriptor is not ready. For example, the
+descriptor is writing to a full pipe that could still be read.
+.IP \[bu]
+io_trywrite returns -3, setting \fIerrno\fR to something other than
+EAGAIN: No bytes were written, because the write attempt encountered a
+persistent error, such as a serious disk failure (EIO), an unreachable
+network (ENETUNREACH), or an invalid descriptor number (EBADF).
+.RE
+
+io_trywrite does not pause waiting for a descriptor that is not ready.
+If you want to pause, use io_waitread or io_wait.
+
+You can make io_trywrite faster and more efficient by making
+the socket non-blocking with io_nonblock().
+
+Once upon a time, many UNIX programs neglected to check the success of
+their writes. They would often encounter EPIPE, and would blithely
+continue writing, rather than exiting with an appropriate exit code. The
+UNIX kernel developers decided to send a SIGPIPE signal, which
+terminates the process by default, along with returning EPIPE. This
+papers over the problem without fixing it: the same programs ignore
+other errors such as EIO. One hopes that the programs have been fixed by
+now; kernels nevertheless continue to generate the SIGPIPE signal. The
+first time io_trywrite or io_waitwrite is called, it arranges for
+SIGPIPE to be ignored.  (Technically, for SIGPIPE to be caught by an
+empty signal handler, so this doesn't affect child processes.) Do not
+use SIGPIPE elsewhere in the program.
+.SH "SEE ALSO"
+io_nonblock(3), io_waitread(3), io_trywritetimeout(3)

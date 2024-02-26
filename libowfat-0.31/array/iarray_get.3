@@ -1,0 +1,25 @@
+.TH iarray_get 3
+.SH NAME
+iarray_get \- get pointer to nth element in iarray
+.SH SYNTAX
+.B #include <iarray.h>
+
+void* \fBiarray_get\fP(iarray* \fIx\fR, size_t \fIpos\fR);
+
+  iarray \fIx\fR;
+  size_t \fIpos\fR;
+  \fIt\fR* p = iarray_get(&\fIx\fR,\fIpos\fR);
+
+.SH DESCRIPTION
+iarray_get is similar to iarray_allocate, but it only works if the
+element has previously been allocated.  If the element in the iarray
+is not there, this function will fail instead of manipulating the
+iarray.  This also guarantees that there will be no locks, so this
+function returns in a deterministic time.
+
+.SH "RETURN VALUE"
+Return a pointer to the requested element.  If there is no such element
+in the array, returns NULL.
+
+.SH "SEE ALSO"
+iarray_init(3), iarray_allocate(3), iarray_free(3)

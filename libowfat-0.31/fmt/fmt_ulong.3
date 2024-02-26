@@ -1,0 +1,20 @@
+.TH fmt_ulong 3
+.SH NAME
+fmt_ulong \- write an ASCII representation of an unsigned long integer
+.SH SYNTAX
+.B #include <fmt.h>
+
+size_t \fBfmt_ulong\fP(char *\fIdest\fR,unsigned long \fIsource\fR);
+.SH DESCRIPTION
+fmt_ulong writes an ASCII representation ('0' to '9', base 10) of
+\fIsource\fR to \fIdest\fR and returns the number of bytes written.
+
+fmt_ulong does not append \\0.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_ulong returns the
+number of bytes it would have written.
+
+For convenience, fmt.h defines the integer FMT_ULONG to be big enough to
+contain every possible fmt_ulong output plus \\0.
+.SH "SEE ALSO"
+scan_ulong(3)

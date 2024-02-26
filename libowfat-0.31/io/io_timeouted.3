@@ -1,0 +1,17 @@
+.TH io_timeouted 3
+.SH NAME
+io_timeouted \- return a file descriptor over deadline
+.SH SYNTAX
+.B #include <io.h>
+
+int64 \fBio_timeouted\fP();
+.SH DESCRIPTION
+io_timeouted returns the next file descriptor that is past it's deadline.
+If no descriptors are past their deadlines, it returns -1.
+
+After io_timeouted() returned -1, you should wait a second before
+calling it again.  Checking for connections past their deadline involves
+walking through the whole data structure, which may thrash the CPU
+cache needlessly.  Treat it as an expensive operation.
+.SH "SEE ALSO"
+io_wait(3), io_timeout(3)

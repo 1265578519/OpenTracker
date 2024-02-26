@@ -1,0 +1,14 @@
+.TH open_write 3
+.SH NAME
+open_write \- open a file for writing
+.SH SYNTAX
+.B #include <open.h>
+
+int \fBopen_write\fP(const char *\fIfilename\fR);
+.SH DESCRIPTION
+open_write opens the file \fIfilename\fR for write-only use and returns
+the file handle.  If the file does not exist, it will be created with
+mode 0644.  If there was an error opening or creating the file,
+open_write returns -1 and sets errno accordingly.
+.SH "SEE ALSO"
+open(2)

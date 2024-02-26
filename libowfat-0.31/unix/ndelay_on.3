@@ -1,0 +1,18 @@
+.TH ndelay_on 3
+.SH NAME
+ndelay_on \- put file descriptor in non-blocking mode
+.SH SYNTAX
+.B #include <ndelay.h>
+
+extern int \fBndelay_on\fP(int \fIfd\fR);
+.SH DESCRIPTION
+ndelay_on puts a file descriptor in non-blocking mode.  Reading from and
+writing to non-blocking network sockets, FIFOs or device files will
+return immediately, even if not as many bytes have been processed as
+were specified.
+
+If an error occurred, ndelay_on will return nonzero and set \fIerrno\fR
+accordingly.
+
+.SH "SEE ALSO"
+fcntl(2), ndelay_off(3)

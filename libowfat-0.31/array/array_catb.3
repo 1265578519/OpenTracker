@@ -1,0 +1,20 @@
+.TH array_catb 3
+.SH NAME
+array_catb \- append bytes to an array
+.SH SYNTAX
+.B #include <array.h>
+
+void \fBarray_catb\fP(array* \fIx\fR,const char* \fIy\fR,int64 \fIlen\fR);
+
+  array \fIx\fR;
+  const char* \fIy\fR;
+  int64 \fIlen\fR;
+  array_catb(&\fIx\fR,\fIy\fR,\fIlen\fR);
+
+.SH DESCRIPTION
+array_catb appends the bytes \fIy\fR[0], \fIy\fR[1], ...,
+\fIy\fR[\fIlen\fR-1] to the array \fIx\fR.  It handles failure in the
+same way as array_cat.
+.SH "SEE ALSO"
+array_allocate(3), array_get(3), array_fail(3), array_reset(3),
+array_cat(3), array_cats(3), array_cats0(3), array_cate(3)

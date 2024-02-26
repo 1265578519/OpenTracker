@@ -1,0 +1,37 @@
+.TH buffer 3
+.SH NAME
+buffer.h \- generic read/write buffering
+.SH SYNTAX
+.B #include <buffer.h>
+
+  buffer* buffer_0;   /* like stdio's stdin */
+  buffer* buffer_1;   /* like stdio's stdout */
+  buffer* buffer_2;   /* like stdio's stderr */
+
+.SH DESCRIPTION
+buffer.h provides a generic buffer interface that can be used for
+read and write buffering.  Buffers must be initialized with
+\fBbuffer_init\fR.
+
+A buffer can only be used for reading or writing at the same time, not
+both.
+
+Unlike stdio, these write buffers are not flushed automatically at
+program termination; you must manually call \fBbuffer_flush\fR,
+\fBbuffer_putsflush\fR, \fBbuffer_putflush\fR or
+\fBbuffer_putnlflush\fR.
+
+.SH EXAMPLE
+See buffer_init(3) for example read buffer code.  Here is typical code
+for printing an error message on stderr:
+
+  #include <buffer.h>
+
+  buffer_puts(buffer_2,"error: got only ");
+  buffer_putulong(buffer_2,got);
+  buffer_puts(buffer_2," bytes, but expected at least ");
+  buffer_putulong(buffer_2,expected);
+  buffer_putsflush(buffer_2," bytes!");
+
+.SH "SEE ALSO"
+buffer_init(3), buffer_put(3), buffer_get(3), buffer_flush(3)

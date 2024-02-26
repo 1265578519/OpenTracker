@@ -1,0 +1,32 @@
+.TH fmt_ip6_flat 3
+.SH NAME
+fmt_ip6_flat \- write a formatted ASCII representation of an IPv6 number
+.SH SYNTAX
+.B #include <ip6.h>
+
+unsigned int \fBfmt_ip6_flat\fP(char *\fIdest\fR,const char \fIip\fR[16]);
+.SH DESCRIPTION
+fmt_ip6_flat formats an IPv6 number in a flat ASCII representation from
+\fIip\fR and writes the result into \fIdest\fR. It returns the number of
+bytes written (always 32).
+
+This representation does not contain colons and is meant to be easily
+machine-readable.  Use fmt_ip6 for the normal (standard) representation.
+This function is meant for places which use colons to separate fields
+and thus have problems interpreting the standard IPv6 notation.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_ip6_flat returns the
+number of bytes it would have written.
+
+fmt_ip6_flat does not append \\0.
+
+For convenience, ip6.h defines the integer IP6_FMT to be big enough to
+contain every possible fmt_ip6_flat output plus \\0.
+.SH EXAMPLE
+#include <ip6.h>
+
+  char buf[IP6_FMT];
+  char ip[16];
+  buf[fmt_ip6_flat(buf,ip)]=0;
+.SH "SEE ALSO"
+scan_ip6_flat(3), fmt_ip6(3)

@@ -1,0 +1,13 @@
+.TH scan_ushort 3
+.SH NAME
+scan_ushort \- parse an unsigned short integer in decimal ASCII representation
+.SH SYNTAX
+.B #include <scan.h>
+
+size_t \fBscan_ushort\fP(const char *\fIsrc\fR,unsigned short *\fIdest\fR);
+.SH DESCRIPTION
+scan_ushort parses an unsigned short integer in decimal ASCII representation
+from \fIsrc\fR and writes the result into \fIdest\fR. It returns the
+number of bytes read from \fIsrc\fR.
+.SH "SEE ALSO"
+scan_xshort(3), scan_8short(3), fmt_ulong(3)

@@ -1,0 +1,19 @@
+.TH buffer_getline 3
+.SH NAME
+buffer_getline \- read line from buffer
+.SH SYNTAX
+.B #include <buffer.h>
+
+ssize_t \fBbuffer_getline\fP(buffer* \fIb\fR,char* \fIx\fR,size_t \fIlen\fR);
+.SH DESCRIPTION
+buffer_getline copies data from \fIb\fR to \fIx\fR[0], \fIx\fR[1], ...,
+\fIx\fR[\fIlen\fR-1] until \fIlen\fR bytes have been copied or a
+new-line character ('\\n') is encountered.  That character is also
+copied.
+
+Note that line is not 0-terminated to make reading lines with 0-bytes
+possible through this interface.
+.SH "RETURN VALUE"
+Number of bytes read (without '\\n'), -1 on error (setting \fIerrno\fR).
+.SH "SEE ALSO"
+buffer_init(3), buffer_feed(3), buffer_peek(3), buffer_seek(3), buffer(3)

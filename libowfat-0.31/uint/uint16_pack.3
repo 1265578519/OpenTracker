@@ -1,0 +1,18 @@
+.TH uint16_pack 3
+.SH NAME
+uint16_pack \- write an unsigned little-endian 16-bit integer
+.SH SYNTAX
+.B #include <uint16.h>
+
+uint16 \fIu\fR;
+
+void \fBuint16_pack\fP(char \fIs\fR[2],uint16 \fIu\fR);
+.SH DESCRIPTION
+uint16 is a 16-bit unsigned integer type, normally either unsigned int
+or unsigned long.
+
+uint16_pack portably writes a uint16 \fIu\fR to \fIs\fR in
+little-endian byte order.
+
+.SH "SEE ALSO"
+uint16_unpack(3), uint16_pack_big(3)

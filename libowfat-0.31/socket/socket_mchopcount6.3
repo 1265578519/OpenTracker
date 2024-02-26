@@ -1,0 +1,18 @@
+.TH socket_mchopcount6 3
+.SH NAME
+socket_mchopcount6 \- set multicast hop count
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_mchopcount6\fP(int \fIs\fR,char \fITTL\fR);
+.SH DESCRIPTION
+socket_mchopcount6 sets the maximum hop count of outgoing multicast
+packets on the socket \fIs\fR.  Each router decrements the packet hop
+count by one and discards the packet if it reaches zero.  Setting the
+maximum hop count to 1, for example, will limit the packet propagation
+to the LAN.
+
+If something goes wrong, socket_mchopcount6 returns -1, setting errno
+appropriately.
+.SH "SEE ALSO"
+socket_mcttl4(3), socket_mcjoin4(3), socket_mcleave4(3)

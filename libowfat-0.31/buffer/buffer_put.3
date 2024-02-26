@@ -1,0 +1,19 @@
+.TH buffer_put 3
+.SH NAME
+buffer_put \- write binary data to buffer
+.SH SYNTAX
+.B #include <buffer.h>
+
+int \fBbuffer_put\fP(buffer* \fIb\fR,const char* \fIx\fR,size_t \fIlen\fR);
+.SH DESCRIPTION
+buffer_put writes \fIlen\fR bytes from \fIx\fR to \fIb\fR.
+
+The difference to buffer_putalign is that, when there isn't enough space
+for new data, buffer_put calls buffer_flush before copying any data,
+while buffer_putalign fills all available space with data before calling
+buffer_flush.
+.SH "RETURN VALUE"
+buffer_put returns 0 if everything was fine, -1 on error (setting
+errno).
+.SH "SEE ALSO"
+buffer_putalign(3), buffer_puts(3), buffer_flush(3), buffer(3)

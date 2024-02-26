@@ -1,0 +1,26 @@
+.TH socket_udp4 3
+.SH NAME
+socket_udp4 \- create a non-blocking UDP/IP datagram socket
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_udp4\fP();
+.SH DESCRIPTION
+socket_udp4 creates a non-blocking UDP/IP datagram socket and returns a
+file descriptor pointing to that socket.  If something goes wrong,
+socket_udp4 returns -1, setting errno appropriately, without allocating
+any resources.
+
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[4];
+  uint16 \fIp\fR;
+
+  \fIs\fR = socket_udp4();
+  socket_bind4(s,ip,p);
+  socket_connect4(s,ip,p);
+
+.SH "SEE ALSO"
+socket_bind4(3), socket_bind6(3)

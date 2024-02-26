@@ -1,0 +1,19 @@
+.TH critbit0_clear 3
+.SH NAME
+critbit0_clear \- free all memory associated with a critbit tree
+.SH SYNTAX
+.B #include <critbit.h>
+
+critbit0_tree cb = { 0 };
+
+void \fBcritbit0_clear\fP(critbit0_tree* \fIcb\fR);
+.SH DESCRIPTION
+critbit0_clear deletes all keys in \fIcb\fR and frees all memory
+associated with it.
+.SH "NOTE"
+This function uses recursion to traverse the tree. It may require
+nontrivial amounts of available stack space.
+.SH "RETURN VALUE"
+none.
+.SH "SEE ALSO"
+critbit0_delete(3)

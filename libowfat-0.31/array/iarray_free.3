@@ -1,0 +1,16 @@
+.TH iarray_free 3
+.SH NAME
+iarray_free \- free iarray data structure
+.SH SYNTAX
+.B #include <iarray.h>
+
+void \fBiarray_free\fP(iarray* \fIx\fR);
+
+.SH DESCRIPTION
+iarray_free frees the iarray and all elements in it.
+
+Using the array during or after iarray_free results in undefined
+behavior.
+
+.SH "SEE ALSO"
+iarray_allocate(3), iarray_get(3), iarray_allocate(3)

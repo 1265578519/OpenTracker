@@ -1,0 +1,26 @@
+.TH dns_ip6_qualify 3
+.SH NAME
+dns_ip6_qualify \- qualify name and look up IPv6 addresses
+.SH SYNTAX
+.B #include <dns.h>
+
+int \fBdns_ip6_qualify\fP(stralloc* \fIout\fR,stralloc* \fIfqdn\fR,
+                    const stralloc* \fIudn\fR);
+.SH DESCRIPTION
+dns_ip6_qualify feeds the name \fIudn\fR through qualification and looks up
+16-byte IPv6 addresses for the result. It puts the fully qualified domain name
+into \fIfqdn\fR, puts the concatenation of the IP addresses into \fIout\fR, and
+returns 0. If the domain does not exist in DNS, or has no IP addresses,
+\fIout\fR will be empty.
+
+dns_ip6_qualify also looks up 4-byte IPv4 addresses and converts them
+into IPv4-mapped IPv6 addresses (::ffff:1.2.3.4) to provide easy
+backwards compatibility for IPv6 applications.
+
+If dns_ip6_qualify has trouble with the qualification, has trouble with DNS, or
+runs out of memory, it returns -1, setting errno appropriately. It may or may
+not change \fIout\fR and \fIfqdn\fR.
+.SH QUALIFICATION
+See http://cr.yp.to/djbdns/qualification.html
+.SH "SEE ALSO"
+dns_ip6(3), dns_ip6_packet(3), dns_ip4_qualify(3)

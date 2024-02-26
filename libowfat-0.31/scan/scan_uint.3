@@ -1,0 +1,13 @@
+.TH scan_uint 3
+.SH NAME
+scan_uint \- parse an unsigned integer in decimal ASCII representation
+.SH SYNTAX
+.B #include <scan.h>
+
+size_t \fBscan_uint\fP(const char *\fIsrc\fR,int *\fIdest\fR);
+.SH DESCRIPTION
+scan_uint parses an unsigned integer in decimal ASCII representation
+from \fIsrc\fR and writes the result into \fIdest\fR. It returns the
+number of bytes read from \fIsrc\fR.
+.SH "SEE ALSO"
+scan_ulong(3), fmt_uint(3)

@@ -1,0 +1,38 @@
+.TH socket_quickack 3
+.SH NAME
+socket_quickack \- turn TCP Quick ACK mode on or off
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_quickack\fP(int \fIs\fR,int \fIvalue\fR);
+.SH DESCRIPTION
+socket_quickack switches TCP Quick ACK mode on (value=1) or off
+(value=0).  If the platform does not support this functionality, returns
+-1 and sets errno to ENOPROTOOPT (or ENOSYS if the platform does not
+define ENOPROTOOPT).
+
+TCP Quick ACK mode is on by default because the operating system has to
+assume it's an interactive connection.  In that case, an ACK will be
+sent quickly after data came in.  If your code handles non-interactive
+server connections, it may make sense to switch Quick ACK mode off,
+telling the kernel to delay sending ACKs because the server is going to
+respond to incoming requests anyway, so the ACK can be piggy-backed onto
+that response, saving useless network traffic.
+
+Normally socket_quickack returns 0. If anything goes wrong, socket_quickack
+returns -1, setting errno appropriately.
+
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[4];
+  uint16 \fIp\fR;
+
+  \fIs\fR = socket_tcp4b();
+  socket_quickack(s);
+  socket_bind4_reuse(s,ip,p);
+  socket_listen(16);
+
+.SH "SEE ALSO"
+socket_fastopen(3)

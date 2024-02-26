@@ -1,0 +1,15 @@
+.TH byte_equal 3
+.SH NAME
+byte_equal \- compare two strings
+.SH SYNTAX
+.B #include <byte.h>
+
+int \fBbyte_equal\fP(const char *\fIone\fR,size_t \fIlen\fR,const char *\fItwo\fR);
+.SH DESCRIPTION
+\fIbyte_equal\fR returns 1 if the strings are equal, 0 otherwise.
+
+When the strings are different, byte_equal does not read bytes past the
+first difference.
+
+.SH "SEE ALSO"
+byte_diff(3)

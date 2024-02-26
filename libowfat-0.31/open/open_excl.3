@@ -1,0 +1,22 @@
+.TH open_excl 3
+.SH NAME
+open_excl \- open a file for exclusive writing
+.SH SYNTAX
+.B #include <open.h>
+
+int \fBopen_excl\fP(const char *\fIfilename\fR);
+.SH DESCRIPTION
+open_excl opens the file \fIfilename\fR for writing and returns the file
+handle.  The file may not exist before the call to \fBopen_excl\fR.  The
+file will be created with mode 0600.
+
+If there was an error creating the file, open_excl returns -1
+and sets errno accordingly.
+
+Since open_excl relies on the O_EXCL flag to open, it does not work
+reliably over NFS (the NFS protocol is broken) and must be emulated
+using a lock file (create a file with a unique file name and link(2) it
+to the lock file.  Then stat the lock file and see if the link count is
+2).
+.SH "SEE ALSO"
+open(2)

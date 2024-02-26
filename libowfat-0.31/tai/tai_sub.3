@@ -1,0 +1,13 @@
+.TH tai_sub 3
+.SH NAME
+tai_sub \- subtract two struct tai
+.SH SYNTAX
+.B #include <tai.h>
+
+extern int \fBtai_sub\fP(struct tai* \fIt\fR,const struct tai* \fIa\fR,
+                   const struct tai* \fIb\fR);
+.SH DESCRIPTION
+\fBtai_sub\fR subtracts \fIb\fR from \fIa\fR and writes the result to \fIt\fR.
+The inputs and output may overlap.
+.SH "SEE ALSO"
+taia_sub(3), tai_add(3)

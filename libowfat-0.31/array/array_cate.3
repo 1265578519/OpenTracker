@@ -1,0 +1,22 @@
+.TH array_cate 3
+.SH NAME
+array_cate \- append subset of one array to another array
+.SH SYNTAX
+.B #include <array.h>
+
+void \fBarray_cate\fP(array* \fIx\fR,array* \fIy\fR, int64 \fIpos\fR,int64 \fIstop\fR);
+
+  array \fIx\fR;
+  array \fIy\fR;
+  int64 \fIpos\fR;
+  int64 \fIstop\fR;
+  array_cate(&\fIx\fR,\fIy\fR,\fIpos\fR,\fIstop\fR);
+
+.SH DESCRIPTION
+array_cate is like array_cat, but uses only byte positions \fIpos\fR
+through \fIstop\fR-1 in \fIy\fR.  It fails if \fIpos\fR negative, or if
+\fIstop\fR is smaller than \fIpos\fR, or if the number of initialized
+bytes in \fIy\fR is smaller than \fIstop\fR.
+.SH "SEE ALSO"
+array_allocate(3), array_get(3), array_fail(3), array_reset(3),
+array_cat(3), array_cats(3), array_cats0(3), array_cate(3)

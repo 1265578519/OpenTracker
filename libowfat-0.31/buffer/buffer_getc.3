@@ -1,0 +1,11 @@
+.TH buffer_getc 3
+.SH NAME
+buffer_getc \- read one char from buffer
+.SH SYNTAX
+.B #include <buffer.h>
+
+int \fBbuffer_getc\fP(buffer* \fIb\fR,char* \fIx\fR);
+.SH DESCRIPTION
+buffer_getc(b,x) is similar to buffer_get(b,x,1).
+.SH "SEE ALSO"
+buffer_init(3), buffer_get(3), buffer(3)

@@ -1,0 +1,18 @@
+.TH io_receivefd 3
+.SH NAME
+io_receivefd \- receive a file descriptor over a Unix Domain socket
+.SH SYNTAX
+.B #include <io.h>
+
+int64 \fBio_receivefd\fP(int64 sock);
+.SH DESCRIPTION
+io_receivefd receives a file descriptor from the Unix Domain socket
+\fIsock\fR.  You can send a descriptor using io_passfd(3).
+
+io_receivefd returns -1 on error or the file descriptor.
+
+The underlying Unix API can send more than one descriptor at the time.
+This function expects only one descriptor and will return the first
+one if more than one were sent.
+.SH "SEE ALSO"
+io_passfd(3)

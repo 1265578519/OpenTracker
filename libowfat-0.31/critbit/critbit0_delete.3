@@ -1,0 +1,18 @@
+.TH critbit0_delete 3
+.SH NAME
+critbit0_delete \- delete a string from a critbit tree
+.SH SYNTAX
+.B #include <critbit.h>
+
+critbit0_tree cb = { 0 };
+
+int \fBcritbit0_delete\fP(critbit0_tree* \fIcb\fR,const char* \fIstr\fR);
+.SH DESCRIPTION
+critbit0_delete attempts to delete a string from a critbit0 tree.
+If \fIstr\fR is in \fIcb\fR, critbit0_delete removes it and returns 1.
+If \fIstr\fR is not in \fIcb\fR, critbit0_delete leaves it alone and
+returns 0.
+.SH "RETURN VALUE"
+1 if it was in cb and has now been removed, 0 if it was not in cb.
+.SH "SEE ALSO"
+critbit0_insert(3)

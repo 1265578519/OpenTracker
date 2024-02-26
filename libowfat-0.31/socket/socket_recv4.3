@@ -1,0 +1,31 @@
+.TH socket_recv4 3
+.SH NAME
+socket_recv4 \- receive a UDP datagram
+.SH SYNTAX
+.B #include <socket.h>
+
+ssize_t \fBsocket_recv4\fP(int \fIs\fR, char* \fIbuf\fR, size_t \fIlen\fR,
+                 char \fIip\fR[4],uint16* \fIport\fR);
+.SH DESCRIPTION
+socket_recv4 receives up to \fIlen\fR bytes starting at \fIbuf\fR from a UDP
+datagram coming in on the socket \fIs\fR.  It writes the UDP port to
+\fIport\fR and the IP address to \fIip\fR, and returns the number of
+bytes actually received (or -1 if anything went wrong).
+.SH RETURN VALUE
+socket_recv4 returns the number of bytes in the datagram if one was
+received.  If not, it returns -1 and sets errno appropriately.
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[4];
+  uint16 \fIp\fR;
+  char buf[1000];
+  int len;
+
+  \fIs\fR = socket_tcp4();
+  socket_bind4(s,ip,p);
+  len = socket_recv4(s,buf,sizeof(buf),ip,&p);
+
+.SH "SEE ALSO"
+socket_recv6(3)

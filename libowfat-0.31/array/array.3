@@ -1,0 +1,92 @@
+.TH array 3
+.SH NAME
+array \- The array library interface
+.SH SYNTAX
+.B #include <array.h>
+
+.SH DESCRIPTION
+An \fBallocated\fR array variable keeps track of
+
+.sp 1
+.IP \(bu
+a (nonzero) pointer to a dynamically allocated region of memory;
+.IP \(bu
+the number of bytes allocated (always positive); and
+.IP \(bu
+the number of bytes initialized (between 0 and the number of bytes
+allocated).
+.PP
+
+There are two other possibilities for the state of an array variable:
+\fBunallocated\fR and \fIfailed\fR.  In both cases, there is no
+dynamically allocated region of memory.
+
+A new array variable is normally created as a static variable:
+
+  #include "array.h"
+
+  static array x;
+
+At this point it is unallocated.  The array library provides various
+allocation and inspection functions.
+
+A new array variable can also be created dynamically. It must be
+initialized to all-0, meaning unallocated, before it is given to any of
+the array functions. It must be returned to the unallocated (or failed)
+state, for example with array_reset, before it is destroyed. These rules
+prevent all memory leaks.
+.SH "Expansion and inspection"
+
+  array x;
+
+  t* p1 = array_allocate(&x,sizeof(t),pos);
+
+  t* p2 = array_get(&x,sizeof(t),pos);
+
+  t* p3 = array_start(&x);
+
+  int64 len = array_length(&x,sizeof(t));
+
+  int64 bytes = array_bytes(&x);
+
+.SH "Truncation and deallocation"
+
+  array x;
+
+  array_truncate(&x,sizeof(t),len);
+
+  array_trunc(&x);
+
+  array_reset(&x);
+
+  array_fail(&x);
+
+.SH "Comparison"
+
+  array x;
+  array y;
+
+  if (array_equal(&x,&y))
+    /* arrays are equal... */
+
+.SH "Concatenation"
+
+  array x;
+  array y;
+
+  array_cat(&x,&y);
+
+  array_catb(&x,"fnord",5);
+
+  array_cats(&x,"fnord");
+
+  array_cats0(&x,"fnord"); /* also append the \\0 */
+
+  array_cat0(&x); /* append \\0 */
+
+  array_cate(&x,"fnord",1,4); /* append "nor" */
+
+.SH "ORIGINAL API DEFINITION"
+http://cr.yp.to/lib/array.html
+.SH "SEE ALSO"
+array_get(3), array_start(3), array_fail(3)

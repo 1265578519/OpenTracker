@@ -1,0 +1,24 @@
+.TH array_truncate 3
+.SH NAME
+array_truncate \- reduce number of initialized bytes
+.SH SYNTAX
+.B #include <array.h>
+
+void \fBarray_truncate\fP(array* \fIx\fR, uint64 \fImembersize\fR, int64 \fIlen\fR);
+
+  array_truncate(&\fIx\fR,sizeof(\fIt\fR),\fIlen\fR);
+
+.SH DESCRIPTION
+array_truncate reduces the number of initialized bytes in \fIx\fR to
+exactly \fIlen\fR*sizeof(\fIt\fR). If the number of initialized bytes
+was already this small (or smaller), array_truncate has no effect. If
+\fIlen\fR is negative, array_truncate has no effect. If \fIx\fR is
+unallocated, array_truncate has no effect. If \fIx\fR has failed,
+array_truncate has no effect.
+
+array_truncate does not change the allocation in \fIx\fR. If you want to free
+the memory used by \fIx\fR, use array_reset.
+
+.SH "SEE ALSO"
+array_allocate(3), array_get(3), array_fail(3), array_trunc(3),
+array_reset(3)

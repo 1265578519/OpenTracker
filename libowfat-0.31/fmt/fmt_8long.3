@@ -1,0 +1,20 @@
+.TH fmt_8long 3
+.SH NAME
+fmt_8long \- write an octal ASCII representation of an unsigned long integer
+.SH SYNTAX
+.B #include <fmt.h>
+
+size_t \fBfmt_8long\fP(char *\fIdest\fR,size_t \fIsource\fR);
+.SH DESCRIPTION
+fmt_8long writes an ASCII representation ('0' to '7', base 8) of
+\fIsource\fR to \fIdest\fR and returns the number of bytes written.
+
+fmt_8long does not append \\0.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_8long returns the
+number of bytes it would have written.
+
+For convenience, fmt.h defines the integer FMT_8LONG to be big enough to
+contain every possible fmt_8long output plus \\0.
+.SH "SEE ALSO"
+scan_8long(3)

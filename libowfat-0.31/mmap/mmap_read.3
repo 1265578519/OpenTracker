@@ -1,0 +1,19 @@
+.TH mmap_read 3
+.SH NAME
+mmap_read \- memory map a file for reading
+.SH SYNTAX
+.B #include <mmap.h>
+
+char* \fBmmap_read\fP(const char* \fIfilename\fR,size_t* \fIfilesize\fR);
+.SH DESCRIPTION
+mmap_read opens \fIfilename\fR for reading, maps the whole file into
+memory, closes the file, writes the length of the file to \fIfilesize\fR
+and returns a pointer to the mapped file.
+
+The file is unmapped by the operating system if the process terminates.
+It can also be manually unmapped by calling \fBmunmap\fR from
+<sys/mman.h>.
+
+If the file could not be opened or mapped, (void*)0 is returned.
+.SH "SEE ALSO"
+mmap_unmap(3)

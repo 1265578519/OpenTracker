@@ -1,0 +1,16 @@
+.TH buffer_get_token 3
+.SH NAME
+buffer_get_token \- read token from buffer
+.SH SYNTAX
+.B #include <buffer.h>
+
+ssize_t \fBbuffer_get_token\fP(buffer* \fIb\fR,char* \fIx\fR,size_t \fIlen\fR,
+                 const char* \fIcharset\fR,size_t \fIsetlen\fR);
+.SH DESCRIPTION
+buffer_get_token copies data from \fIb\fR to \fIx\fR[0], \fIx\fR[1], ...,
+\fIx\fR[\fIlen\fR-1] until \fIlen\fR bytes have been copied or one of
+\fIcharset\fR[0], \fIcharset\fR[1], ..., \fIcharset\fR[\fIsetlen\fR]
+equals the last byte that was read.  buffer_get_token returns the number
+of bytes read or -1 on error (setting \fIerrno\fR appropriately).
+.SH "SEE ALSO"
+buffer_init(3), buffer_feed(3), buffer_peek(3), buffer_seek(3), buffer(3)

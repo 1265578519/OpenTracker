@@ -1,0 +1,18 @@
+.TH dns_name4_domain 3
+.SH NAME
+dns_name4_domain \- construct host name for reverse lookup
+.SH SYNTAX
+.B #include <dns.h>
+
+void \fBdns_name4_domain\fP(char \fIq\fR[DNS_NAME4_DOMAIN],
+                     const char* \fIip\fR[4]);
+.SH DESCRIPTION
+dns_name4_domain is a low-level component of dns_name4.  It converts an
+IP address such as 1.2.3.4 into a domain name such as
+4.3.2.1.in-addr.arpa and places the packet-encoded domain name into \fIq\fR.
+
+q is zero terminated.
+
+q must have space for DNS_NAME4_DOMAIN bytes.
+.SH "SEE ALSO"
+dns_name4(3), dns_name6_domain(3)

@@ -1,0 +1,18 @@
+.TH uint32_pack_big 3
+.SH NAME
+uint32_pack_big \- write an unsigned big-endian 32-bit integer
+.SH SYNTAX
+.B #include <uint32.h>
+
+uint32 \fIu\fR;
+
+void \fBuint32_pack_big\fP(char \fIs\fR[4],uint32 \fIu\fR);
+.SH DESCRIPTION
+uint32 is a 32-bit unsigned integer type, normally either unsigned int
+or unsigned long.
+
+uint32_pack_big portably writes a uint32 \fIu\fR to \fIs\fR in
+big-endian (i.e. network) byte order.
+
+.SH "SEE ALSO"
+uint32_unpack_big(3), uint32_pack(3)

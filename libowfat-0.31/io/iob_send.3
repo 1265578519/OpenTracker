@@ -1,0 +1,29 @@
+.TH iob_send 3
+.SH NAME
+iob_send \- send I/O batch
+.SH SYNTAX
+.B #include <iob.h>
+
+int64 \fBiob_send\fP(int64 s,io_batch* b);
+.SH DESCRIPTION
+iob_send sends the (rest of) \fIb\fR over the socket \fIs\fR.
+
+iob_send returns the number of bytes written, 0 if there were no more
+bytes to be written in the batch, -1 for EAGAIN, or -3 for a permanent
+error (for example "connection reset by peer").
+
+The normal usage pattern is using io_wait to know when a descriptor is
+writable, and then calling iob_send until it returns 0, -1 or -3.
+
+If it returns 0, terminate the loop (everything was written OK).  If it
+returns -1, call io_wait again.  If it returned -3, signal an error and
+close the socket.
+
+The benefit of the I/O batch API is that it exploits platform specific
+APIs like FreeBSD's sendfile.  The file contents will always be sent in
+a way that allows the operating systems to perform zero copy TCP, and
+the buffers will always be sent using as few syscalls as possible and
+avoiding unnecessary copying (using writev).
+.SH "SEE ALSO"
+iob_reset(3), iob_send(3), iob_addbuf(3), iob_adds_free(3), iob_addfile(3),
+iob_prefetch(3)

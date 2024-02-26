@@ -1,0 +1,26 @@
+.TH socket_udp6 3
+.SH NAME
+socket_udp6 \- create a non-blocking IPv6 UDP/IP datagram socket
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_udp6\fP();
+.SH DESCRIPTION
+socket_udp6 creates a non-blocking UDP/IP datagram socket and returns a
+file descriptor pointing to that socket.  If something goes wrong,
+socket_udp6 returns -1, setting errno appropriately, without allocating
+any resources.
+
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[16];
+  uint16 \fIp\fR;
+
+  \fIs\fR = socket_udp6();
+  socket_bind6(s,ip,p);
+  socket_connect6(s,ip,p);
+
+.SH "SEE ALSO"
+socket_bind4(3), socket_bind6(3)

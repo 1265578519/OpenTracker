@@ -1,0 +1,26 @@
+.TH array_cat 3
+.SH NAME
+array_cat \- append one array to another
+.SH SYNTAX
+.B #include <array.h>
+
+void \fBarray_cat\fP(array* \fIx\fR,array* \fIy\fR);
+
+  array \fIx\fR;
+  array \fIy\fR;
+  array_cat(&\fIx\fR,&\fIy\fR);
+
+.SH DESCRIPTION
+array_cat appends \fIy\fR to \fIx\fR; i.e., it changes \fIx\fR,
+allocating more space if necessary, so that the initialized bytes in
+\fIx\fR are the previously initialized bytes in \fIx\fR followed by a
+copy of the initialized bytes in \fIy\fR.
+
+If \fIx\fR has failed, array_cat has no effect.
+
+If \fIy\fR has failed, array_cat switches \fIx\fR to have failed.
+
+If not enough memory is available, array_cat switches \fIx\fR to have failed.
+.SH "SEE ALSO"
+array_allocate(3), array_get(3), array_fail(3), array_reset(3),
+array_catb(3), array_cats(3), array_cats0(3), array_cate(3)

@@ -1,0 +1,11 @@
+.TH io_waituntil 3
+.SH NAME
+io_waituntil \- wait for events
+.SH SYNTAX
+.B #include <io.h>
+
+void \fBio_waituntil\fP(tai6464 t);
+.SH DESCRIPTION
+io_waituntil(t) is like io_wait() but does not wait (noticeably) past time \fIt\fR.
+.SH "SEE ALSO"
+io_wait(3), io_check(3), io_wantread(3), io_wantwrite(3), io_fd(3)

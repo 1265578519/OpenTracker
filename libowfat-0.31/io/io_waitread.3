@@ -1,0 +1,33 @@
+.TH io_waitread 3
+.SH NAME
+io_waitread \- read from a descriptor
+.SH SYNTAX
+.B #include <io.h>
+
+int \fBio_waitread\fP(int64 fd,char* buf,int64 len);
+.SH DESCRIPTION
+io_waitread tries to read \fIlen\fR bytes of data from descriptor
+\fIfd\fR into buf[0], buf[1], ..., buf[len-1]. (The effects are
+undefined if \fIlen\fR is 0 or smaller.) There are several possible
+results:
+
+.RS 0
+.IP \[bu] 3
+o_waitread returns an integer between 1 and \fIlen\fR: This number of bytes was
+available for immediate reading; the bytes were read into the beginning
+of \fIbuf\fR. Note that this number can be, and often is, smaller than \fIlen\fR;
+you must not assume that io_waitread always succeeds in reading exactly
+\fIlen\fR bytes.
+.IP \[bu]
+io_waitread returns 0: No bytes were read, because the descriptor is at
+end of file. For example, this descriptor has reached the end of a disk
+file, or is reading an empty pipe that has been closed by all writers.
+.IP \[bu]
+io_waitread returns -3, setting \fIerrno\fR to something other than
+EAGAIN: No bytes were read, because the read attempt encountered a
+persistent error, such as a serious disk failure (EIO), an unreachable
+network (ENETUNREACH), or an invalid descriptor number (EBADF).
+.RE
+
+.SH "SEE ALSO"
+io_nonblock(3), io_waitread(3), io_waitreadtimeout(3)

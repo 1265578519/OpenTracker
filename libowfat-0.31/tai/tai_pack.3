@@ -1,0 +1,14 @@
+.TH tai_pack 3
+.SH NAME
+tai_pack \- convert to external TAI64 format
+.SH SYNTAX
+.B #include <tai.h>
+
+extern int \fBtai_pack\fP(char* buf,const struct tai* \fIt\fR);
+.SH DESCRIPTION
+tai_pack converts a TAI64 label from internal format in \fIt\fR to external
+TAI64 format in \fIbuf\fR.
+
+See http://cr.yp.to/libtai/tai64.html
+.SH "SEE ALSO"
+taia_pack(3), tai_unpack(3)

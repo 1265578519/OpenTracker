@@ -1,0 +1,25 @@
+.TH iob_new 3
+.SH NAME
+iob_new \- create new I/O batch
+.SH SYNTAX
+.B #include <iob.h>
+
+io_batch* \fBiob_new\fP(int hint_entries);
+.SH DESCRIPTION
+iob_new creates a new I/O batch with enough space allocated for
+\fIhint_entries\fR entries (buffers or files).  This is purely a
+performance hint, if you are unsure just pass 1.
+
+You can add buffers, strings and files to an I/O batch and then send it
+all at once using iob_send.
+
+The benefit of the I/O batch API is that it exploits platform specific
+APIs like FreeBSD's sendfile.  The file contents will always be sent in
+a way that allows the operating systems to perform zero copy TCP, and
+the buffers will always be sent using as few syscalls as possible and
+avoiding unnecessary copying (using writev).
+.SH "RETURN VALUE"
+iob_new returns a pointer to an I/O batch data structure.  If there was
+a memory allocation error, it returns NULL instead.
+.SH "SEE ALSO"
+iob_reset(3), iob_send(3), iob_addbuf(3), iob_adds_free(3), iob_addfile(3)

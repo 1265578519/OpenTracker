@@ -1,0 +1,15 @@
+.TH stralloc_starts 3
+.SH NAME
+stralloc_starts \- check if string is prefix of stralloc
+.SH SYNTAX
+.B #include <stralloc.h>
+
+int \fBstralloc_starts\fP(stralloc* \fIsa\fR,const char* \fIin\fR);
+.SH DESCRIPTION
+stralloc_starts returns 1 if the \\0-terminated string in \fIin\fR, without
+the terminating \\0, is a prefix of the string stored in \fIsa\fR. Otherwise
+it returns 0. \fIsa\fR must already be allocated.
+.SH "RETURN VALUE"
+1 if \fIin\fR is a prefix of \fIsa\fR, otherwise 0.
+.SH "SEE ALSO"
+str_starts(3)

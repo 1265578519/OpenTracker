@@ -1,0 +1,23 @@
+.TH fmt_uint0 3
+.SH NAME
+fmt_uint0 \- write a zero-padded ASCII representation of an unsigned integer
+.SH SYNTAX
+.B #include <fmt.h>
+
+size_t \fBfmt_uint0\fP(char *\fIdest\fR,unsigned int \fIsource\fR,
+                       size_t \fIn\fR);
+.SH DESCRIPTION
+fmt_uint0 writes an ASCII representation ('0' to '9', base 10) of
+\fIsource\fR to \fIdest\fR and returns the number of bytes written.
+The output is padded with '0'-bytes until it encompasses at least
+\fIn\fR bytes, but it will not be truncated if it does not fit.
+
+fmt_uint0 does not append \\0.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_uint0 returns the number
+of bytes it would have written.
+
+For convenience, fmt.h defines the integer FMT_ULONG to be big enough to
+contain every possible fmt_uint output plus \\0.
+.SH "SEE ALSO"
+scan_uint(3), fmt_uint(3)

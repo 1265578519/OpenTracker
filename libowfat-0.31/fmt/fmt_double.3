@@ -1,0 +1,20 @@
+.TH fmt_double 3
+.SH NAME
+fmt_double \- write an ASCII representation of a double
+.SH SYNTAX
+.B #include <fmt.h>
+
+size_t \fBfmt_double\fP(char *\fIdest\fR,double \fId\fR,size_t
+\fImaxlen\fR,size_t \fIprec\fR);
+.SH DESCRIPTION
+fmt_double writes an ASCII representation ('0' to '9', base 10) of
+\fId\fR to \fIdest\fR and returns the number of bytes written.  No more
+than \fImaxlen\fR bytes will be written.  \fIprec\fR digits will be
+written, using scientific notation if necessary.
+
+fmt_double does not append \\0.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_double returns the
+number of bytes it would have written.
+.SH "SEE ALSO"
+scan_double(3)

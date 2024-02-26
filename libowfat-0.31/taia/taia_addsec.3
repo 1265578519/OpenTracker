@@ -1,0 +1,13 @@
+.TH taia_addsec 3
+.SH NAME
+taia_addsec \- add n seconds to a struct taia
+.SH SYNTAX
+.B #include <taia.h>
+
+extern int \fBtaia_addsec\fP(struct taia* \fIt\fR,const struct taia* \fIs\fR,
+                   int \fIsecs\fR);
+.SH DESCRIPTION
+\fBtaia_addsec\fR adds \fIsecs\fR seconds to \fIs\fR and writes the result to \fIt\fR.
+The inputs and output may overlap.
+.SH "SEE ALSO"
+taia_sub(3), taia_add(3)

@@ -1,0 +1,18 @@
+.TH stralloc_append 3
+.SH NAME
+stralloc_append \- append a character to a stralloc
+.SH SYNTAX
+.B #include <stralloc.h>
+
+int \fBstralloc_append\fP(stralloc* \fIsa\fR,const char* \fIin\fR);
+.SH DESCRIPTION
+stralloc_append appends the byte from *\fIbuf\fR to the
+string stored in \fIsa\fR, allocating space if necessary, and
+returns 1.
+
+If it runs out of memory, stralloc_append leaves \fIsa\fR alone and
+returns 0.
+.SH "RETURN VALUE"
+1 for success, 0 on memory allocation failure.
+.SH "SEE ALSO"
+stralloc_copyb(3)

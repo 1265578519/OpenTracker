@@ -1,0 +1,12 @@
+.TH taia_frac 3
+.SH NAME
+taia_frac \- get current time
+.SH SYNTAX
+.B #include <taia.h>
+
+int \fBtaia_frac\fP(const struct taia* \fIt\fR);
+.SH DESCRIPTION
+taia_frac returns a double-precision approximation to the fraction part
+of \fIt\fR. The result of taia_frac is always nonnegative.
+.SH "SEE ALSO"
+taia_approx(3)

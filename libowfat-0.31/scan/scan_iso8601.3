@@ -1,0 +1,17 @@
+.TH scan_iso8601 3
+.SH NAME
+scan_iso8601 \- parse an ISO-8601 timestamp
+.SH SYNTAX
+.B #include <scan.h>
+
+size_t \fBscan_iso8601\fP(const char *\fIsrc\fR,struct timespec *\fIdest\fR);
+.SH DESCRIPTION
+scan_iso8601 parses a timestamp as defined in ISO-8601 into a struct
+timespec.  It returns the number of bytes read from \fIsrc\fR (0 for
+parse error).
+
+scan_iso8601 supports input timestamps in time zones other than UTC
+even though fmt_iso8601 does not. Note that the returned time_t is
+always in UTC, even if a local time was given.
+.SH "SEE ALSO"
+fmt_iso8601(3)

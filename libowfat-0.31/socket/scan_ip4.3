@@ -1,0 +1,26 @@
+.TH scan_ip4 3
+.SH NAME
+scan_ip4 \- parse an IPv4 number in dotted-decimal notation
+.SH SYNTAX
+.B #include <ip4.h>
+
+int \fBscan_ip4\fP(const char *\fIsrc\fR,char \fIip\fR[4]);
+.SH DESCRIPTION
+scan_ip4 parses an IPv4 number in dotted-decimal ASCII representation
+from \fIsrc\fR and writes the result into \fIip\fR. It returns the
+number of bytes read from \fIsrc\fR or 0 if the parsing failed.
+
+Unlike many other IP parsing routines, scan_ip4 does not recognize octal
+(like \fB0177.0.0.1\fR) or hexadecimal numbers (like \fB0x7f000001\fR).
+.SH EXAMPLE
+#include <str.h>
+.br
+#include <ip4.h>
+
+  char buf[]="160.45.40.10";
+  char ip[4];
+  if (scan_ip4(buf,ip) != str_len(buf))
+    parse_error();
+
+.SH "SEE ALSO"
+fmt_ip4(3), scan_ip6(3), inet_pton(3)

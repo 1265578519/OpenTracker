@@ -1,0 +1,14 @@
+.TH io_finishandshutdown 3
+.SH NAME
+io_finishandshutdown \- deallocate internal data structures
+.SH SYNTAX
+.B #include <io.h>
+
+void \fBio_finishandshutdown\fP();
+.SH DESCRIPTION
+io_finishandshutdown deallocates the internal data structures of
+io_wait().  This only makes sense if you run your program in a malloc
+checker and want to eliminate the false alarms.  Your OS will free data
+structures automatically on process termination.
+.SH "SEE ALSO"
+io_wait(3)

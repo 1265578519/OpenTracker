@@ -1,0 +1,16 @@
+.TH stralloc_diffs 3
+.SH NAME
+stralloc_diffs \- check if string is prefix of stralloc
+.SH SYNTAX
+.B #include <stralloc.h>
+
+int \fBstralloc_diffs\fP(stralloc* \fIa\fR,const char* \fIb\fR);
+.SH DESCRIPTION
+stralloc_diffs returns negative, 0, or positive, depending on whether
+the \\0-terminated string in \fIa\fR, without
+the terminating \\0, is lexicographically smaller than, equal to, or
+greater than the string stored in \fIa\fR.
+.SH "RETURN VALUE"
+<0 if a<b, 0 if a==b, >0 if a>b.
+.SH "SEE ALSO"
+stralloc_diff(3), stralloc_starts(3), str_diff(3)

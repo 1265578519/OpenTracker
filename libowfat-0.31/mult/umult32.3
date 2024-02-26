@@ -1,0 +1,14 @@
+.TH umult32 3
+.SH NAME
+umult32 \- integer multiplication with overflow checking
+.SH SYNTAX
+.B #include <safemult.h>
+
+int \fBumult32\fP(uint32 a,uint32 b,uint32* c);
+.SH DESCRIPTION
+umult32 does c=a*b and returns 1.
+
+In case of an integer overflow, umult32 leaves \fIc\fR alone and returns
+0.
+.SH "SEE ALSO"
+umult16(3), imult32(3), umult64(3)

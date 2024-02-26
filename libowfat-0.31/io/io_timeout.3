@@ -1,0 +1,22 @@
+.TH io_timeout 3
+.SH NAME
+io_timeout \- set time limit on descriptor
+.SH SYNTAX
+.B #include <io.h>
+
+void \fBio_timeout\fP(int64 fd,tai6464 deadline);
+.SH DESCRIPTION
+The io library keeps track of an optional ``timeout'' for each descriptor. The
+timeout is a specific moment in time, stored in a tai6464 variable.
+
+io_timeout(\fId\fR,\fIt\fR) sets the timeout for descriptor \fId\fR to \fIt\fR.
+
+io_timeout has no return value; it always succeeds. (Space to store the timeout
+was already allocated as part of the descriptor.) It has no effect if \fId\fR is not
+the number of a descriptor.
+
+Note that you have to call io_timeouted to be notified of timeouts, just
+like you are calling io_canread or io_canwrite for read and write
+notification.
+.SH "SEE ALSO"
+io_waituntil(3), io_timeouted(3)

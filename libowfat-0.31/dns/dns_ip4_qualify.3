@@ -1,0 +1,22 @@
+.TH dns_ip4_qualify 3
+.SH NAME
+dns_ip4_qualify \- qualify name and look up IPv4 addresses
+.SH SYNTAX
+.B #include <dns.h>
+
+int \fBdns_ip4_qualify\fP(stralloc* \fIout\fR,stralloc* \fIfqdn\fR,
+                    const stralloc* \fIudn\fR);
+.SH DESCRIPTION
+dns_ip4_qualify feeds the name \fIudn\fR through qualification and looks up
+4-byte IP addresses for the result. It puts the fully qualified domain name
+into \fIfqdn\fR, puts the concatenation of the IP addresses into \fIout\fR, and
+returns 0. If the domain does not exist in DNS, or has no IP addresses,
+\fIout\fR will be empty.
+
+If dns_ip4_qualify has trouble with the qualification, has trouble with DNS, or
+runs out of memory, it returns -1, setting errno appropriately. It may or may
+not change \fIout\fR and \fIfqdn\fR.
+.SH QUALIFICATION
+See http://cr.yp.to/djbdns/qualification.html
+.SH "SEE ALSO"
+dns_ip4(3), dns_ip4_packet(3), dns_ip6_qualify(3)

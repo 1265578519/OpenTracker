@@ -1,0 +1,24 @@
+.TH io_close 3
+.SH NAME
+io_close \- close a file descriptor
+.SH SYNTAX
+.B #include <io.h>
+
+void \fBio_close\fP(int64 fd);
+.SH DESCRIPTION
+io_close eliminates the descriptor numbered \fIfd\fR. This usually does not
+mean eliminating the object that the descriptor is talking to.
+(For example, if a descriptor writes to a named disk file, closing the
+descriptor will not remove the file; it simply removes one way of
+writing to the file. On the other hand, a pipe disappears as soon as no
+descriptors refer to it.)
+
+io_close has no return value; it always succeeds in deallocating the
+memory used for the descriptor.  If \fIfd\fR is not the number of a
+descriptor, io_close has no effect.
+
+io_close() is like close(), but it also removes the descriptor from the
+internal io_wait() data structures.  If you called io_fd on a
+descriptor, you need to use io_close to close it, not just close().
+.SH "SEE ALSO"
+io_wait(3), io_canwrite(3)

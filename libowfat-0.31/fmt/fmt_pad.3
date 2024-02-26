@@ -1,0 +1,22 @@
+.TH fmt_pad 3
+.SH NAME
+fmt_pad \- pad a string with spaces.
+.SH SYNTAX
+.B #include <fmt.h>
+
+size_t \fBfmt_pad\fP(char *\fIdest\fR, const char *\fIsource\fR,
+      size_t \fIsrclen\fR, size_t \fIpadlen\fR,
+      size_t \fImaxlen\fR);
+.SH DESCRIPTION
+fmt_pad writes \fIpadlen\fR-\fIsrclen\fR spaces (if that number is
+positive) and then \fIsrclen\fR characters from \fIsource\fR.  It
+truncates the output only if the length would exceed \fImaxlen\fR.
+
+It returns the number of bytes it wrote.
+
+fmt_pad does not append \\0.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_pad returns the number
+of bytes it would have written.
+.SH "SEE ALSO"
+fmt_strn(3), fmt_fill(3)

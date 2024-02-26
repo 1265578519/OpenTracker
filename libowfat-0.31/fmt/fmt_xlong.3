@@ -1,0 +1,21 @@
+.TH fmt_xlong 3
+.SH NAME
+fmt_xlong \- write a hexadecimal ASCII representation of an unsigned long integer
+.SH SYNTAX
+.B #include <fmt.h>
+
+size_t \fBfmt_xlong\fP(char *\fIdest\fR,unsigned long \fIsource\fR);
+.SH DESCRIPTION
+fmt_xlong writes an ASCII representation ('0' to '9' and 'a' to 'f',
+base 16) of \fIsource\fR to \fIdest\fR and returns the number of bytes
+written.
+
+fmt_xlong does not append \\0.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_xlong returns the
+number of bytes it would have written.
+
+For convenience, fmt.h defines the integer FMT_XLONG to be big enough to
+contain every possible fmt_xlong output plus \\0.
+.SH "SEE ALSO"
+scan_xlong(3)

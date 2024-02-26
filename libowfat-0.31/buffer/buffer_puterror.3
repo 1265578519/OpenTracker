@@ -1,0 +1,13 @@
+.TH buffer_puterror 3
+.SH NAME
+buffer_puterror \- write error string to buffer and flush
+.SH SYNTAX
+.B #include <buffer.h>
+
+int \fBbuffer_puterror\fP(buffer* \fIb\fR);
+.SH DESCRIPTION
+buffer_puterror is equivalent to calling buffer_puterror2 with errno.
+.SH "RETURN VALUE"
+0 if everything is fine, -1 on error (setting \fIerrno\fR).
+.SH "SEE ALSO"
+buffer_puterror2(3), buffer_puts(3), buffer_put(3), buffer_flush(3), buffer(3)

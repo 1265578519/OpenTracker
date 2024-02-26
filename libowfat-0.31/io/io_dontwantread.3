@@ -1,0 +1,18 @@
+.TH io_dontwantread 3
+.SH NAME
+io_dontwantread \- signal that you do not want to read from a descriptor
+.SH SYNTAX
+.B #include <io.h>
+
+void \fBio_dontwantread\fP(int64 fd);
+.SH DESCRIPTION
+io_dontwantread tells the next io_wait() that you don't want to read
+from this descriptor for now.  Call io_wantread() again if you change
+your mind.
+
+You have to have called io_fd on the descriptor first (io_pipe and
+io_socketpair do this for you).  Waiting on descriptors only works for
+sockets, fifos and pipes.  It may also work on devices and TTYs, but
+that is platform dependent -- you should not rely on that.
+.SH "SEE ALSO"
+io_wait(3), io_canread(3), io_wantread(3), io_fd(3)

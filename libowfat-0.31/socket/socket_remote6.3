@@ -1,0 +1,19 @@
+.TH socket_remote6 3
+.SH NAME
+socket_remote6 \- get remote IP address of socket
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_remote6\fP(int \fIs\fR,char \fIip\fR[16],uint16 *\fIport\fR,uint32 *\fIscope_id\fR);
+.SH DESCRIPTION
+socket_remote6 returns the remote IPv6 address, port and scope ID for the
+UDP or TCP socket \fIs\fR and writes the IPv6 address to \fIip\fR, the
+port to \fIport\fR and the scope ID to \fIscope_id\fR.
+
+If \fIscope_id\fR is the null pointer, socket_remote6 will discard the
+scope ID.
+
+If something goes wrong, socket_remote6 returns -1, setting errno
+appropriately.
+.SH "SEE ALSO"
+socket_accept6(3), socket_local6(3)

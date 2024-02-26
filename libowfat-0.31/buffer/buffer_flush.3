@@ -1,0 +1,27 @@
+.TH buffer_flush 3
+.SH NAME
+buffer_flush \- feed buffer to write function
+.SH SYNTAX
+.B #include <buffer.h>
+
+int \fBbuffer_flush\fP(buffer* \fIb\fR);
+.SH DESCRIPTION
+buffer_flush feeds a string \fId\fR[0], \fId\fR[1], ...,
+\fId\fR[\fIdlen\fR-1] to the write operation by calling
+
+  \fBop\fR(\fIfd\fR,\fId\fR,\fIdlen\fR)
+
+If \fBop\fR successfully handles one or more bytes at the beginning of
+the string, it must return the number of bytes handled; if this number
+is smaller than \fIdlen\fR, buffer_flush will call \fBop\fR again with
+the rest of the string. If \fBop\fR does not handle any bytes, and does
+not encounter an error, it must return 0, or return -1 with \fIerrno\fR
+set to EINTR; in either case, buffer_flush will immediately call \fBop\fR
+again. If \fBop\fR encounters an error, it must return -1 with errno set to
+something other than EINTR; buffer_flush will pass the error to the
+caller.
+
+On success, buffer_flush returns 0. On error, buffer_flush returns -1,
+setting \fIerrno\fR appropriately.
+.SH "SEE ALSO"
+buffer_init(3)

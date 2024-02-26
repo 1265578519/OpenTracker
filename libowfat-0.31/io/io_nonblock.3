@@ -1,0 +1,43 @@
+.TH io_nonblock 3
+.SH NAME
+io_nonblock \- switch to non-blocking I/O
+.SH SYNTAX
+.B #include <io.h>
+
+void \fBio_nonblock\fP(int64 fd);
+.SH DESCRIPTION
+io_nonblock puts UNIX descriptor fd into ``non-blocking mode.'' Calling
+io_nonblock(\fIfd\fR) before io_fd(\fIfd\fR) makes io_tryread and
+io_trywrite faster and more efficient.
+
+Actually, current UNIX kernels do not support non-blocking descriptors; they
+support non-blocking open files. Furthermore, many programs will break if they
+encounter non-blocking mode. This means that you must not use io_nonblock for a
+descriptor inherited from another program.
+
+io_nonblock has no return value; it always succeeds. If d is not the number of
+a UNIX descriptor, io_nonblock has no effect.
+
+If io_fd is given a descriptor in blocking mode, io_tryread and io_trywrite go
+through the following contortions to avoid blocking:
+
+.RS 0
+.nr step 1 1
+.IP \n[step] 3
+Stop if poll says that the descriptor is not ready. Otherwise there's a good
+chance, but not a guarantee: even if poll says the descriptor is ready, the
+descriptor might not be ready a moment later. (Furthermore, poll can fail on
+some systems.)
+.IP \n+[step]
+Catch SIGALRM. SIGALRM must not be blocked, and must not be used elsewhere in
+the program.
+.IP \n+[step]
+Set an interval timer so that any blocking call will be interrupted by SIGALRM
+within 10 milliseconds. (Current UNIX kernels do not allow any shorter
+interval.) Of course, this may still mean a 10-millisecond delay.
+.RE
+
+If io_fd is given a descriptor in non-blocking mode (or a descriptor for a
+regular disk file), io_tryread and io_trywrite avoid these contortions.
+.SH "SEE ALSO"
+io_wait(3), io_canwrite(3)

@@ -1,0 +1,15 @@
+.TH iob_prefetch 3
+.SH NAME
+iob_prefetch \- prefetch data for I/O batch
+.SH SYNTAX
+.B #include <iob.h>
+
+void \fBiob_prefetch\fP(io_batch* b,uint64 n);
+.SH DESCRIPTION
+iob_prefetch makes sure the next \fIn\fR bytes are in memory.
+
+This is useful when serving large files over the network concurrently.
+Prefetching the data can then reduce hard disk head movement and enhance
+throughput.
+.SH "SEE ALSO"
+iob_reset(3), iob_send(3), iob_addbuf(3), iob_adds_free(3), iob_addfile(3)

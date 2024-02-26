@@ -1,0 +1,17 @@
+.TH uint64_pack 3
+.SH NAME
+uint64_pack \- write an unsigned little-endian 64-bit integer
+.SH SYNTAX
+.B #include <uint64.h>
+
+uint64 \fIu\fR;
+
+void \fBuint64_pack\fP(char \fIs\fR[4],uint64 \fIu\fR);
+.SH DESCRIPTION
+uint64 is a 64-bit unsigned integer type.
+
+uint64_pack portably writes a uint64 \fIu\fR to \fIs\fR in
+little-endian byte order.
+
+.SH "SEE ALSO"
+uint64_unpack(3), uint64_pack_big(3)

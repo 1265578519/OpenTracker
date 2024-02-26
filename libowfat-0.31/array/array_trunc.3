@@ -1,0 +1,16 @@
+.TH array_trunc 3
+.SH NAME
+array_trunc \- reduce number of initialized bytes
+.SH SYNTAX
+.B #include <array.h>
+
+void \fBarray_trunc\fP(array* \fIx\fR);
+
+  array \fIx\fR;
+  array_trunc(&\fIx\fR);
+
+.SH DESCRIPTION
+array_trunc is the same as array_truncate with \fIlen\fR equal to 0.
+.SH "SEE ALSO"
+array_allocate(3), array_get(3), array_fail(3), array_truncate(3),
+array_reset(3)

@@ -1,0 +1,14 @@
+.TH stralloc_free 3
+.SH NAME
+stralloc_free \- free storage associated with a stralloc
+.SH SYNTAX
+.B #include <stralloc.h>
+
+void \fBstralloc_free\fP(stralloc* \fIsa\fR);
+.SH DESCRIPTION
+stralloc_free returns the storage associated with \fIsa\fR to the
+system.  Afterwards, the stralloc is unallocated.
+.SH "RETURN VALUE"
+none.
+.SH "SEE ALSO"
+stralloc_ready(3)

@@ -1,0 +1,12 @@
+.TH case_lowers 3
+.SH NAME
+case_lowers \- compare strings case-insensitively
+.SH SYNTAX
+.B #include <case.h>
+
+void \fBcase_lowers\fP(char* \fIs\fR);
+.SH DESCRIPTION
+case_lowers converts each 'A' to 'a', 'B' to 'b', ..., 'Z' to 'z' for
+each character in \fIs\fR until the first \\0.
+.SH "SEE ALSO"
+case_lowerb(3)

@@ -1,0 +1,23 @@
+.TH array_reset 3
+.SH NAME
+array_reset \- deallocate array
+.SH SYNTAX
+.B #include <array.h>
+
+void \fBarray_reset\fP(array* \fIx\fR);
+
+  array \fIx\fR;
+  array_reset(&\fIx\fR);
+
+.SH DESCRIPTION
+If \fIx\fR is allocated, array_reset frees the region that \fIx\fR
+points to, and switches \fIx\fR to being unallocated.
+
+If \fIx\fR x has failed, array_reset simply switches \fIx\fR to being
+unallocated.
+
+If \fIx\fR x is unallocated, array_reset has no effect.
+
+.SH "SEE ALSO"
+array_allocate(3), array_get(3), array_fail(3), array_trunc(3),
+array_truncate(3)

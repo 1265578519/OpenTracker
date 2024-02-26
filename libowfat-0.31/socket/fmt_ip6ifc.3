@@ -1,0 +1,35 @@
+.TH fmt_ip6ifc 3
+.SH NAME
+fmt_ip6ifc \- write a formatted ASCII representation of an IPv6 number
+.SH SYNTAX
+.B #include <ip6.h>
+
+unsigned int \fBfmt_ip6ifc\fP(char *\fIdest\fR,const char \fIip\fR[16],uint32 \fIscope_id\fR);
+.SH DESCRIPTION
+fmt_ip6ifc formats an IPv6 number in ASCII representation from \fIip\fR and
+writes the result into \fIdest\fR. It returns the number of bytes
+written.
+
+fmt_ip6ifc will apply "::" compression to the output.
+
+If \fIip\fR is an IPv4-mapped IPv6 address, fmt_ip6ifc will output it as
+IPv4 address.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_ip6ifc returns the number
+of bytes it would have written.
+
+fmt_ip6 does not append \\0.
+
+ip6.h defines the integer IP6_FMT to be big enough to contain every
+possible fmt_ip6 output plus \\0.  However, for fmt_ip6ifc you need to
+add 1 for the '%' and IF_NAMESIZE from <net/if.h> for the interface
+name.
+.SH EXAMPLE
+#include <ip6.h>
+
+  char buf[IP6_FMT];
+  char ip[16];
+  scope_id sid;
+  buf[fmt_ip6ifc(buf,ip,sid)]=0;
+.SH "SEE ALSO"
+scan_ip6(3), fmt_ip4(3)

@@ -1,0 +1,31 @@
+.TH iarray_allocate 3
+.SH NAME
+iarray_allocate \- get pointer to nth element in iarray
+.SH SYNTAX
+.B #include <iarray.h>
+
+void* \fBiarray_allocate\fP(iarray* \fIx\fR, size_t \fIpos\fR);
+
+  iarray \fIx\fR;
+  size_t \fIpos\fR;
+  \fIt\fR* p = iarray_allocate(&\fIx\fR,\fIpos\fR);
+
+.SH DESCRIPTION
+iarray_allocate is similar to iarray_get, but if the requested element
+is not in the array, the array will be resized.  If the resize fails,
+iarray_allocate returns NULL and leaves the array untouched.
+
+This function is safe to use in environments with multiple threads, but
+it can block for indeterminate time if other threads are reallocating
+the array at the same time.
+
+Note that it is safe to use iarray_allocate where you would otherwise
+use iarray_get.  The only reason to use iarray_get over iarray_allocate
+would be optimization.
+
+.SH "RETURN VALUE"
+Return a pointer to the requested element.  If there was a memory
+allocation failure, returns NULL.
+
+.SH "SEE ALSO"
+iarray_init(3), iarray_get(3), iarray_free(3)

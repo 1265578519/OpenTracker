@@ -1,0 +1,16 @@
+.TH uint16_read 3
+.SH NAME
+uint16_read \- read an unsigned little-endian 16-bit integer
+.SH SYNTAX
+.B #include <uint16.h>
+
+uint16 \fBuint16_read\fP(const char \fIs\fR[4]);
+.SH DESCRIPTION
+uint16 is a 16-bit unsigned integer type, normally either unsigned int
+or unsigned long.
+
+uint16_read portably reads a uint16 as stored on a little-endian
+architecture from \fIs\fR and returns it.
+
+.SH "SEE ALSO"
+uint16_unpack(3), uint16_unpack_big(3)

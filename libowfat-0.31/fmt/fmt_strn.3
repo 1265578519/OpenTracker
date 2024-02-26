@@ -1,0 +1,18 @@
+.TH fmt_strn 3
+.SH NAME
+fmt_strn \- write an ASCII string
+.SH SYNTAX
+.B #include <fmt.h>
+
+size_t \fBfmt_strn\fP(char *\fIdest\fR,const char *\fIsource\fR,
+                      size_t \fImaxlen\fR);
+.SH DESCRIPTION
+fmt_str copies at most \fImaxlen\fR leading nonzero bytes from
+\fIsource\fR to \fIdest\fR and returns the number of bytes it copied.
+
+fmt_str does not append \\0.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_strn returns the number
+of bytes it would have written.
+.SH "SEE ALSO"
+strncpy(3)

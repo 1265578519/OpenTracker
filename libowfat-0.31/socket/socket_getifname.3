@@ -1,0 +1,17 @@
+.TH socket_getifname 3
+.SH NAME
+socket_getifname \- get interface name
+.SH SYNTAX
+.B #include <socket.h>
+
+const char* \fBsocket_getifname\fP(uint32 \fIinterface\fR);
+.SH DESCRIPTION
+socket_getifname returns the symbolic interface name for a network
+interface number.  The returned char* is a static buffer in the libc.
+If you query the named for more than one interface, you have to save the
+name before calling \fBsocket_getifidx\fR again.
+
+If something goes wrong, socket_getifname returns "[unknown]".
+
+.SH "SEE ALSO"
+socket_getifidx(3), socket_connect6(3)

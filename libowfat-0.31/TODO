@@ -1,0 +1,23 @@
+TransmitFile
+http://msdn.microsoft.com/library/en-us/winsock/winsock/transmitfile_2.asp
+
+http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/base/i_o_completion_ports.asp
+
+http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/base/createiocompletionport.asp
+
+http://www.sysinternals.com/ntw2k/info/comport.shtml
+
+http://msdn.microsoft.com/msdnmag/issues/1000/winsock/default.aspx
+
+
+Solaris 9:
+http://docs.sun.com/app/docs/doc/817-0679/6mgfb87mm?q=sendfile&a=view
+http://docs.sun.com/app/docs/doc/817-0679/6mgfb87mn?q=sendfile&a=view
+
+HP-UX: http://docs.hp.com/hpux/onlinedocs/B9106-90009/00/01/168-con.html
+
+AIX: http://publib16.boulder.ibm.com/pseries/en_US/libs/commtrf2/send_file.htm
+
+Solaris 10: http://developers.sun.com/solaris/articles/event_completion.html
+
+Linux: vmsplice (not in main kernel right now)

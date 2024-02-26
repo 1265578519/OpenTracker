@@ -1,0 +1,19 @@
+.TH stralloc_catm 3
+.SH NAME
+stralloc_catm \- append string(s) to a stralloc
+.SH SYNTAX
+.B #include <stralloc.h>
+
+int \fBstralloc_catm\fP(stralloc* \fIsa\fR,const char* \fIs\fR, ...);
+.SH DESCRIPTION
+stralloc_catm appends \\0-terminated strings from \fIs\fR... to the
+end of the string stored in \fIsa\fR, allocating space if necessary, and
+returns 1. If \fIsa\fR is unallocated, stralloc_catm is the same as
+stralloc_copym.
+
+If it runs out of memory, stralloc_catm returns 0.  At that point, it
+may already have copied a few of the strings to sa.
+.SH "RETURN VALUE"
+1 for success, 0 on memory allocation failure.
+.SH "SEE ALSO"
+stralloc_copym(3)

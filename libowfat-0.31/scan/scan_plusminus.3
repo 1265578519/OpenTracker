@@ -1,0 +1,12 @@
+.TH scan_plusminus 3
+.SH NAME
+scan_plusminus \- parse '+' or '-'
+.SH SYNTAX
+.B #include <scan.h>
+
+size_t \fBscan_plusminus\fP(const char *\fIsrc\fR,int *\fIdest\fR);
+.SH DESCRIPTION
+scan_plusminus parses an ASCII '+' or '-' sign from \fIsrc\fR, sets
+\fIdest\fR 1 or -1, respectively, and returns 1.
+
+If neither is found, '+' is assumed and 0 is returned.

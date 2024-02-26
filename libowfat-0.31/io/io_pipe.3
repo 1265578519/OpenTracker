@@ -1,0 +1,28 @@
+.TH io_pipe 3
+.SH NAME
+io_pipe \- create a Unix pipe
+.SH SYNTAX
+.B #include <io.h>
+
+int \fBio_pipe\fP(int64 pfd[2]);
+.SH DESCRIPTION
+io_pipe creates a new UNIX ``pipe.'' The pipe can receive data and provide
+data; any bytes written to the pipe can then be read from the pipe in the same
+order.
+
+A pipe is typically stored in an 8192-byte memory buffer; the exact number
+depends on the UNIX kernel. Bytes are written to the end of the buffer and read
+from the beginning of the buffer. Once a byte has been read, it is eliminated
+from the buffer, making space for another byte to be written; readers cannot
+``rewind'' a pipe to read old data. Once 8192 bytes have been written to the
+buffer, the pipe will not be ready for further writing until some of the bytes
+have been read. Once all the bytes written have been read, the pipe will not be
+ready for further reading until more bytes are written.
+
+io_pipe sets \fId\fR[0] to the number of a new descriptor reading from the pipe, and
+sets \fId\fR[1] to the number of a new descriptor writing to the pipe. It then
+returns 1 to indicate success. If something goes wrong, io_pipe returns 0,
+setting errno to indicate the error; in this case it frees any memory that it
+allocated for the new pipe, and it leaves \fId\fR alone.
+.SH "SEE ALSO"
+io_readfile(3), io_createfile(3), io_socketpair(3)

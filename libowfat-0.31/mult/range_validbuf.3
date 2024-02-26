@@ -1,0 +1,18 @@
+.TH range_validbuf 3
+.SH NAME
+range_validbuf \- range check buffer
+.SH SYNTAX
+.B #include <rangecheck.h>
+
+int \fBrange_validbuf\fR(const void* buf,size_t len);
+
+.SH DESCRIPTION
+range_validbuf does some basic plausibility checks on the buffer
+\fIbuf\fR[0..\fIlen\fR-1].
+.SH "RETURN VALUE"
+If the buffer is implausible (buf is NULL or buf+len has an integer
+overflow), return 0.
+
+Otherwise, return 1.
+.SH "SEE ALSO"
+rangecheck(3)

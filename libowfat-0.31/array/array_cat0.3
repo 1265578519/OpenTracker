@@ -1,0 +1,18 @@
+.TH array_cat0 3
+.SH NAME
+array_cat0 \- append 0 byte to an array
+.SH SYNTAX
+.B #include <array.h>
+
+void \fBarray_cat0\fP(array* \fIx\fR);
+
+  array \fIx\fR;
+  array_cat0(&\fIx\fR);
+
+.SH DESCRIPTION
+array_cat0 appends a 0-byte to the array \fIx\fR.
+
+array_cat0 handles failure in the same way as array_cat.
+.SH "SEE ALSO"
+array_allocate(3), array_get(3), array_fail(3), array_reset(3),
+array_cat(3), array_catb(3), array_cats(3), array_cats0(3), array_cate(3)

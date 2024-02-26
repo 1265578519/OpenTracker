@@ -1,0 +1,17 @@
+.TH dns_txt 3
+.SH NAME
+dns_txt \- look up TXT records
+.SH SYNTAX
+.B #include <dns.h>
+
+int \fBdns_txt\fP(stralloc* \fIout\fR,stralloc* \fIfqdn\fR);
+.SH DESCRIPTION
+dns_txt looks up TXT records for the fully-qualified domain name in
+\fIfqdn\fR. It puts the concatenation of the TXT records into \fIout\fR
+and returns 0.  If the domain does not exist in DNS, or has no TXT
+records, \fIout\fR will be empty.
+
+If dns_txt has trouble with the DNS lookup or runs out of memory, it returns
+-1, setting errno appropriately. It may or may not change \fIout\fR.
+.SH "SEE ALSO"
+dns_txt_packet(3)

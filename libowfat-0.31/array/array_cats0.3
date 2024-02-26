@@ -1,0 +1,19 @@
+.TH array_cats0 3
+.SH NAME
+array_cats0 \- append C string to an array
+.SH SYNTAX
+.B #include <array.h>
+
+void \fBarray_cats0\fP(array* \fIx\fR,const char* \fIy\fR);
+
+  array \fIx\fR;
+  array_cats0(&\fIx\fR,"fnord");
+
+.SH DESCRIPTION
+array_cats0 appends the contents of the 0-terminated string \fIy\fR,
+including the terminating 0 byte, to the array \fIx\fR.
+
+array_cats0 handles failure in the same way as array_cat.
+.SH "SEE ALSO"
+array_allocate(3), array_get(3), array_fail(3), array_reset(3),
+array_cat(3), array_catb(3), array_cats(3), array_cate(3)

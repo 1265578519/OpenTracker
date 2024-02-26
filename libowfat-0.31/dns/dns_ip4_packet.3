@@ -1,0 +1,16 @@
+.TH dns_ip4_packet 3
+.SH NAME
+dns_ip4_packet \- extract IPv4 address from DNS answer packet
+.SH SYNTAX
+.B #include <dns.h>
+
+int \fBdns_ip4_packet\fP(stralloc* \fIout\fR,const char* \fIbuf\fR,
+                   unsigned int \fIlen\fR);
+.SH DESCRIPTION
+dns_ip4_packet is a low-level component of dns_ip4, designed to support
+asynchronous DNS lookups. It reads a DNS packet of length \fIlen\fR from
+\fIbuf\fR, extracts IP addresses from the answer section of the packet,
+puts the addresses into \fIout\fR, and returns 0 or -1 the same way as
+dns_ip4.
+.SH "SEE ALSO"
+dns_ip4(3), dns_ip6_packet(3)

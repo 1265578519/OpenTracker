@@ -1,0 +1,12 @@
+.TH buffer_putsflush 3
+.SH NAME
+buffer_putsflush \- write ASCIIZ string to buffer and flush
+.SH SYNTAX
+.B #include <buffer.h>
+
+int \fBbuffer_putsflush\fP(buffer* \fIb\fR,const char* \fIx\fR);
+.SH DESCRIPTION
+buffer_putsflush is like buffer_putflush with \fIlen\fR determined as
+the number of bytes before the first \\0 in \fIx\fR.
+.SH "SEE ALSO"
+buffer_put(3), buffer_flush(3), buffer(3)

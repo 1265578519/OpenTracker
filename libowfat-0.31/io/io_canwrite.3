@@ -1,0 +1,29 @@
+.TH io_canwrite 3
+.SH NAME
+io_canwrite \- return a file descriptor that can be written to
+.SH SYNTAX
+.B #include <io.h>
+
+int64 \fBio_canwrite\fP();
+.SH DESCRIPTION
+io_canwrite returns the next file descriptor that can be written to.
+You have to have used io_wantwrite() on the file descriptor earlier, and
+you have to have called io_wait() or io_waituntil().
+
+These functions then keep an internal data structure on which
+descriptors were reported writable by the operating system.
+
+Please note that there is no guarantee that you can still write data
+without blocking to that descriptor, just that you could when io_wait()
+or io_waituntil() were called.  Another process could have written
+something before you.  Look at the result from io_trywrite().
+
+If there are no more descriptors that you can write to without blocking,
+io_canwrite will return -1.  In this case you should call io_wait() or
+io_waituntil() again.
+
+You should only use io_trywrite(3), io_sendfile(3) or iob_send(3) to
+write to the file, not plain write(2).  If you use write(2) and get
+EAGAIN, call io_eagain(3).
+.SH "SEE ALSO"
+io_wait(3), io_canwrite(3)

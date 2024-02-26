@@ -1,0 +1,45 @@
+.TH buffer_init 3
+.SH NAME
+buffer_init \- initialize buffer structure
+.SH SYNTAX
+.B #include <buffer.h>
+
+void \fBbuffer_init\fR(buffer &\fIb\fR,
+                ssize_t (*\fIop\fR)(int,char*,size_t),
+                int \fIfd\fR, char* \fIy\fR, size_t \fIylen\fR);
+.SH DESCRIPTION
+buffer_init prepares \fIb\fR to store a string in \fIy\fR[0], \fIy\fR[1], ...,
+\fIy\fR[\fIylen\fR-1].  Initially the string is empty.
+
+buffer_init also prepares \fIb\fR to use the read/write operation specified by
+\fIop\fR and \fIfd\fR.
+
+You can use
+
+  buffer \fIb\fR = BUFFER_INIT(\fIop\fR,\fIfd\fR,\fIy\fR,\fIylen\fR);
+
+to initialize \fIb\fR statically if \fIop\fR, \fIfd\fR, \fIy\fR, and \fIylen\fR
+are compile-time constants.
+
+You can call buffer_init again at any time. Note that this discards the
+currently buffered string.
+.SH EXAMPLE
+  #include <buffer.h>
+  #include <open.h>
+
+  char buf[4096];
+  int fd=open_read("/etc/services");
+  buffer input;
+
+  if (fd>=0) {
+    char x;
+    buffer_init(&input,read,fd,buf,sizeof buf);
+    while (buffer_get(&input,&x,1)==1) {
+      buffer_put(buffer_1,&x,1);
+      if (x=='\\n') break;
+    }
+    buffer_flush(buffer_1);
+  }
+
+.SH "SEE ALSO"
+buffer_flush(3), buffer(3)

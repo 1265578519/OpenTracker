@@ -1,0 +1,26 @@
+.TH buffer_get_new_token_sa 3
+.SH NAME
+buffer_get_new_token_sa \- read token from buffer
+.SH SYNTAX
+.nf
+.B #include <stralloc.h>
+.B #include <buffer.h>
+
+int \fBbuffer_get_new_token_sa\fP(buffer* \fIb\fR,stralloc* \fIsa\fR,
+                    const char* \fIcharset\fR,size_t \fIsetlen\fR);
+.SH DESCRIPTION
+buffer_get_new_token_sa copies data from the \fIb\fR to \fIsa\fR until
+one of the delimiters in \fIcharset\fR is found, overwriting the
+previous content of \fIsa\fR.  That delimiter is also copied to
+\fIsa\fR.
+
+If reading from the buffer or allocating memory fails,
+buffer_get_new_token_sa returns -1 and sets \fIerrno\fR appropriately.  At
+that point \fIsa\fR may already contain a partial token.
+
+If you want to read from a non-blocking socket, use buffer_get_token_sa
+instead.
+.SH "RETURN VALUE"
+-1 on error (setting errno), 0 on EOF, 1 when successful.
+.SH "SEE ALSO"
+buffer_getline_sa(3), buffer_get_token(3), buffer(3)

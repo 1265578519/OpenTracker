@@ -1,0 +1,16 @@
+.TH iob_reset 3
+.SH NAME
+iob_reset \- reset an I/O batch
+.SH SYNTAX
+.B #include <iob.h>
+
+void \fBiob_reset\fP(io_batch* b);
+.SH DESCRIPTION
+iob_free empties the list of transactions in an I/O batch.  Files added
+with iob_addfile_close are closed, and buffer added with iob_addbuf_free
+of iob_adds_free are freed.
+
+The I/O batch itself is not freed.  You can start adding transactions to
+it again.
+.SH "SEE ALSO"
+iob_new(3), iob_reset(3)

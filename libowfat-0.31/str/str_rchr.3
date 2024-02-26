@@ -1,0 +1,12 @@
+.TH str_rchr 3
+.SH NAME
+str_rchr \- find character in ASCIIZ string
+.SH SYNTAX
+.B #include <str.h>
+
+size_t \fBstr_rchr\fP(const char* \fIhaystack\fR,char \fIneedle\fR);
+.SH DESCRIPTION
+str_rchr returns the index of the last occurrance of needle or the first
+occurrance of \\0 in \fIstring\fR.
+.SH "SEE ALSO"
+strchr(3)

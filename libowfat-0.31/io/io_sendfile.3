@@ -1,0 +1,20 @@
+.TH io_sendfile 3
+.SH NAME
+io_sendfile \- send data from a file to a socket
+.SH SYNTAX
+.B #include <io.h>
+
+int64 \fBio_sendfile\fP(int64 sock,int64 fd,uint64 off,uint64 n);
+.SH DESCRIPTION
+io_sendfile sends data from a file to a socket.  This function tries to
+do this in a way that allows high quality operating systems to do
+zero-copy TCP (serving the data without copying the file contents to
+user space or inside kernel space).  This function will use special
+operating system "sendfile" primitives where available and use memory
+mapped I/O otherwise.  It should always be faster than using read() and
+write() to copy the data yourself.
+
+io_sendfile will return the number of bytes sent.  If an error occurred,
+it will return -1 for EAGAIN, or -3 otherwise.
+.SH "SEE ALSO"
+io_wait(3), io_waituntil(3)

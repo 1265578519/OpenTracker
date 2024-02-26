@@ -1,0 +1,14 @@
+.TH str_copy 3
+.SH NAME
+str_copy \- copy an ASCIIZ string
+.SH SYNTAX
+.B #include <str.h>
+
+size_t \fBstr_copy\fP(char* \fIout\fR,const char* \fIin\fR);
+.SH DESCRIPTION
+str_copy copies the leading bytes of \fIin\fR to \fIout\fR up to and
+including the first occurrance of \\0.
+
+str_copy returns the number of bytes copied.
+.SH "SEE ALSO"
+strlen(3)

@@ -1,0 +1,32 @@
+.TH socket_listen 3
+.SH NAME
+socket_listen \- attempt to make a TCP connection
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_listen\fP(int \fIs\fR,int \fIn\fR);
+.SH DESCRIPTION
+socket_listen prepares TCP socket \fIs\fR to accept TCP connections.  It
+allows a backlog of approximately \fIn\fR TCP SYNs. (On systems
+supporting SYN cookies, the backlog is irrelevant.) Normally
+socket_listen returns 0.
+
+If anything goes wrong, socket_listen returns -1, setting errno
+appropriately.
+
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[16];
+  uint16 \fIp\fR;
+
+  if ((\fIs\fR=socket_tcp6())==-1)
+    strerr_die2sys(111,FATAL,"unable to create TCP socket: ");
+  if (socket_bind6_reuse(\fIs\fR,(char *)V6any,8002,0) == -1)
+    strerr_die2sys(111,FATAL,"unable to bind: ");
+  if (socket_listen(\fIs\fR,1) == -1)
+    strerr_die2sys(111,FATAL,"unable to listen: ");
+
+.SH "SEE ALSO"
+socket_connect4(3), socket_connect6(3)

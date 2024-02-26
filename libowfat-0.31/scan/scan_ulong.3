@@ -1,0 +1,40 @@
+.TH scan_ulong 3
+.SH NAME
+scan_ulong \- parse an unsigned long integer in decimal ASCII representation
+.SH SYNTAX
+.B #include <scan.h>
+
+size_t \fBscan_ulong\fP(const char *\fIsrc\fR,unsigned long *\fIdest\fR);
+.SH DESCRIPTION
+scan_ulong parses an unsigned long integer in decimal ASCII representation
+from \fIsrc\fR and writes the result into \fIdest\fR. It returns the
+number of bytes read from \fIsrc\fR.
+
+Leading + or - or space (or anything outside of 0-9) is not accepted.
+The libc conventions of "023" for octal or "0x23" for hexadecimal are
+not supported.
+
+scan_ulong will abort the scan if the next character is not a digit, or
+if it is a digit but adding it to the number would lead to an integer
+overflow.
+.SH "RETURN VALUE"
+scan_ulong returns the number of characters successfully scanned and
+processed from src.
+.SH EXAMPLES
+scan_ulong("23",&i) -> i=23, return 2
+
+scan_ulong("+23",&i) -> return 0
+
+scan_ulong("-23",&i) -> return 0
+
+scan_ulong(" 23",&i) -> return 0
+
+scan_ulong("23,42",&i) -> i=23, return 2
+
+scan_ulong("023",&i) -> i=23, return 3
+
+scan_ulong("0x23",&i) -> i=0, return 1
+
+scan_ulong("4294967296",&i") -> i=429496729, return 9 // 32-bit system
+.SH "SEE ALSO"
+scan_xlong(3), scan_8long(3), fmt_ulong(3)

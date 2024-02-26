@@ -1,0 +1,26 @@
+.TH socket_sctp4b 3
+.SH NAME
+socket_sctp4b \- create a blocking SCTP/IP stream socket
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_sctp4b\fP();
+.SH DESCRIPTION
+socket_sctp4b creates a blocking SCTP/IP stream socket and returns a
+file descriptor pointing to that socket.  If something goes wrong,
+socket_sctp4b returns -1, setting errno appropriately, without allocating
+any resources.
+
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[4];
+  uint16 \fIp\fR;
+
+  \fIs\fR = socket_sctp4b();
+  socket_bind4(s,ip,p);
+  socket_connect4(s,ip,p);
+
+.SH "SEE ALSO"
+socket_sctp4(3), socket_bind4(3), socket_bind6(3)

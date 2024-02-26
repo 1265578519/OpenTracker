@@ -1,0 +1,10 @@
+.TH taia_uint 3
+.SH NAME
+taia_uint \- convert seconds into struct taia
+.SH SYNTAX
+.B #include <taia.h>
+
+extern int \fBtaia_uint\fP(struct taia* \fIt\fR,unsigned int \fIsecs\fR);
+.SH DESCRIPTION
+taia_uint converts \fIsecs\fR into a struct taia (setting the fractional
+part to zero).

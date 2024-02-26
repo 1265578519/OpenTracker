@@ -1,0 +1,14 @@
+.TH readclose 3
+.SH NAME
+readclose \- read a whole file into a stralloc
+.SH SYNTAX
+.B #include <readclose.h>
+
+int \fBreadclose\fP(int fd,stralloc* \fIsa\fR,size_t \fIbufsize\fR);
+.SH DESCRIPTION
+readclose reads the
+whole content into the stralloc \fIsa\fR.  The file is read in chunks of
+\fIbufsize\fR bytes size.  If everything worked fine, readclose returns
+0.  On error, readclose returns -1 and sets errno appropriately.
+.SH "SEE ALSO"
+open_read(3), openreadclose(3), readclose_append(3)

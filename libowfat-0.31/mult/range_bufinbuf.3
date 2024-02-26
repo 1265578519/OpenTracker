@@ -1,0 +1,24 @@
+.TH range_bufinbuf 3
+.SH NAME
+range_bufinbuf \- range check for buf in buffer
+.SH SYNTAX
+.B #include <rangecheck.h>
+
+int \fBrange_bufinbuf\fR(const void* buf1,size_t len1,
+                   const void* buf2,size_t len2);
+
+.SH DESCRIPTION
+range_bufinbuf checks that the buffer \fIbuf2\fR[0..\fIlen2\fR-1] lies
+entirely in \fIbuf1\fR[0..\fIlen1\fR].
+
+If the buffer is 0-terminated and you don't know the length beforehand,
+use range_strinbuf, range_str2inbuf or range_str4inbuf instead.
+.SH "RETURN VALUE"
+If one of the buffers is implausible (buf is NULL or buf+len has an integer
+overflow), return 0.
+
+If the buf2[0..len2-1] lies before or after buf1[0..len1-1], return 0.
+
+Otherwise, return 1.
+.SH "SEE ALSO"
+rangecheck(3)

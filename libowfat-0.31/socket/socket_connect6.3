@@ -1,0 +1,54 @@
+.TH socket_connect6 3
+.SH NAME
+socket_connect6 \- attempt to make a TCP connection
+.SH SYNTAX
+.B #include <socket.h>
+
+int \fBsocket_connect6\fP(int \fIs\fR, const char \fIip\fR[16],
+                    uint16 \fIport\fR,uint32 \fIscope_id\fR);
+.SH DESCRIPTION
+socket_connect6 attempts to make a connection from TCP socket \fIs\fR to
+TCP port \fIport\fR on IP address \fIip\fR.
+
+The meaning of \fIscope_id\fR is dependent on the implementation and
+IPv6 IP.  On link-local IPv6 addresses it specifies the outgoing
+interface index.  The name (e.g. "eth0") for a given interface index can
+be queried with getifname.  \fIscope_id\fR should normally be set to 0.
+
+socket_connect6 may return
+.sp 1
+.IP \(bu
+0, to indicate that the connection succeeded (and succeeded immediately,
+if the socket is non-blocking)
+.IP \(bu
+-1, setting errno to error_inprogress or error_wouldblock, to indicate
+that the socket is non-blocking
+.IP \(bu
+-1, setting errno to something else, to indicate that the connection
+failed (and failed immediately, if the socket is non-blocking).
+.PP
+
+When a background connection succeeds or fails, \fIs\fR becomes
+writable; you can use socket_connected to see whether the connection
+succeeded.  If the connection failed, socket_connected returns 0,
+setting errno appropriately.
+
+Once a TCP socket is connected, you can use the read and write
+system calls to transmit data.
+
+You can call socket_connect6 without calling socket_bind6.  This has the
+effect as first calling socket_bind6 with IP address :: and port 0.
+
+.SH EXAMPLE
+  #include <socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[16];
+  uint16 \fIp\fR;
+
+  \fIs\fR = socket_tcp6();
+  socket_bind6(s,ip,p);
+  socket_connect6(s,ip,p,0);
+
+.SH "SEE ALSO"
+socket_connect4(3), socket_fastopen_connect6(3), socket_getifname(3)

@@ -1,0 +1,23 @@
+.TH io_tryreadtimeout 3
+.SH NAME
+io_tryreadtimeout \- read from a descriptor without blocking
+.SH SYNTAX
+.B #include <io.h>
+
+int \fBio_tryreadtimeout\fP(int64 fd,char* buf,int64 len);
+.SH DESCRIPTION
+io_tryreadtimeout is identical to io_tryread, with the following
+exception: if
+
+.RS 0
+.IP \[bu] 3
+io_tryread returns -1 (the descriptor is not ready for reading), and
+.IP \[bu]
+the descriptor has a timeout, and
+.IP \[bu]
+the read attempt was after the descriptor's timeout,
+.RE
+
+then io_tryreadtimeout instead returns -2, with errno set to ETIMEDOUT.
+.SH "SEE ALSO"
+io_nonblock(3), io_waitread(3), io_tryread(3)
