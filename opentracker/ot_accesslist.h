@@ -6,19 +6,28 @@
 #ifndef OT_ACCESSLIST_H__
 #define OT_ACCESSLIST_H__
 
-#if defined ( WANT_ACCESSLIST_BLACK ) && defined (WANT_ACCESSLIST_WHITE )
+#if defined ( WANT_ACCESSLIST_BLACK ) && defined ( WANT_ACCESSLIST_WHITE )
 #  error WANT_ACCESSLIST_BLACK and WANT_ACCESSLIST_WHITE are exclusive.
 #endif
 
 #if defined ( WANT_ACCESSLIST_BLACK ) || defined (WANT_ACCESSLIST_WHITE )
 #define WANT_ACCESSLIST
-void accesslist_init( );
-void accesslist_deinit( );
+void accesslist_init( void );
+void accesslist_deinit( void );
 int  accesslist_hashisvalid( ot_hash hash );
+void accesslist_cleanup( void );
 
 extern char *g_accesslist_filename;
+#ifdef WANT_DYNAMIC_ACCESSLIST
+extern char *g_accesslist_pipe_add;
+extern char *g_accesslist_pipe_delete;
+#endif
 
 #else
+#ifdef WANT_DYNAMIC_ACCESSLIST
+#  error WANT_DYNAMIC_ACCESSLIST needs either WANT_ACCESSLIST_BLACK or WANT_ACCESSLIST_WHITE
+#endif
+
 #define accesslist_init( accesslist_filename )
 #define accesslist_deinit( )
 #define accesslist_hashisvalid( hash ) 1

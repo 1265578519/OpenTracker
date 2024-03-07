@@ -133,7 +133,6 @@ struct ot_workstruct {
   char    *peer_id;
 
   /* HTTP specific, non static */
-  int      keep_alive;
   char    *request;
   ssize_t  request_size;
   ssize_t  header_size;
@@ -143,6 +142,8 @@ struct ot_workstruct {
   /* Entropy state for rand48 function so that threads don't need to acquire mutexes for
      global random() or arc4random() state, which causes heavy load on linuxes */
   uint16_t rand48_state[3];
+
+  int      keep_alive;
 };
 
 /*
@@ -163,7 +164,7 @@ struct ot_workstruct {
 #error Live logging networks disabled at the moment.
 #endif
 
-void trackerlogic_init( );
+void trackerlogic_init( void );
 void trackerlogic_deinit( void );
 void exerr( char * message );
 

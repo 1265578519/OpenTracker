@@ -17,6 +17,7 @@
 #include "ot_vector.h"
 #include "ot_clean.h"
 #include "ot_stats.h"
+#include "ot_accesslist.h"
 
 /* Returns amount of removed peers */
 static ssize_t clean_single_bucket( ot_peer *peers, size_t peer_count, time_t timedout, int *removed_seeders ) {
@@ -123,6 +124,9 @@ static void * clean_worker( void * args ) {
       usleep( OT_CLEAN_SLEEP );
     }
     stats_cleanup();
+#ifdef WANT_ACCESSLIST
+    accesslist_cleanup();
+#endif
   }
   return NULL;
 }

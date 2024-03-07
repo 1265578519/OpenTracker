@@ -293,7 +293,7 @@ static int torrent_statter( ot_torrent *torrent, uintptr_t data ) {
 /* Converter function from memory to human readable hex strings */
 static char*to_hex(char*d,uint8_t*s){char*m="0123456789ABCDEF";char *t=d;char*e=d+40;while(d<e){*d++=m[*s>>4];*d++=m[*s++&15];}*d=0;return t;}
 
-typedef struct { size_t val; ot_torrent * torrent; } ot_record;
+typedef struct { size_t val; ot_hash hash; } ot_record;
 
 /* Fetches stats from tracker */
 size_t stats_top_txt( char * reply, int amount ) {
@@ -311,18 +311,22 @@ size_t stats_top_txt( char * reply, int amount ) {
   for( bucket=0; bucket<OT_BUCKET_COUNT; ++bucket ) {
     ot_vector *torrents_list = mutex_bucket_lock( bucket );
     for( j=0; j<torrents_list->size; ++j ) {
-      ot_peerlist *peer_list = ( ((ot_torrent*)(torrents_list->data))[j] ).peer_list;
-      int idx = amount - 1; while( (idx >= 0) && ( peer_list->peer_count > top100c[idx].val ) ) --idx;
+      ot_torrent *torrent = (ot_torrent*)(torrents_list->data) + j;
+      idx = amount - 1;
+      while( (idx >= 0) && ( torrent->peer_list->peer_count > top100c[idx].val ) )
+        --idx;
       if ( idx++ != amount - 1 ) {
         memmove( top100c + idx + 1, top100c + idx, ( amount - 1 - idx ) * sizeof( ot_record ) );
-        top100c[idx].val = peer_list->peer_count;
-        top100c[idx].torrent = (ot_torrent*)(torrents_list->data) + j;
+        memcpy( &top100c[idx].hash, &torrent->hash, sizeof(ot_hash));
+        top100c[idx].val = torrent->peer_list->peer_count;
       }
-      idx = amount - 1; while( (idx >= 0) && ( peer_list->seed_count > top100s[idx].val ) ) --idx;
+      idx = amount - 1;
+      while( (idx >= 0) && ( torrent->peer_list->seed_count > top100s[idx].val ) )
+        --idx;
       if ( idx++ != amount - 1 ) {
         memmove( top100s + idx + 1, top100s + idx, ( amount - 1 - idx ) * sizeof( ot_record ) );
-        top100s[idx].val = peer_list->seed_count;
-        top100s[idx].torrent = (ot_torrent*)(torrents_list->data) + j;
+        memcpy( &top100s[idx].hash, &torrent->hash, sizeof(ot_hash));
+        top100s[idx].val = torrent->peer_list->seed_count;
       }
     }
     mutex_bucket_unlock( bucket, 0 );
@@ -332,12 +336,12 @@ size_t stats_top_txt( char * reply, int amount ) {
 
   r += sprintf( r, "Top %d torrents by peers:\n", amount );
   for( idx=0; idx<amount; ++idx )
-    if( top100c[idx].torrent )
-      r += sprintf( r, "\t%zd\t%s\n", top100c[idx].val, to_hex( hex_out, top100c[idx].torrent->hash) );
+    if( top100c[idx].val )
+      r += sprintf( r, "\t%zd\t%s\n", top100c[idx].val, to_hex( hex_out, top100c[idx].hash) );
   r += sprintf( r, "Top %d torrents by seeds:\n", amount );
   for( idx=0; idx<amount; ++idx )
-    if( top100s[idx].torrent )
-      r += sprintf( r, "\t%zd\t%s\n", top100s[idx].val, to_hex( hex_out, top100s[idx].torrent->hash) );
+    if( top100s[idx].val )
+      r += sprintf( r, "\t%zd\t%s\n", top100s[idx].val, to_hex( hex_out, top100s[idx].hash) );
 
   return r - reply;
 }

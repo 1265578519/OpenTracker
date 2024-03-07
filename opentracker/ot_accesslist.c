@@ -10,6 +10,11 @@
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
+#ifdef WANT_DYNAMIC_ACCESSLIST
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
+#endif
 
 /* Libowfat */
 #include "byte.h"
@@ -24,23 +29,80 @@
 
 /* GLOBAL VARIABLES */
 #ifdef WANT_ACCESSLIST
-       char    *g_accesslist_filename;
+char    *g_accesslist_filename = NULL;
+#ifdef WANT_DYNAMIC_ACCESSLIST
+char    *g_accesslist_pipe_add = NULL;
+char    *g_accesslist_pipe_delete = NULL;
+#endif
 static pthread_mutex_t g_accesslist_mutex;
 
-typedef struct {
-  ot_hash *list;
-  size_t   size;
-} ot_accesslist;
-ot_accesslist * g_accesslist = NULL;
-ot_accesslist * g_accesslist_old = NULL;
+/* Accesslists are lock free linked lists. We can not make them locking, because every announce
+   would try to acquire the mutex, making it the most contested mutex in the whole of opentracker,
+   basically creating a central performance choke point.
 
+   The idea is that updating the list heads happens under the g_accesslist_mutex guard and is
+   done atomically, while consumers might potentially still hold pointers deeper inside the list.
+
+   Consumers (for now only via accesslist_hashisvalid) will always fetch the list head pointer
+   that is guaranteed to live for at least five minutes. This should be many orders of magnitudes
+   more than how long it will be needed by the bsearch done on the list. */
+struct ot_accesslist;
+typedef struct ot_accesslist ot_accesslist;
+struct ot_accesslist {
+  ot_hash       *list;
+  size_t         size;
+  ot_time        base;
+  ot_accesslist *next;
+};
+static ot_accesslist * _Atomic g_accesslist = NULL;
+#ifdef WANT_DYNAMIC_ACCESSLIST
+static ot_accesslist * _Atomic g_accesslist_add = NULL;
+static ot_accesslist * _Atomic g_accesslist_delete = NULL;
+#endif
+
+/* Helpers to work on access lists */
 static int vector_compare_hash(const void *hash1, const void *hash2 ) {
   return memcmp( hash1, hash2, OT_HASH_COMPARE_SIZE );
 }
 
+static ot_accesslist * accesslist_free(ot_accesslist *accesslist) {
+  while (accesslist) {
+    ot_accesslist * this_accesslist = accesslist;
+    accesslist = this_accesslist->next;
+    free(this_accesslist->list);
+    free(this_accesslist);
+  }
+  return NULL;
+}
+
+static ot_accesslist * accesslist_make(ot_accesslist *next, size_t size) {
+  ot_accesslist * accesslist_new = malloc(sizeof(ot_accesslist));
+  if (accesslist_new) {
+    accesslist_new->list = size ? malloc(sizeof(ot_hash) * size) : NULL;
+    accesslist_new->size = size;
+    accesslist_new->base = g_now_minutes;
+    accesslist_new->next = next;
+    if (size && !accesslist_new->list) {
+      free(accesslist_new);
+      accesslist_new = NULL;
+    }
+  }
+  return accesslist_new;
+}
+
+/* This must be called with g_accesslist_mutex held.
+   This will never delete head, because that might still be in use. */
+static void accesslist_clean(ot_accesslist *accesslist) {
+  while (accesslist && accesslist->next) {
+    if (accesslist->next->base + 5 < g_now_minutes)
+      accesslist->next = accesslist_free(accesslist->next);
+    accesslist = accesslist->next;
+  }
+}
+
 /* Read initial access list */
 static void accesslist_readfile( void ) {
-  ot_accesslist * accesslist_new = malloc(sizeof(ot_accesslist));
+  ot_accesslist * accesslist_new;
   ot_hash *info_hash;
   const char *map, *map_end, *read_offs;
   size_t maplen;
@@ -54,14 +116,13 @@ static void accesslist_readfile( void ) {
 
   /* You need at least 41 bytes to pass an info_hash, make enough room
      for the maximum amount of them */
-  accesslist_new->size = 0;
-  info_hash = accesslist_new->list = malloc( ( maplen / 41 ) * 20 );
-  if( !accesslist_new->list ) {
+  accesslist_new = accesslist_make(g_accesslist, maplen / 41);
+  if( !accesslist_new ) {
     fprintf( stderr, "Warning: Not enough memory to allocate %zd bytes for accesslist buffer. May succeed later.\n", ( maplen / 41 ) * 20 );
     mmap_unmap( map, maplen);
-    free(accesslist_new);
     return;
   }
+  info_hash = accesslist_new->list;
 
   /* No use to scan if there's not enough room for another full info_hash */
   map_end = map + maplen - 40;
@@ -71,18 +132,18 @@ static void accesslist_readfile( void ) {
   while( read_offs <= map_end ) {
     int i;
     for( i=0; i<(int)sizeof(ot_hash); ++i ) {
-      int eger1 = scan_fromhex( read_offs[ 2*i ] );
-      int eger2 = scan_fromhex( read_offs[ 1 + 2*i ] );
+      int eger1 = scan_fromhex( (unsigned char)read_offs[ 2*i ] );
+      int eger2 = scan_fromhex( (unsigned char)read_offs[ 1 + 2*i ] );
       if( eger1 < 0 || eger2 < 0 )
         break;
-      (*info_hash)[i] = eger1 * 16 + eger2;
+      (*info_hash)[i] = (uint8_t)(eger1 * 16 + eger2);
     }
 
     if( i == sizeof(ot_hash) ) {
       read_offs += 40;
 
       /* Append accesslist to accesslist vector */
-      if( read_offs == map_end || scan_fromhex( *read_offs ) < 0 )
+      if( read_offs == map_end || scan_fromhex( (unsigned char)*read_offs ) < 0 )
         ++info_hash;
     }
 
@@ -100,14 +161,19 @@ static void accesslist_readfile( void ) {
 
   /* Now exchange the accesslist vector in the least race condition prone way */
   pthread_mutex_lock(&g_accesslist_mutex);
+  accesslist_new->next = g_accesslist;
+  g_accesslist = accesslist_new; /* Only now set a new list */
 
-  if (g_accesslist_old) {
-    free(g_accesslist_old->list);
-    free(g_accesslist_old);
-  }
+#ifdef WANT_DYNAMIC_ACCESSLIST
+  /* If we have dynamic accesslists, reloading a new one will always void the add/delete lists.
+     Insert empty ones at the list head */
+  if (g_accesslist_add && (accesslist_new = accesslist_make(g_accesslist_add, 0)) != NULL)
+      g_accesslist_add = accesslist_new;
+  if (g_accesslist_delete && (accesslist_new = accesslist_make(g_accesslist_delete, 0)) != NULL)
+      g_accesslist_delete = accesslist_new;
+#endif
 
-  g_accesslist_old = g_accesslist; /* Keep a copy for later free */
-  g_accesslist     = accesslist_new; /* Only now set a new list */
+  accesslist_clean(g_accesslist);
 
   pthread_mutex_unlock(&g_accesslist_mutex);
 }
@@ -115,11 +181,25 @@ static void accesslist_readfile( void ) {
 int accesslist_hashisvalid( ot_hash hash ) {
   /* Get working copy of current access list */
   ot_accesslist * accesslist = g_accesslist;
-
+#ifdef WANT_DYNAMIC_ACCESSLIST
+  ot_accesslist * accesslist_add, * accesslist_delete;
+#endif
   void * exactmatch = NULL;
 
   if (accesslist)
-      exactmatch = bsearch( hash, accesslist->list, accesslist->size, OT_HASH_COMPARE_SIZE, vector_compare_hash );
+    exactmatch = bsearch( hash, accesslist->list, accesslist->size, OT_HASH_COMPARE_SIZE, vector_compare_hash );
+
+#ifdef WANT_DYNAMIC_ACCESSLIST
+  /* If we had no match on the main list, scan the list of dynamically added hashes */
+  accesslist_add = g_accesslist_add;
+  if ((exactmatch == NULL) && accesslist_add)
+    exactmatch = bsearch( hash, accesslist_add->list, accesslist_add->size, OT_HASH_COMPARE_SIZE, vector_compare_hash );
+
+  /* If we found a matching hash on the main list, scan the list of dynamically deleted hashes */
+  accesslist_delete = g_accesslist_delete;
+  if ((exactmatch != NULL) && accesslist_delete && bsearch( hash, accesslist_add->list, accesslist_add->size, OT_HASH_COMPARE_SIZE, vector_compare_hash ))
+    exactmatch = NULL;
+#endif
 
 #ifdef WANT_ACCESSLIST_BLACK
   return exactmatch == NULL;
@@ -138,6 +218,8 @@ static void * accesslist_worker( void * args ) {
   (void)args;
 
   while( 1 ) {
+    if (!g_opentracker_running)
+        return NULL;
 
     /* Initial attempt to read accesslist */
     accesslist_readfile( );
@@ -148,27 +230,156 @@ static void * accesslist_worker( void * args ) {
   return NULL;
 }
 
+#ifdef WANT_DYNAMIC_ACCESSLIST
+static pthread_t thread_adder_id, thread_deleter_id;
+static void * accesslist_adddel_worker(char * fifoname, ot_accesslist * _Atomic * adding_to, ot_accesslist * _Atomic * removing_from) {
+  struct stat st;
+
+  if (!stat(fifoname, &st)) {
+    if (!S_ISFIFO(st.st_mode)) {
+      fprintf(stderr, "Error when starting dynamic accesslists: Found Non-FIFO file at %s.\nPlease remove it and restart opentracker.\n", fifoname);
+      return NULL;
+    }
+  } else {
+    int error = mkfifo(fifoname, 0755);
+    if (error && error != EEXIST) {
+      fprintf(stderr, "Error when starting dynamic accesslists: Couldn't create FIFO at %s, error: %s\n", fifoname, strerror(errno));
+      return NULL;
+    }
+  }
+
+  while (g_opentracker_running) {
+    FILE * fifo = fopen(fifoname, "r");
+    char *line = NULL;
+    size_t linecap = 0;
+    ssize_t linelen;
+
+    if (!fifo) {
+      fprintf(stderr, "Error when reading dynamic accesslists: Couldn't open FIFO at %s, error: %s\n", fifoname, strerror(errno));
+      return NULL;
+    }
+
+    while ((linelen = getline(&line, &linecap, fifo)) > 0) {
+      ot_hash info_hash;
+      int i;
+
+      printf("Got line %*s", (int)linelen, line);
+      /* We do ignore anything that is not of the form "^[:xdigit:]{40}[^:xdigit:].*"
+        If there's not enough characters for an info_hash in the line, skip it. */
+      if (linelen < 41)
+        continue;
+
+      for( i=0; i<(int)sizeof(ot_hash); ++i ) {
+        int eger1 = scan_fromhex( (unsigned char)line[ 2*i ] );
+        int eger2 = scan_fromhex( (unsigned char)line[ 1 + 2*i ] );
+        if( eger1 < 0 || eger2 < 0 )
+          break;
+        ((uint8_t*)info_hash)[i] = (uint8_t)(eger1 * 16 + eger2);
+      }
+printf("parsed info_hash %20s\n", info_hash);
+      if( i != sizeof(ot_hash) )
+        continue;
+
+      /* From now on we modify g_accesslist_add and g_accesslist_delete, so prevent the
+         other worker threads from doing the same */
+      pthread_mutex_lock(&g_accesslist_mutex);
+
+      /* If the info hash is in the removing_from list, create a new head without that entry */
+      if (*removing_from && (*removing_from)->list) {
+        ot_hash * exactmatch = bsearch( info_hash, (*removing_from)->list, (*removing_from)->size, OT_HASH_COMPARE_SIZE, vector_compare_hash );
+        if (exactmatch) {
+          ptrdiff_t off = exactmatch - (*removing_from)->list;
+          ot_accesslist * accesslist_new = accesslist_make(*removing_from, (*removing_from)->size - 1);
+          if (accesslist_new) {
+            memcpy(accesslist_new->list, (*removing_from)->list, sizeof(ot_hash) * off);
+            memcpy(accesslist_new->list + off, (*removing_from)->list + off + 1, (*removing_from)->size - off - 1);
+            *removing_from = accesslist_new;
+          }
+        }
+      }
+
+      /* Simple case: there's no adding_to list yet, create one with one member */
+      if (!*adding_to) {
+        ot_accesslist * accesslist_new = accesslist_make(NULL, 1);
+        if (accesslist_new) {
+          memcpy(accesslist_new->list, info_hash, sizeof(ot_hash));
+          *adding_to = accesslist_new;
+        }
+      } else {
+        int exactmatch = 0;
+        ot_hash * insert_point = binary_search( info_hash, (*adding_to)->list, (*adding_to)->size, OT_HASH_COMPARE_SIZE, sizeof(ot_hash), &exactmatch );
+
+        /* Only if the info hash is not in the adding_to list, create a new head with that entry */
+        if (!exactmatch) {
+          ot_accesslist * accesslist_new = accesslist_make(*adding_to, (*adding_to)->size + 1);
+          ptrdiff_t off = insert_point - (*adding_to)->list;
+          if (accesslist_new) {
+            memcpy(accesslist_new->list, (*adding_to)->list, sizeof(ot_hash) * off);
+            memcpy(accesslist_new->list + off, info_hash, sizeof(info_hash));
+            memcpy(accesslist_new->list + off + 1, (*adding_to)->list + off, (*adding_to)->size - off);
+            *adding_to = accesslist_new;
+          }
+        }
+      }
+
+      pthread_mutex_unlock(&g_accesslist_mutex);
+    }
+
+    fclose(fifo);
+  }
+  return NULL;
+}
+
+static void * accesslist_adder_worker( void * args ) {
+  (void)args;
+  return accesslist_adddel_worker(g_accesslist_pipe_add, &g_accesslist_add, &g_accesslist_delete);
+}
+static void * accesslist_deleter_worker( void * args ) {
+  (void)args;
+  return accesslist_adddel_worker(g_accesslist_pipe_delete, &g_accesslist_delete, &g_accesslist_add);
+}
+#endif
+
 static pthread_t thread_id;
 void accesslist_init( ) {
   pthread_mutex_init(&g_accesslist_mutex, NULL);
   pthread_create( &thread_id, NULL, accesslist_worker, NULL );
+#ifdef WANT_DYNAMIC_ACCESSLIST
+  if (g_accesslist_pipe_add)
+    pthread_create( &thread_adder_id, NULL, accesslist_adder_worker, NULL );
+  if (g_accesslist_pipe_delete)
+    pthread_create( &thread_deleter_id, NULL, accesslist_deleter_worker, NULL );
+#endif
 }
 
 void accesslist_deinit( void ) {
+  /* Wake up sleeping worker */
+  pthread_kill(thread_id, SIGHUP);
+
+  pthread_mutex_lock(&g_accesslist_mutex);
+
+  g_accesslist = accesslist_free(g_accesslist);
+
+#ifdef WANT_DYNAMIC_ACCESSLIST
+  g_accesslist_add = accesslist_free(g_accesslist_add);
+  g_accesslist_delete = accesslist_free(g_accesslist_delete);
+#endif
+
+  pthread_mutex_unlock(&g_accesslist_mutex);
   pthread_cancel( thread_id );
   pthread_mutex_destroy(&g_accesslist_mutex);
+}
 
-  if (g_accesslist_old) {
-    free(g_accesslist_old->list);
-    free(g_accesslist_old);
-    g_accesslist_old = 0;
-  }
+void accesslist_cleanup( void ) {
+  pthread_mutex_lock(&g_accesslist_mutex);
 
-  if (g_accesslist) {
-    free(g_accesslist->list);
-    free(g_accesslist);
-    g_accesslist = 0;
-  }
+  accesslist_clean(g_accesslist);
+#if WANT_DYNAMIC_ACCESSLIST
+  accesslist_clean(g_accesslist_add);
+  accesslist_clean(g_accesslist_delete);
+#endif
+
+  pthread_mutex_unlock(&g_accesslist_mutex);
 }
 #endif
 

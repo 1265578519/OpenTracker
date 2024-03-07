@@ -40,11 +40,11 @@ enum {
 
 void   stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event_data );
 void   stats_deliver( int64 sock, int tasktype );
-void   stats_cleanup();
+void   stats_cleanup( void );
 size_t return_stats_for_tracker( char *reply, int mode, int format );
 size_t stats_return_tracker_version( char *reply );
-void   stats_init( );
-void   stats_deinit( );
+void   stats_init( void );
+void   stats_deinit( void );
 
 extern const char *g_version_rijndael_c;
 extern const char *g_version_livesync_c;

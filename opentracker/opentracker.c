@@ -135,8 +135,8 @@ static void help( char *name ) {
 }
 #undef HELPLINE
 
-static size_t header_complete( char * request, ssize_t byte_count ) {
-  int i = 0, state = 0;
+static ssize_t header_complete( char * request, ssize_t byte_count ) {
+  ssize_t i = 0, state = 0;
 
   for( i=1; i < byte_count; i+=2 )
     if( request[i] <= 13 ) {
@@ -177,6 +177,9 @@ static void handle_read( const int64 sock, struct ot_workstruct *ws ) {
     return;
   }
 
+  if( byte_count == -1)
+    return;
+
   /* If we get the whole request in one packet, handle it without copying */
   if( !array_start( &cookie->request ) ) {
     if( ( ws->header_size = header_complete( ws->inbuf, byte_count ) ) ) {
@@ -184,7 +187,7 @@ static void handle_read( const int64 sock, struct ot_workstruct *ws ) {
       ws->request_size = byte_count;
       http_handle_request( sock, ws );
     } else
-      array_catb( &cookie->request, ws->inbuf, byte_count );
+      array_catb( &cookie->request, ws->inbuf, (size_t)byte_count );
     return;
   }
 
@@ -462,6 +465,12 @@ int parse_configfile( char * config_filename ) {
 #elif defined( WANT_ACCESSLIST_BLACK )
     } else if(!byte_diff(p, 16, "access.blacklist" ) && isspace(p[16])) {
       set_config_option( &g_accesslist_filename, p+17 );
+#endif
+#ifdef WANT_DYNAMIC_ACCESSLIST
+    } else if(!byte_diff(p, 15, "access.fifo_add" ) && isspace(p[15])) {
+      set_config_option( &g_accesslist_pipe_add, p+16 );
+    } else if(!byte_diff(p, 18, "access.fifo_delete" ) && isspace(p[18])) {
+      set_config_option( &g_accesslist_pipe_delete, p+19 );
 #endif
 #ifdef WANT_RESTRICT_STATS
     } else if(!byte_diff(p, 12, "access.stats" ) && isspace(p[12])) {
