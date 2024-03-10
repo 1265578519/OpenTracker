@@ -194,7 +194,7 @@ ssize_t http_sendiovecdata( const int64 sock, struct ot_workstruct *ws, int iove
 
 static ssize_t http_handle_stats( const int64 sock, struct ot_workstruct *ws, char *read_ptr ) {
 static const ot_keywords keywords_main[] =
-  { { "mode", 1 }, {"format", 2 }, { NULL, -3 } };
+  { { "mode", 1 }, {"format", 2 }, {"info_hash", 3}, { NULL, -3 } };
 static const ot_keywords keywords_mode[] =
   { { "peer", TASK_STATS_PEERS }, { "conn", TASK_STATS_CONNS }, { "scrp", TASK_STATS_SCRAPE }, { "udp4", TASK_STATS_UDP }, { "tcp4", TASK_STATS_TCP },
     { "busy", TASK_STATS_BUSY_NETWORKS }, { "torr", TASK_STATS_TORRENTS }, { "fscr", TASK_STATS_FULLSCRAPE },
@@ -230,6 +230,7 @@ static const ot_keywords keywords_format[] =
     case  2: /* matched "format" */
       if( ( format = scan_find_keywords( keywords_format, &read_ptr, SCAN_SEARCHPATH_VALUE ) ) <= 0 ) HTTPERROR_400_PARAM;
       break;
+    case  3: HTTPERROR_400_PARAM; /* If the stats URL was mistakenly added as announce URL, return a 400 */
     }
   }
 
