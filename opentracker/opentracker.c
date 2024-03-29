@@ -104,7 +104,7 @@ static void install_signal_handlers( void ) {
 }
 
 static void usage( char *name ) {
-  fprintf( stderr, "Usage: %s [-i ip] [-p port] [-P port] [-r redirect] [-d dir] [-u user] [-A ip] [-f config] [-s livesyncport]"
+  fprintf( stderr, "Usage: %s [-i ip] [-p port] [-P port] [-r redirect] [-d dir] [-u user] [-A ip[/bits]] [-f config] [-s livesyncport]"
 #ifdef WANT_ACCESSLIST_BLACK
   " [-b blacklistfile]"
 #elif defined ( WANT_ACCESSLIST_WHITE )
@@ -124,7 +124,7 @@ static void help( char *name ) {
   HELPLINE("-r redirecturl","specify url where / should be redirected to (default none)");
   HELPLINE("-d dir","specify directory to try to chroot to (default: \".\")");
   HELPLINE("-u user","specify user under whose privileges opentracker should run (default: \"nobody\")");
-  HELPLINE("-A ip","bless an ip address as admin address (e.g. to allow syncs from this address)");
+  HELPLINE("-A ip[/bits]","bless an ip address or net as admin address (e.g. to allow syncs from this address)");
 #ifdef WANT_ACCESSLIST_BLACK
   HELPLINE("-b file","specify blacklist file.");
 #elif defined( WANT_ACCESSLIST_WHITE )
@@ -395,7 +395,7 @@ static int scan_ip6_port( const char *src, ot_ip6 ip, uint16 *port ) {
   s += off;
   if( bracket && *s == ']' ) ++s;
   if( *s == 0 || isspace(*s)) return s-src;
-  if( !ip6_isv4mapped(ip)){
+  if( !ip6_isv4mapped(ip)) {
     if( *s != ':' && *s != '.' ) return 0;
     if( !bracket && *(s) == ':' ) return 0;
     s++;
@@ -407,10 +407,35 @@ static int scan_ip6_port( const char *src, ot_ip6 ip, uint16 *port ) {
   return off+s-src;
 }
 
+static int scan_ip6_net( const char *src, ot_net *net) {
+  const char *s = src;
+  int off;
+  while( isspace(*s) ) ++s;
+  if( !(off = scan_ip6( s, net->address ) ) )
+    return 0;
+  s += off;
+  if(*s!='/')
+    net->bits = 128;
+  else {
+    s++;
+    if( !(off = scan_int (s, &net->bits ) ) )
+      return 0;
+    if( ip6_isv4mapped(net->address))
+      net->bits += 96;
+    if(net->bits > 128)
+      return 0;
+    s += off;
+  }
+  return off+s-src;
+}
+
 int parse_configfile( char * config_filename ) {
   FILE *  accesslist_filehandle;
   char    inbuf[512];
   ot_ip6  tmpip;
+#if defined(WANT_RESTRICT_STATS) || defined(WANT_IP_FROM_PROXY) || defined(WANT_SYNC_LIVE)
+  ot_net  tmpnet;
+#endif
   int     bound = 0;
 
   accesslist_filehandle = fopen( config_filename, "r" );
@@ -474,22 +499,22 @@ int parse_configfile( char * config_filename ) {
 #endif
 #ifdef WANT_RESTRICT_STATS
     } else if(!byte_diff(p, 12, "access.stats" ) && isspace(p[12])) {
-      if( !scan_ip6( p+13, tmpip )) goto parse_error;
-      accesslist_blessip( tmpip, OT_PERMISSION_MAY_STAT );
+      if( !scan_ip6_net( p+13, &tmpnet )) goto parse_error;
+      accesslist_bless_net( &tmpnet, OT_PERMISSION_MAY_STAT );
 #endif
     } else if(!byte_diff(p, 17, "access.stats_path" ) && isspace(p[17])) {
       set_config_option( &g_stats_path, p+18 );
 #ifdef WANT_IP_FROM_PROXY
     } else if(!byte_diff(p, 12, "access.proxy" ) && isspace(p[12])) {
-      if( !scan_ip6( p+13, tmpip )) goto parse_error;
-      accesslist_blessip( tmpip, OT_PERMISSION_MAY_PROXY );
+      if( !scan_ip6_net( p+13, &tmpnet )) goto parse_error;
+      accesslist_bless_net( &tmpnet, OT_PERMISSION_MAY_PROXY );
 #endif
     } else if(!byte_diff(p, 20, "tracker.redirect_url" ) && isspace(p[20])) {
       set_config_option( &g_redirecturl, p+21 );
 #ifdef WANT_SYNC_LIVE
     } else if(!byte_diff(p, 24, "livesync.cluster.node_ip" ) && isspace(p[24])) {
-      if( !scan_ip6( p+25, tmpip )) goto parse_error;
-      accesslist_blessip( tmpip, OT_PERMISSION_MAY_LIVESYNC );
+      if( !scan_ip6_net( p+25, &tmpnet )) goto parse_error;
+      accesslist_bless_net( &tmpnet, OT_PERMISSION_MAY_LIVESYNC );
     } else if(!byte_diff(p, 23, "livesync.cluster.listen" ) && isspace(p[23])) {
       uint16_t tmpport = LIVESYNC_PORT;
       if( !scan_ip6_port( p+24, tmpip, &tmpport )) goto parse_error;
@@ -591,7 +616,8 @@ int drop_privileges ( const char * const serveruser, const char * const serverdi
 }
 
 int main( int argc, char **argv ) {
-  ot_ip6 serverip, tmpip;
+  ot_ip6 serverip;
+  ot_net tmpnet;
   int bound = 0, scanon = 1;
   uint16_t tmpport;
   char * statefile = 0;
@@ -641,8 +667,8 @@ int main( int argc, char **argv ) {
       case 'r': set_config_option( &g_redirecturl, optarg ); break;
       case 'l': statefile = optarg; break;
       case 'A':
-        if( !scan_ip6( optarg, tmpip )) { usage( argv[0] ); exit( 1 ); }
-        accesslist_blessip( tmpip, 0xffff ); /* Allow everything for now */
+        if( !scan_ip6_net( optarg, &tmpnet )) { usage( argv[0] ); exit( 1 ); }
+        accesslist_bless_net( &tmpnet, 0xffff ); /* Allow everything for now */
         break;
       case 'f': bound += parse_configfile( optarg ); break;
       case 'h': help( argv[0] ); exit( 0 );

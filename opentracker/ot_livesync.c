@@ -192,7 +192,7 @@ static void * livesync_worker( void * args ) {
     /* Expect at least tracker id and packet type */
     if( ws.request_size <= (ssize_t)(sizeof( g_tracker_id ) + sizeof( uint32_t )) )
       continue;
-    if( !accesslist_isblessed(in_ip, OT_PERMISSION_MAY_LIVESYNC))
+    if( !accesslist_is_blessed(in_ip, OT_PERMISSION_MAY_LIVESYNC))
       continue;
     if( !memcmp( ws.inbuf, &g_tracker_id, sizeof( g_tracker_id ) ) ) {
       /* TODO: log packet coming from ourselves */

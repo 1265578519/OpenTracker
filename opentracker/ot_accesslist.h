@@ -82,7 +82,7 @@ typedef enum {
   OT_PERMISSION_MAY_PROXY      = 0x8
 } ot_permissions;
 
-int  accesslist_blessip( ot_ip6 ip, ot_permissions permissions );
-int  accesslist_isblessed( ot_ip6 ip, ot_permissions permissions );
+int  accesslist_bless_net( ot_net *net, ot_permissions permissions );
+int  accesslist_is_blessed( ot_ip6 ip, ot_permissions permissions );
 
 #endif

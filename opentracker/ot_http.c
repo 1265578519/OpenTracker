@@ -215,7 +215,7 @@ static const ot_keywords keywords_format[] =
 #ifdef WANT_RESTRICT_STATS
   struct http_data *cookie = io_getcookie( sock );
 
-  if( !cookie || !accesslist_isblessed( cookie->ip, OT_PERMISSION_MAY_STAT ) )
+  if( !cookie || !accesslist_is_blessed( cookie->ip, OT_PERMISSION_MAY_STAT ) )
     HTTPERROR_403_IP;
 #endif
 
@@ -417,7 +417,7 @@ static ssize_t http_handle_announce( const int64 sock, struct ot_workstruct *ws,
   }
 
 #ifdef WANT_IP_FROM_PROXY
-  if( accesslist_isblessed( cookie->ip, OT_PERMISSION_MAY_PROXY ) ) {
+  if( accesslist_is_blessed( cookie->ip, OT_PERMISSION_MAY_PROXY ) ) {
     ot_ip6 proxied_ip;
     char *fwd = http_header( ws->request, ws->header_size, "x-forwarded-for" );
     if( fwd && scan_ip6( fwd, proxied_ip ) )
@@ -495,7 +495,7 @@ static ssize_t http_handle_announce( const int64 sock, struct ot_workstruct *ws,
 #ifdef WANT_FULLLOG_NETWORKS
       case 8: /* matched "lognet" */
       {
-        //if( accesslist_isblessed( cookie->ip, OT_PERMISSION_MAY_STAT ) ) {
+        //if( accesslist_is_blessed( cookie->ip, OT_PERMISSION_MAY_STAT ) ) {
           char *tmp_buf = ws->reply;
           ot_net net;
           signed short parsed, bits;

@@ -21,6 +21,7 @@
 #include "scan.h"
 #include "ip6.h"
 #include "mmap.h"
+#include "fmt.h"
 
 /* Opentracker */
 #include "trackerlogic.h"
@@ -384,10 +385,10 @@ void accesslist_cleanup( void ) {
 #endif
 
 int address_in_net( const ot_ip6 address, const ot_net *net ) {
-  int bits = net->bits;
+  int bits = net->bits, checkbits = ( 0x7f00 >> ( bits & 7 ));
   int result = memcmp( address, &net->address, bits >> 3 );
   if( !result && ( bits & 7 ) )
-    result = ( ( 0x7f00 >> ( bits & 7 ) ) & address[bits>>3] ) - net->address[bits>>3];
+    result = ( checkbits & address[bits>>3] ) - ( checkbits & net->address[bits>>3]);
   return result == 0;
 }
 
@@ -509,29 +510,37 @@ int proxylist_check_proxy( const ot_ip6 proxy, const ot_ip6 address ) {
 
 #endif
 
-static ot_ip6         g_adminip_addresses[OT_ADMINIP_MAX];
-static ot_permissions g_adminip_permissions[OT_ADMINIP_MAX];
-static unsigned int   g_adminip_count = 0;
+static ot_net         g_admin_nets[OT_ADMINIP_MAX];
+static ot_permissions g_admin_nets_permissions[OT_ADMINIP_MAX];
+static unsigned int   g_admin_nets_count = 0;
 
-int accesslist_blessip( ot_ip6 ip, ot_permissions permissions ) {
-  if( g_adminip_count >= OT_ADMINIP_MAX )
+int accesslist_bless_net( ot_net *net, ot_permissions permissions ) {
+  if( g_admin_nets_count >= OT_ADMINIP_MAX )
     return -1;
 
-  memcpy(g_adminip_addresses + g_adminip_count,ip,sizeof(ot_ip6));
-  g_adminip_permissions[ g_adminip_count++ ] = permissions;
+  memcpy(g_admin_nets + g_admin_nets_count, net, sizeof(ot_net));
+  g_admin_nets_permissions[ g_admin_nets_count++ ] = permissions;
 
 #ifdef _DEBUG
   {
     char _debug[512];
-    int off = snprintf( _debug, sizeof(_debug), "Blessing ip address " );
-    off += fmt_ip6c(_debug+off, ip );
+    int off = snprintf( _debug, sizeof(_debug), "Blessing ip net " );
+    off += fmt_ip6c(_debug+off, net->address );
+    if( net->bits < 128) {
+      _debug[off++] = '/';
+      if( ip6_isv4mapped(net->address) )
+        off += fmt_long(_debug+off, net->bits-96);
+      else
+        off += fmt_long(_debug+off, net->bits);
+    }
 
     if( permissions & OT_PERMISSION_MAY_STAT       ) off += snprintf( _debug+off, 512-off, " may_fetch_stats" );
     if( permissions & OT_PERMISSION_MAY_LIVESYNC   ) off += snprintf( _debug+off, 512-off, " may_sync_live" );
     if( permissions & OT_PERMISSION_MAY_FULLSCRAPE ) off += snprintf( _debug+off, 512-off, " may_fetch_fullscrapes" );
     if( permissions & OT_PERMISSION_MAY_PROXY      ) off += snprintf( _debug+off, 512-off, " may_proxy" );
-    if( !permissions ) off += snprintf( _debug+off, sizeof(_debug)-off, " nothing\n" );
+    if( !permissions ) off += snprintf( _debug+off, sizeof(_debug)-off, " nothing" );
     _debug[off++] = '.';
+    _debug[off++] = '\n';
     (void)write( 2, _debug, off );
   }
 #endif
@@ -539,10 +548,10 @@ int accesslist_blessip( ot_ip6 ip, ot_permissions permissions ) {
   return 0;
 }
 
-int accesslist_isblessed( ot_ip6 ip, ot_permissions permissions ) {
+int accesslist_is_blessed( ot_ip6 ip, ot_permissions permissions ) {
   unsigned int i;
-  for( i=0; i<g_adminip_count; ++i )
-    if( !memcmp( g_adminip_addresses + i, ip, sizeof(ot_ip6)) && ( g_adminip_permissions[ i ] & permissions ) )
+  for( i=0; i<g_admin_nets_count; ++i )
+    if( address_in_net(ip, g_admin_nets + i) && (g_admin_nets_permissions[ i ] & permissions ))
       return 1;
   return 0;
 }

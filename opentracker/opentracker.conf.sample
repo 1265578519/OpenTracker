@@ -93,8 +93,37 @@
 #
 # access.stats_path stats
 #
-#      If you want ip from a proxy, set your proxy ip address here.
-# access.proxy 127.0.0.1
+# IIc)
+#      If opentracker lives behind one or multiple reverse proxies, you can
+#      every http connection appears to come from these proxies. In order to
+#      take the X-Forwarded-For address instead, compile opentracker with the
+#      WANT_IP_FROM_PROXY option and set your proxy addresses here.
+#
+# access.proxy 10.0.1.23
+# access.proxy 10.0.1.24
+#
+access.proxy 173.245.48.0/20
+access.proxy 103.21.244.0/22
+access.proxy 103.22.200.0/22
+access.proxy 103.31.4.0/22
+access.proxy 141.101.64.0/18
+access.proxy 108.162.192.0/18
+access.proxy 190.93.240.0/20
+access.proxy 188.114.96.0/20
+access.proxy 197.234.240.0/22
+access.proxy 198.41.128.0/17
+access.proxy 162.158.0.0/15
+access.proxy 104.16.0.0/13
+access.proxy 104.24.0.0/14
+access.proxy 172.64.0.0/13
+access.proxy 131.0.72.0/22
+access.proxy 2400:cb00::/32
+access.proxy 2606:4700::/32
+access.proxy 2803:f800::/32
+access.proxy 2405:b500::/32
+access.proxy 2405:8100::/32
+access.proxy 2a06:98c0::/29
+access.proxy 2c0f:f248::/32
 
 # III) Live sync uses udp multicast packets to keep a cluster of opentrackers
 #      synchronized. This option tells opentracker which port to listen for
