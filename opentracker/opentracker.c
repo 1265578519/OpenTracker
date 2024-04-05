@@ -48,7 +48,7 @@ static char * g_serverdir;
 static char * g_serveruser;
 static unsigned int g_udp_workers;
 
-static void panic( const char *routine ) __attribute__ ((noreturn));
+static void panic( const char *routing ) __attribute__ ((noreturn));
 static void panic( const char *routine ) {
   fprintf( stderr, "%s: %s\n", routine, strerror(errno) );
   exit( 111 );
@@ -118,9 +118,9 @@ static void help( char *name ) {
   usage( name );
 
   HELPLINE("-f config","include and execute the config file");
-  HELPLINE("-i ip","specify ip to bind to with next -[pP] (default: any, overrides preceeding ones)");
-  HELPLINE("-p port","do bind to tcp port (default: 6969, you may specify more than one)");
-  HELPLINE("-P port","do bind to udp port (default: 6969, you may specify more than one)");
+  HELPLINE("-i ip","specify ip to bind to (default: *, you may specify more than one)");
+  HELPLINE("-p port","specify tcp port to bind to (default: 6969, you may specify more than one)");
+  HELPLINE("-P port","specify udp port to bind to (default: 6969, you may specify more than one)");
   HELPLINE("-r redirecturl","specify url where / should be redirected to (default none)");
   HELPLINE("-d dir","specify directory to try to chroot to (default: \".\")");
   HELPLINE("-u user","specify user under whose privileges opentracker should run (default: \"nobody\")");
@@ -132,9 +132,6 @@ static void help( char *name ) {
 #endif
 
   fprintf( stderr, "\nExample:   ./opentracker -i 127.0.0.1 -p 6969 -P 6969 -f ./opentracker.conf -i 10.1.1.23 -p 2710 -p 80\n" );
-  fprintf( stderr, "           Here -i 127.0.0.1 selects the ip address for the next -p 6969 and -P 6969.\n");
-  fprintf( stderr, "           If no port is bound from config file or command line, the last address given\n");
-  fprintf( stderr, "           (or ::1 if none is set) will be used on port 6969.\n");
 }
 #undef HELPLINE
 
@@ -333,6 +330,16 @@ static void * server_mainloop( void * args ) {
 
 static int64_t ot_try_bind( ot_ip6 ip, uint16_t port, PROTO_FLAG proto ) {
   int64 sock = proto == FLAG_TCP ? socket_tcp6( ) : socket_udp6( );
+
+#ifndef WANT_V6
+  if( !ip6_isv4mapped(ip) ) {
+    exerr( "V4 Tracker is V4 only!" );
+  }
+#else
+  if( ip6_isv4mapped(ip) ) {
+    exerr( "V6 Tracker is V6 only!" );
+  }
+#endif
 
 #ifdef _DEBUG
   {
@@ -616,8 +623,9 @@ int main( int argc, char **argv ) {
   char * statefile = 0;
 
   memset( serverip, 0, sizeof(ot_ip6) );
-#ifdef WANT_V4_ONLY
+#ifndef WANT_V6
   serverip[10]=serverip[11]=-1;
+  noipv6=1;
 #endif
 
 #ifdef WANT_DEV_RANDOM

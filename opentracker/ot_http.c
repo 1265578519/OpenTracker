@@ -420,19 +420,19 @@ static ssize_t http_handle_announce( const int64 sock, struct ot_workstruct *ws,
   if( accesslist_is_blessed( cookie->ip, OT_PERMISSION_MAY_PROXY ) ) {
     ot_ip6 proxied_ip;
     char *fwd = http_header( ws->request, ws->header_size, "x-forwarded-for" );
-    if( fwd && scan_ip6( fwd, proxied_ip ) ) {
-      OT_SETIP( ws->peer, proxied_ip );
-    } else
-      OT_SETIP( ws->peer, cookie->ip );
+    if( fwd && scan_ip6( fwd, proxied_ip ) )
+      OT_SETIP( &ws->peer, proxied_ip );
+    else
+      OT_SETIP( &ws->peer, cookie->ip );
   } else
 #endif
-  OT_SETIP( ws->peer, cookie->ip );
+  OT_SETIP( &ws->peer, cookie->ip );
 
   ws->peer_id = NULL;
   ws->hash = NULL;
 
-  OT_SETPORT( ws->peer, &port );
-  OT_PEERFLAG( ws->peer ) = 0;
+  OT_SETPORT( &ws->peer, &port );
+  OT_PEERFLAG( &ws->peer ) = 0;
   numwant = 400;
   scanon = 1;
 

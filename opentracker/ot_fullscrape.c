@@ -82,11 +82,7 @@ void fullscrape_deliver( int64 sock, ot_tasktype tasktype ) {
   mutex_workqueue_pushtask( sock, tasktype );
 }
 
-static char * fullscrape_write_one( ot_tasktype mode, char *r, ot_torrent *torrent, ot_hash *hash ) {
-  size_t seed_count = torrent->peer_list6->seed_count + torrent->peer_list4->seed_count;
-  size_t peer_count = torrent->peer_list6->peer_count + torrent->peer_list4->peer_count;
-  size_t down_count = torrent->peer_list6->down_count + torrent->peer_list4->down_count;
-
+static char * fullscrape_write_one( ot_tasktype mode, char *r, ot_peerlist *peer_list, ot_hash *hash ) {
   switch( mode & TASK_TASK_MASK ) {
     case TASK_FULLSCRAPE:
     default:
@@ -94,30 +90,30 @@ static char * fullscrape_write_one( ot_tasktype mode, char *r, ot_torrent *torre
       *r++='2'; *r++='0'; *r++=':';
       memcpy( r, hash, sizeof(ot_hash) ); r += sizeof(ot_hash);
       /* push rest of the scrape string */
-      r += sprintf( r, "d8:completei%zde10:downloadedi%zde10:incompletei%zdee", seed_count, down_count, peer_count-seed_count );
+      r += sprintf( r, "d8:completei%zde10:downloadedi%zde10:incompletei%zdee", peer_list->seed_count, peer_list->down_count, peer_list->peer_count-peer_list->seed_count );
 
       break;
     case TASK_FULLSCRAPE_TPB_ASCII:
       to_hex( r, *hash ); r+= 2 * sizeof(ot_hash);
-      r += sprintf( r, ":%zd:%zd\n", seed_count, peer_count-seed_count );
+      r += sprintf( r, ":%zd:%zd\n", peer_list->seed_count, peer_list->peer_count-peer_list->seed_count );
       break;
     case TASK_FULLSCRAPE_TPB_ASCII_PLUS:
       to_hex( r, *hash ); r+= 2 * sizeof(ot_hash);
-      r += sprintf( r, ":%zd:%zd:%zd\n", seed_count, peer_count-seed_count, down_count );
+      r += sprintf( r, ":%zd:%zd:%zd\n", peer_list->seed_count, peer_list->peer_count-peer_list->seed_count, peer_list->down_count );
       break;
     case TASK_FULLSCRAPE_TPB_BINARY:
       memcpy( r, *hash, sizeof(ot_hash) ); r += sizeof(ot_hash);
-      *(uint32_t*)(r+0) = htonl( (uint32_t)  seed_count );
-      *(uint32_t*)(r+4) = htonl( (uint32_t)( peer_count-seed_count) );
+      *(uint32_t*)(r+0) = htonl( (uint32_t)  peer_list->seed_count );
+      *(uint32_t*)(r+4) = htonl( (uint32_t)( peer_list->peer_count-peer_list->seed_count) );
       r+=8;
       break;
     case TASK_FULLSCRAPE_TPB_URLENCODED:
       r += fmt_urlencoded( r, (char *)*hash, 20 );
-      r += sprintf( r, ":%zd:%zd\n", seed_count, peer_count-seed_count );
+      r += sprintf( r, ":%zd:%zd\n", peer_list->seed_count, peer_list->peer_count-peer_list->seed_count );
       break;
     case TASK_FULLSCRAPE_TRACKERSTATE:
       to_hex( r, *hash ); r+= 2 * sizeof(ot_hash);
-      r += sprintf( r, ":%zd:%zd\n", torrent->peer_list6->base, down_count );
+      r += sprintf( r, ":%zd:%zd\n", peer_list->base, peer_list->down_count );
       break;
     }
     return r;
@@ -149,7 +145,7 @@ static void fullscrape_make( int *iovec_entries, struct iovec **iovector, ot_tas
 
     /* For each torrent in this bucket.. */
     for( i=0; i<torrents_list->size; ++i ) {
-      r = fullscrape_write_one( mode, r, torrents+i, &torrents[i].hash );
+      r = fullscrape_write_one( mode, r, torrents[i].peer_list, &torrents[i].hash );
 
       if( r > re) {
         /* Allocate a fresh output buffer at the end of our buffers list */
@@ -214,7 +210,7 @@ static void fullscrape_make_gzip( int *iovec_entries, struct iovec **iovector, o
     /* For each torrent in this bucket.. */
     for( i=0; i<torrents_list->size; ++i ) {
       char compress_buffer[OT_SCRAPE_MAXENTRYLEN];
-      r = fullscrape_write_one( mode, compress_buffer, torrents+i, &torrents[i].hash );
+      r = fullscrape_write_one( mode, compress_buffer, torrents[i].peer_list, &torrents[i].hash );
       strm.next_in   = (uint8_t*)compress_buffer;
       strm.avail_in  = r - compress_buffer;
       zres = deflate( &strm, Z_NO_FLUSH );

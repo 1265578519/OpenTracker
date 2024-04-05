@@ -20,36 +20,36 @@
 #include "ot_accesslist.h"
 
 /* Returns amount of removed peers */
-static ssize_t clean_single_bucket( ot_peer *peers, size_t peer_count, size_t peer_size, time_t timedout, int *removed_seeders ) {
-  ot_peer *last_peer = peers + peer_count * peer_size, *insert_point;
+static ssize_t clean_single_bucket( ot_peer *peers, size_t peer_count, time_t timedout, int *removed_seeders ) {
+  ot_peer *last_peer = peers + peer_count, *insert_point;
+  time_t timediff;
 
   /* Two scan modes: unless there is one peer removed, just increase ot_peertime */
   while( peers < last_peer ) {
-    time_t timediff = timedout + OT_PEERTIME( peers, peer_size );
-    if( timediff >= OT_PEER_TIMEOUT )
+    if( ( timediff = timedout + OT_PEERTIME( peers ) ) >= OT_PEER_TIMEOUT )
       break;
-    OT_PEERTIME( peers, peer_size ) = timediff;
-    peers += peer_size;
+    OT_PEERTIME( peers++ ) = timediff;
   }
 
-  /* If we at least remove one peer, we have to copy */
-  for( insert_point = peers; peers < last_peer; peers += peer_size ) {
-    time_t timediff = timedout + OT_PEERTIME( peers, peer_size );
-
-    if( timediff < OT_PEER_TIMEOUT ) {
-      OT_PEERTIME( peers, peer_size ) = timediff;
-      memcpy( insert_point, peers, peer_size);
-      insert_point += peer_size;
+  /* If we at least remove one peer, we have to copy  */
+  insert_point = peers;
+  while( peers < last_peer )
+    if( ( timediff = timedout + OT_PEERTIME( peers ) ) < OT_PEER_TIMEOUT ) {
+      OT_PEERTIME( peers ) = timediff;
+      memcpy( insert_point++, peers++, sizeof(ot_peer));
     } else
-      if( OT_PEERFLAG_D( peers, peer_size ) & PEER_FLAG_SEEDING )
+      if( OT_PEERFLAG( peers++ ) & PEER_FLAG_SEEDING )
         (*removed_seeders)++;
-  }
 
   return peers - insert_point;
 }
 
-int clean_single_peer_list( ot_peerlist *peer_list, size_t peer_size ) {
-  ot_vector *peer_vector = &peer_list->peers;
+/* Clean a single torrent
+   return 1 if torrent timed out
+*/
+int clean_single_torrent( ot_torrent *torrent ) {
+  ot_peerlist *peer_list = torrent->peer_list;
+  ot_vector *bucket_list = &peer_list->peers;
   time_t timedout = (time_t)( g_now_minutes - peer_list->base );
   int num_buckets = 1, removed_seeders = 0;
 
@@ -69,26 +69,24 @@ int clean_single_peer_list( ot_peerlist *peer_list, size_t peer_size ) {
   }
 
   if( OT_PEERLIST_HASBUCKETS( peer_list ) ) {
-    num_buckets = peer_vector->size;
-    peer_vector = (ot_vector *)peer_vector->data;
+    num_buckets = bucket_list->size;
+    bucket_list = (ot_vector *)bucket_list->data;
   }
 
   while( num_buckets-- ) {
-    size_t removed_peers = clean_single_bucket( peer_vector->data, peer_vector->size, peer_size, timedout, &removed_seeders );
+    size_t removed_peers = clean_single_bucket( bucket_list->data, bucket_list->size, timedout, &removed_seeders );
     peer_list->peer_count -= removed_peers;
-    peer_vector->size     -= removed_peers;
-    if( removed_peers )
-      vector_fixup_peers( peer_vector, peer_size );
-
-    /* Skip to next bucket, a vector containing peers */
-    ++peer_vector;
+    bucket_list->size     -= removed_peers;
+    if( bucket_list->size < removed_peers )
+      vector_fixup_peers( bucket_list );
+    ++bucket_list;
   }
 
   peer_list->seed_count -= removed_seeders;
 
-  /* See if we need to convert a torrent from simple vector to bucket list */
+  /* See, if we need to convert a torrent from simple vector to bucket list */
   if( ( peer_list->peer_count > OT_PEER_BUCKET_MINCOUNT ) || OT_PEERLIST_HASBUCKETS(peer_list) )
-    vector_redistribute_buckets( peer_list, peer_size );
+    vector_redistribute_buckets( peer_list );
 
   if( peer_list->peer_count )
     peer_list->base = g_now_minutes;
@@ -98,14 +96,7 @@ int clean_single_peer_list( ot_peerlist *peer_list, size_t peer_size ) {
     peer_list->base = g_now_minutes - OT_PEER_TIMEOUT;
   }
   return 0;
-}
 
-/* Clean a single torrent
-   return 1 if torrent timed out
-*/
-int clean_single_torrent( ot_torrent *torrent ) {
-  return clean_single_peer_list( torrent->peer_list6, OT_PEER_SIZE6) *
-         clean_single_peer_list( torrent->peer_list4, OT_PEER_SIZE4);
 }
 
 /* Clean up all peers in current bucket, remove timedout pools and

@@ -35,7 +35,7 @@ char groupip_1[4] = { 224,0,23,5 };
 
 #define LIVESYNC_MAXDELAY                    15      /* seconds */
 
-enum { OT_SYNC_PEER4, OT_SYNC_PEER6 };
+enum { OT_SYNC_PEER };
 
 /* Forward declaration */
 static void * livesync_worker( void * args );
@@ -47,14 +47,9 @@ static int64    g_socket_in = -1;
 static int64    g_socket_out = -1;
 
 static pthread_mutex_t g_outbuf_mutex = PTHREAD_MUTEX_INITIALIZER;
-typedef struct {
-    uint8_t  data[LIVESYNC_OUTGOING_BUFFSIZE_PEERS];
-    size_t   fill;
-    ot_time  next_packet_time;
-} sync_buffer;
-
-static sync_buffer g_v6_buf;
-static sync_buffer g_v4_buf;
+char            g_outbuf[LIVESYNC_OUTGOING_BUFFSIZE_PEERS];
+static size_t   g_outbuf_data;
+static ot_time  g_next_packet_time;
 
 static pthread_t thread_id;
 void livesync_init( ) {
@@ -63,17 +58,11 @@ void livesync_init( ) {
     exerr( "No socket address for live sync specified." );
 
   /* Prepare outgoing peers buffer */
-  memcpy( g_v6_buf.data, &g_tracker_id, sizeof( g_tracker_id ) );
-  memcpy( g_v4_buf.data, &g_tracker_id, sizeof( g_tracker_id ) );
+  memcpy( g_outbuf, &g_tracker_id, sizeof( g_tracker_id ) );
+  uint32_pack_big( g_outbuf + sizeof( g_tracker_id ), OT_SYNC_PEER);
+  g_outbuf_data = sizeof( g_tracker_id ) + sizeof( uint32_t );
 
-  uint32_pack_big( (char*)g_v6_buf.data + sizeof( g_tracker_id ), OT_SYNC_PEER6);
-  uint32_pack_big( (char*)g_v4_buf.data + sizeof( g_tracker_id ), OT_SYNC_PEER4);
-
-  g_v6_buf.fill = sizeof( g_tracker_id ) + sizeof( uint32_t );
-  g_v4_buf.fill = sizeof( g_tracker_id ) + sizeof( uint32_t );
-
-  g_v6_buf.next_packet_time = g_now_seconds + LIVESYNC_MAXDELAY;
-  g_v4_buf.next_packet_time = g_now_seconds + LIVESYNC_MAXDELAY;
+  g_next_packet_time = g_now_seconds + LIVESYNC_MAXDELAY;
 
   pthread_create( &thread_id, NULL, livesync_worker, NULL );
 }
@@ -118,43 +107,43 @@ void livesync_bind_mcast( ot_ip6 ip, uint16_t port) {
 }
 
 /* Caller MUST hold g_outbuf_mutex. Returns with g_outbuf_mutex unlocked */
-static void livesync_issue_peersync( sync_buffer *buf ) {
+static void livesync_issue_peersync( ) {
   char   mycopy[LIVESYNC_OUTGOING_BUFFSIZE_PEERS];
-  size_t fill = buf->fill;
+  size_t data = g_outbuf_data;
 
-  memcpy( mycopy, buf->data, fill );
-  buf->fill = sizeof( g_tracker_id ) + sizeof( uint32_t );
-  buf->next_packet_time = g_now_seconds + LIVESYNC_MAXDELAY;
+  memcpy( mycopy, g_outbuf, data );
+  g_outbuf_data = sizeof( g_tracker_id ) + sizeof( uint32_t );
+  g_next_packet_time = g_now_seconds + LIVESYNC_MAXDELAY;
 
   /* From now this thread has a local copy of the buffer and
      has modified the protected element */
   pthread_mutex_unlock(&g_outbuf_mutex);
 
-  socket_send4(g_socket_out, mycopy, fill, groupip_1, LIVESYNC_PORT);
+  socket_send4(g_socket_out, mycopy, data, groupip_1, LIVESYNC_PORT);
 }
 
-static void livesync_handle_peersync( struct ot_workstruct *ws, size_t peer_size ) {
-  size_t off = sizeof( g_tracker_id ) + sizeof( uint32_t );
+static void livesync_handle_peersync( struct ot_workstruct *ws ) {
+  int off = sizeof( g_tracker_id ) + sizeof( uint32_t );
 
   /* Now basic sanity checks have been done on the live sync packet
      We might add more testing and logging. */
-  while( (ssize_t)(off + sizeof( ot_hash ) + peer_size) <= ws->request_size ) {
-    memcpy( &ws->peer, ws->request + off + sizeof(ot_hash), peer_size );
+  while( off + (ssize_t)sizeof( ot_hash ) + (ssize_t)sizeof( ot_peer ) <= ws->request_size ) {
+    memcpy( &ws->peer, ws->request + off + sizeof(ot_hash), sizeof( ot_peer ) );
     ws->hash = (ot_hash*)(ws->request + off);
 
     if( !g_opentracker_running ) return;
 
-    if( OT_PEERFLAG(ws->peer) & PEER_FLAG_STOPPED )
+    if( OT_PEERFLAG(&ws->peer) & PEER_FLAG_STOPPED )
       remove_peer_from_torrent( FLAG_MCA, ws );
     else
       add_peer_to_torrent_and_return_peers( FLAG_MCA, ws, /* amount = */ 0 );
 
-    off += sizeof( ot_hash ) + peer_size;
+    off += sizeof( ot_hash ) + sizeof( ot_peer );
   }
 
   stats_issue_event(EVENT_SYNC, 0,
                     (ws->request_size - sizeof( g_tracker_id ) - sizeof( uint32_t ) ) /
-                    ((ssize_t)sizeof( ot_hash ) + peer_size));
+                    ((ssize_t)sizeof( ot_hash ) + (ssize_t)sizeof( ot_peer )));
 }
 
 /* Tickle the live sync module from time to time, so no events get
@@ -163,36 +152,24 @@ static void livesync_handle_peersync( struct ot_workstruct *ws, size_t peer_size
 void livesync_ticker( ) {
   /* livesync_issue_peersync sets g_next_packet_time */
   pthread_mutex_lock(&g_outbuf_mutex);
-  if( g_now_seconds > g_v6_buf.next_packet_time &&
-     g_v6_buf.fill > sizeof( g_tracker_id ) + sizeof( uint32_t ) )
-    livesync_issue_peersync(&g_v6_buf);
-  else
-    pthread_mutex_unlock(&g_outbuf_mutex);
-
-  pthread_mutex_lock(&g_outbuf_mutex);
-  if( g_now_seconds > g_v4_buf.next_packet_time &&
-     g_v4_buf.fill > sizeof( g_tracker_id ) + sizeof( uint32_t ) )
-    livesync_issue_peersync(&g_v4_buf);
+  if( g_now_seconds > g_next_packet_time &&
+     g_outbuf_data > sizeof( g_tracker_id ) + sizeof( uint32_t ) )
+    livesync_issue_peersync();
   else
     pthread_mutex_unlock(&g_outbuf_mutex);
 }
 
 /* Inform live sync about whats going on. */
 void livesync_tell( struct ot_workstruct *ws ) {
-  size_t       peer_size; /* initialized in next line */
-  ot_peer     *peer_src = peer_from_peer6(&ws->peer, &peer_size);
-  sync_buffer *dest_buf = peer_size == OT_PEER_SIZE6 ? &g_v6_buf : &g_v4_buf;
-
   pthread_mutex_lock(&g_outbuf_mutex);
 
-  memcpy( dest_buf->data + dest_buf->fill, ws->hash, sizeof(ot_hash) );
-  dest_buf->fill += sizeof(ot_hash);
+  memcpy( g_outbuf + g_outbuf_data, ws->hash, sizeof(ot_hash) );
+  memcpy( g_outbuf + g_outbuf_data + sizeof(ot_hash), &ws->peer, sizeof(ot_peer) );
 
-  memcpy( dest_buf->data + dest_buf->fill, peer_src, peer_size );
-  dest_buf->fill += peer_size;
+  g_outbuf_data += sizeof(ot_hash) + sizeof(ot_peer);
 
-  if( dest_buf->fill >= LIVESYNC_OUTGOING_BUFFSIZE_PEERS - LIVESYNC_OUTGOING_WATERMARK_PEERS )
-    livesync_issue_peersync(dest_buf);
+  if( g_outbuf_data >= LIVESYNC_OUTGOING_BUFFSIZE_PEERS - LIVESYNC_OUTGOING_WATERMARK_PEERS )
+    livesync_issue_peersync();
   else
     pthread_mutex_unlock(&g_outbuf_mutex);
 }
@@ -223,11 +200,8 @@ static void * livesync_worker( void * args ) {
     }
 
     switch( uint32_read_big( sizeof( g_tracker_id ) + (char *)ws.inbuf ) ) {
-    case OT_SYNC_PEER6:
-      livesync_handle_peersync( &ws, OT_PEER_SIZE6 );
-      break;
-    case OT_SYNC_PEER4:
-      livesync_handle_peersync( &ws, OT_PEER_SIZE4 );
+    case OT_SYNC_PEER:
+      livesync_handle_peersync( &ws );
       break;
     default:
       break;

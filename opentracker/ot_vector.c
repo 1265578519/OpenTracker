@@ -17,11 +17,8 @@
 #include "uint32.h"
 #include "uint16.h"
 
-static int vector_compare_peer6(const void *peer1, const void *peer2 ) {
-  return memcmp( peer1, peer2, OT_PEER_COMPARE_SIZE6 );
-}
-static int vector_compare_peer4(const void *peer1, const void *peer2 ) {
-  return memcmp( peer1, peer2, OT_PEER_COMPARE_SIZE4 );
+static int vector_compare_peer(const void *peer1, const void *peer2 ) {
+  return memcmp( peer1, peer2, OT_PEER_COMPARE_SIZE );
 }
 
 /* This function gives us a binary search that returns a pointer, even if
@@ -50,10 +47,10 @@ void *binary_search( const void * const key, const void * base, const size_t mem
   return (void*)base;
 }
 
-static uint8_t vector_hash_peer( ot_peer const *peer, size_t compare_size, int bucket_count ) {
-  unsigned int hash = 5381;
+static uint8_t vector_hash_peer( ot_peer *peer, int bucket_count ) {
+  unsigned int hash = 5381, i = OT_PEER_COMPARE_SIZE;
   uint8_t *p = (uint8_t*)peer;
-  while( compare_size-- ) hash += (hash<<5) + *(p++);
+  while( i-- ) hash += (hash<<5) + *(p++);
   return hash % bucket_count;
 }
 
@@ -85,37 +82,27 @@ void *vector_find_or_insert( ot_vector *vector, void *key, size_t member_size, s
   return match;
 }
 
-ot_peer *vector_find_or_insert_peer( ot_vector *vector, ot_peer const *peer, size_t peer_size, int *exactmatch ) {
-  ot_peer *match, *end;
-  const size_t compare_size = OT_PEER_COMPARE_SIZE_FROM_PEER_SIZE(peer_size);
-  size_t match_to_end;
+ot_peer *vector_find_or_insert_peer( ot_vector *vector, ot_peer *peer, int *exactmatch ) {
+  ot_peer *match;
 
   /* If space is zero but size is set, we're dealing with a list of vector->size buckets */
   if( vector->space < vector->size )
-    vector = ((ot_vector*)vector->data) + vector_hash_peer(peer, compare_size, vector->size );
-  match = binary_search( peer, vector->data, vector->size, peer_size, compare_size, exactmatch );
+    vector = ((ot_vector*)vector->data) + vector_hash_peer(peer, vector->size );
+  match = (ot_peer*)binary_search( peer, vector->data, vector->size, sizeof(ot_peer), OT_PEER_COMPARE_SIZE, exactmatch );
 
   if( *exactmatch ) return match;
 
-  /* This is the amount of bytes that needs to be pushed backwards by peer_size bytes to make room for new peer */
-  end = (ot_peer*)vector->data + vector->size * peer_size;
-  match_to_end = end - match;
-
   if( vector->size + 1 > vector->space ) {
-    ptrdiff_t offset = match - (ot_peer*)vector->data;
     size_t   new_space = vector->space ? OT_VECTOR_GROW_RATIO * vector->space : OT_VECTOR_MIN_MEMBERS;
-    ot_peer *new_data = realloc( vector->data, new_space * peer_size );
-
+    ot_peer *new_data = realloc( vector->data, new_space * sizeof(ot_peer) );
     if( !new_data ) return NULL;
     /* Adjust pointer if it moved by realloc */
-    match = new_data + offset;
+    match = new_data + (match - (ot_peer*)vector->data);
 
     vector->data = new_data;
     vector->space = new_space;
   }
-
-  /* Here we're guaranteed to have enough space in vector to move the block of peers after insertion point */
-  memmove( match + peer_size, match, match_to_end);
+  memmove( match + 1, match, sizeof(ot_peer) * ( ((ot_peer*)vector->data) + vector->size - match ) );
 
   vector->size++;
   return match;
@@ -126,27 +113,26 @@ ot_peer *vector_find_or_insert_peer( ot_vector *vector, ot_peer const *peer, siz
               1 if a non-seeding peer was removed
               2 if a seeding peer was removed
 */
-int vector_remove_peer( ot_vector *vector, ot_peer const *peer, size_t peer_size) {
-  int      exactmatch, was_seeder;
-  ot_peer  *match, *end;
-  size_t compare_size = OT_PEER_COMPARE_SIZE_FROM_PEER_SIZE(peer_size);
+int vector_remove_peer( ot_vector *vector, ot_peer *peer ) {
+  int      exactmatch;
+  ot_peer *match, *end;
 
   if( !vector->size ) return 0;
 
   /* If space is zero but size is set, we're dealing with a list of vector->size buckets */
   if( vector->space < vector->size )
-    vector = ((ot_vector*)vector->data) + vector_hash_peer(peer, compare_size, vector->size );
+    vector = ((ot_vector*)vector->data) + vector_hash_peer(peer, vector->size );
 
-  end = ((ot_peer*)vector->data) + peer_size * vector->size;
-  match = (ot_peer*)binary_search( peer, vector->data, vector->size, peer_size, compare_size, &exactmatch );
+  end = ((ot_peer*)vector->data) + vector->size;
+  match = (ot_peer*)binary_search( peer, vector->data, vector->size, sizeof(ot_peer), OT_PEER_COMPARE_SIZE, &exactmatch );
   if( !exactmatch ) return 0;
 
-  was_seeder = ( OT_PEERFLAG_D( match, peer_size ) & PEER_FLAG_SEEDING ) ? 2 : 1;
-  memmove( match, match + peer_size, end - match - peer_size );
+  exactmatch = ( OT_PEERFLAG( match ) & PEER_FLAG_SEEDING ) ? 2 : 1;
+  memmove( match, match + 1, sizeof(ot_peer) * ( end - match - 1 ) );
 
   vector->size--;
-  vector_fixup_peers( vector, peer_size );
-  return was_seeder;
+  vector_fixup_peers( vector );
+  return exactmatch;
 }
 
 void vector_remove_torrent( ot_vector *vector, ot_torrent *match ) {
@@ -156,8 +142,7 @@ void vector_remove_torrent( ot_vector *vector, ot_torrent *match ) {
 
   /* If this is being called after a unsuccessful malloc() for peer_list
      in add_peer_to_torrent, match->peer_list actually might be NULL */
-  if( match->peer_list6) free_peerlist( match->peer_list6 );
-  if( match->peer_list4) free_peerlist( match->peer_list4 );
+  if( match->peer_list) free_peerlist( match->peer_list );
 
   memmove( match, match + 1, sizeof(ot_torrent) * ( end - match - 1 ) );
   if( ( --vector->size * OT_VECTOR_SHRINK_THRESH < vector->space ) && ( vector->space >= OT_VECTOR_SHRINK_RATIO * OT_VECTOR_MIN_MEMBERS ) ) {
@@ -173,11 +158,9 @@ void vector_clean_list( ot_vector * vector, int num_buckets ) {
   return;
 }
 
-void vector_redistribute_buckets( ot_peerlist * peer_list, size_t peer_size ) {
+void vector_redistribute_buckets( ot_peerlist * peer_list ) {
   int tmp, bucket, bucket_size_new, num_buckets_new, num_buckets_old = 1;
   ot_vector * bucket_list_new, * bucket_list_old = &peer_list->peers;
-  int (*sort_func)(const void *, const void *) =
-    peer_size == OT_PEER_SIZE6 ? &vector_compare_peer6 : &vector_compare_peer4;
 
   if( OT_PEERLIST_HASBUCKETS( peer_list ) ) {
     num_buckets_old = peer_list->peers.size;
@@ -215,33 +198,33 @@ void vector_redistribute_buckets( ot_peerlist * peer_list, size_t peer_size ) {
   /* preallocate vectors to hold all peers */
   for( bucket=0; bucket<num_buckets_new; ++bucket ) {
     bucket_list_new[bucket].space = bucket_size_new;
-    bucket_list_new[bucket].data  = malloc( bucket_size_new * peer_size );
+    bucket_list_new[bucket].data  = malloc( bucket_size_new * sizeof(ot_peer) );
     if( !bucket_list_new[bucket].data )
       return vector_clean_list( bucket_list_new, num_buckets_new );
   }
 
   /* Now sort them into the correct bucket */
   for( bucket=0; bucket<num_buckets_old; ++bucket ) {
-    ot_peer * peers_old = bucket_list_old[bucket].data;
+    ot_peer * peers_old = bucket_list_old[bucket].data, * peers_new;
     int peer_count_old = bucket_list_old[bucket].size;
     while( peer_count_old-- ) {
       ot_vector * bucket_dest = bucket_list_new;
       if( num_buckets_new > 1 )
-        bucket_dest += vector_hash_peer(peers_old, OT_PEER_COMPARE_SIZE_FROM_PEER_SIZE(peer_size), num_buckets_new);
+        bucket_dest += vector_hash_peer(peers_old, num_buckets_new);
       if( bucket_dest->size + 1 > bucket_dest->space ) {
-        void * tmp = realloc( bucket_dest->data, peer_size * OT_VECTOR_GROW_RATIO * bucket_dest->space );
+        void * tmp = realloc( bucket_dest->data, sizeof(ot_peer) * OT_VECTOR_GROW_RATIO * bucket_dest->space );
         if( !tmp ) return vector_clean_list( bucket_list_new, num_buckets_new );
         bucket_dest->data   = tmp;
         bucket_dest->space *= OT_VECTOR_GROW_RATIO;
       }
-      memcpy((ot_peer*)bucket_dest->data + peer_size * bucket_dest->size++, peers_old, peer_size);
-      peers_old += peer_size;
+      peers_new = (ot_peer*)bucket_dest->data;
+      memcpy(peers_new + bucket_dest->size++, peers_old++, sizeof(ot_peer));
     }
   }
 
   /* Now sort each bucket to later allow bsearch */
   for( bucket=0; bucket<num_buckets_new; ++bucket )
-    qsort( bucket_list_new[bucket].data, bucket_list_new[bucket].size, peer_size, sort_func );
+    qsort( bucket_list_new[bucket].data, bucket_list_new[bucket].size, sizeof( ot_peer ), vector_compare_peer );
 
   /* Everything worked fine. Now link new bucket_list to peer_list */
   if( OT_PEERLIST_HASBUCKETS( peer_list) )
@@ -261,7 +244,7 @@ void vector_redistribute_buckets( ot_peerlist * peer_list, size_t peer_size ) {
   }
 }
 
-void vector_fixup_peers( ot_vector * vector, size_t peer_size ) {
+void vector_fixup_peers( ot_vector * vector ) {
   int need_fix = 0;
 
   if( !vector->size ) {
@@ -277,7 +260,7 @@ void vector_fixup_peers( ot_vector * vector, size_t peer_size ) {
     need_fix++;
   }
   if( need_fix )
-    vector->data = realloc( vector->data, vector->space * peer_size );
+    vector->data = realloc( vector->data, vector->space * sizeof( ot_peer ) );
 }
 
 const char *g_version_vector_c = "$Source$: $Revision$\n";

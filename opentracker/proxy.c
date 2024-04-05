@@ -61,7 +61,7 @@ int      g_self_pipe[2];
 /* So after each bucket wait 1 / OT_BUCKET_COUNT intervals */
 #define OT_SYNC_SLEEP ( ( ( OT_SYNC_INTERVAL_MINUTES ) * 60 * 1000000 ) / ( OT_BUCKET_COUNT ) )
 
-enum { OT_SYNC_PEER4, OT_SYNC_PEER6 };
+enum { OT_SYNC_PEER };
 enum { FLAG_SERVERSOCKET = 1 };
 
 /* For incoming packets */
@@ -120,15 +120,13 @@ void livesync_bind_mcast( ot_ip6 ip, uint16_t port) {
   socket_mcloop4(g_socket_out, 1);
 }
 
-size_t add_peer_to_torrent_proxy( ot_hash hash, ot_peer *peer, size_t peer_size ) {
-  int          exactmatch;
-  ot_torrent  *torrent;
-  ot_peerlist *peer_list;
-  ot_peer     *peer_dest;
-  ot_vector   *torrents_list = mutex_bucket_lock_by_hash( hash );
-  size_t       compare_size = OT_PEER_COMPARE_SIZE_FROM_PEER_SIZE(peer_size);
+size_t add_peer_to_torrent_proxy( ot_hash hash, ot_peer *peer ) {
+  int         exactmatch;
+  ot_torrent *torrent;
+  ot_peer    *peer_dest;
+  ot_vector  *torrents_list = mutex_bucket_lock_by_hash( hash );
 
-  torrent = vector_find_or_insert( torrents_list, (void*)hash, sizeof( ot_torrent ), compare_size, &exactmatch );
+  torrent = vector_find_or_insert( torrents_list, (void*)hash, sizeof( ot_torrent ), OT_HASH_COMPARE_SIZE, &exactmatch );
   if( !torrent )
     return -1;
 
@@ -136,47 +134,43 @@ size_t add_peer_to_torrent_proxy( ot_hash hash, ot_peer *peer, size_t peer_size 
     /* Create a new torrent entry, then */
     memcpy( torrent->hash, hash, sizeof(ot_hash) );
 
-    if( !( torrent->peer_list6 = malloc( sizeof (ot_peerlist) ) ) ||
-        !( torrent->peer_list4 = malloc( sizeof (ot_peerlist) ) ) ) {
+    if( !( torrent->peer_list = malloc( sizeof (ot_peerlist) ) ) ) {
       vector_remove_torrent( torrents_list, torrent );
       mutex_bucket_unlock_by_hash( hash, 0 );
       return -1;
     }
 
-    byte_zero( torrent->peer_list6, sizeof( ot_peerlist ) );
-    byte_zero( torrent->peer_list4, sizeof( ot_peerlist ) );
+    byte_zero( torrent->peer_list, sizeof( ot_peerlist ) );
   }
 
-  peer_list = peer_size == OT_PEER_SIZE6 ? torrent->peer_list6 : torrent->peer_list4;
-
   /* Check for peer in torrent */
-  peer_dest = vector_find_or_insert_peer( &(peer_list->peers), peer, peer_size, &exactmatch );
+  peer_dest = vector_find_or_insert_peer( &(torrent->peer_list->peers), peer, &exactmatch );
   if( !peer_dest ) {
     mutex_bucket_unlock_by_hash( hash, 0 );
     return -1;
   }
   /* Tell peer that it's fresh */
-  OT_PEERTIME( peer, peer_size ) = 0;
+  OT_PEERTIME( peer ) = 0;
 
   /* If we hadn't had a match create peer there */
   if( !exactmatch ) {
-    peer_list->peer_count++;
-    if( OT_PEERFLAG_D(peer, peer_size) & PEER_FLAG_SEEDING )
-      peer_list->seed_count++;
+    torrent->peer_list->peer_count++;
+    if( OT_PEERFLAG(peer) & PEER_FLAG_SEEDING )
+      torrent->peer_list->seed_count++;
   }
-  memcpy( peer_dest, peer, peer_size );
+  memcpy( peer_dest, peer, sizeof(ot_peer) );
   mutex_bucket_unlock_by_hash( hash, 0 );
   return 0;
 }
 
-size_t remove_peer_from_torrent_proxy( ot_hash hash, ot_peer *peer, size_t peer_size ) {
+size_t remove_peer_from_torrent_proxy( ot_hash hash, ot_peer *peer ) {
   int          exactmatch;
   ot_vector   *torrents_list = mutex_bucket_lock_by_hash( hash );
   ot_torrent  *torrent = binary_search( hash, torrents_list->data, torrents_list->size, sizeof( ot_torrent ), OT_HASH_COMPARE_SIZE, &exactmatch );
 
   if( exactmatch ) {
-    ot_peerlist *peer_list = peer_list = peer_size == OT_PEER_SIZE6 ? torrent->peer_list6 : torrent->peer_list4;
-    switch( vector_remove_peer( &peer_list->peers, peer, peer_size ) ) {
+    ot_peerlist *peer_list = torrent->peer_list;
+    switch( vector_remove_peer( &peer_list->peers, peer ) ) {
       case 2:  peer_list->seed_count--; /* Intentional fallthrough */
       case 1:  peer_list->peer_count--; /* Intentional fallthrough */
       default: break;
@@ -200,21 +194,21 @@ void free_peerlist( ot_peerlist *peer_list ) {
   free( peer_list );
 }
 
-static void livesync_handle_peersync( ssize_t datalen, size_t peer_size ) {
+static void livesync_handle_peersync( ssize_t datalen ) {
   int off = sizeof( g_tracker_id ) + sizeof( uint32_t );
 
   fprintf( stderr, "." );
 
-  while( (ssize_t)(off + sizeof( ot_hash ) + peer_size) <= datalen ) {
+  while( off + (ssize_t)sizeof( ot_hash ) + (ssize_t)sizeof( ot_peer ) <= datalen ) {
     ot_peer *peer = (ot_peer*)(g_inbuffer + off + sizeof(ot_hash));
     ot_hash *hash = (ot_hash*)(g_inbuffer + off);
 
-    if( OT_PEERFLAG_D(peer, peer_size) & PEER_FLAG_STOPPED )
-      remove_peer_from_torrent_proxy( *hash, peer, peer_size );
+    if( OT_PEERFLAG(peer) & PEER_FLAG_STOPPED )
+      remove_peer_from_torrent_proxy( *hash, peer );
     else
-      add_peer_to_torrent_proxy( *hash, peer, peer_size );
+      add_peer_to_torrent_proxy( *hash, peer );
 
-    off += sizeof( ot_hash ) + peer_size;
+    off += sizeof( ot_hash ) + sizeof( ot_peer );
   }
 }
 
@@ -475,7 +469,7 @@ static void server_mainloop() {
   int64 sock;
 
   /* inlined livesync_init() */
-  memset( g_peerbuffer_start, 0, sizeof( g_peerbuffer_start ) );
+  memset( g_peerbuffer_start, 0, sizeof( g_peerbuffer_start ) ); 
   g_peerbuffer_pos = g_peerbuffer_start;
   memcpy( g_peerbuffer_pos, &g_tracker_id, sizeof( g_tracker_id ) );
   uint32_pack_big( (char*)g_peerbuffer_pos + sizeof( g_tracker_id ), OT_SYNC_PEER);
@@ -483,7 +477,7 @@ static void server_mainloop() {
   g_next_packet_time = time(NULL) + LIVESYNC_MAXDELAY;
 
   while(1) {
-    /* See if we need to connect to anyone */
+    /* See, if we need to connect to anyone */
     if( time(NULL) > g_connection_reconn )
       handle_reconnects( );
 
@@ -564,6 +558,7 @@ int main( int argc, char **argv ) {
 #else
   g_tracker_id = random();
 #endif
+  noipv6=1;
 
   while( scanon ) {
     switch( getopt( argc, argv, ":l:c:L:h" ) ) {
@@ -840,12 +835,9 @@ static void * livesync_worker( void * args ) {
       /* drop packet coming from ourselves */
       continue;
     }
-    switch( uint32_read_big( (char*)g_inbuffer + sizeof( g_tracker_id ) ) ) {
-    case OT_SYNC_PEER4:
-      livesync_handle_peersync( datalen, OT_PEER_SIZE4 );
-      break;
-    case OT_SYNC_PEER6:
-      livesync_handle_peersync( datalen, OT_PEER_SIZE6 );
+    switch( uint32_read_big( sizeof( g_tracker_id ) + (char*)g_inbuffer ) ) {
+    case OT_SYNC_PEER:
+      livesync_handle_peersync( datalen );
       break;
     default:
       // fprintf( stderr, "Received an unknown live sync packet type %u.\n", uint32_read_big( sizeof( g_tracker_id ) + (char*)g_inbuffer ) );

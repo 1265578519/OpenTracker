@@ -93,16 +93,15 @@
 #
 # access.stats_path stats
 #
-# II
-#      If opentracker lives behind one or multiple reverse proxies,
+# IIc)
+#      If opentracker lives behind one or multiple reverse proxies, you can
 #      every http connection appears to come from these proxies. In order to
 #      take the X-Forwarded-For address instead, compile opentracker with the
-#      WANT_IP_FROM_PROXY option and set your proxy addresses or networkss here.
+#      WANT_IP_FROM_PROXY option and set your proxy addresses here.
 #
 # access.proxy 10.0.1.23
-# access.proxy 192.0.0.0/8
+# access.proxy 10.0.1.24
 #
-access.proxy 127.0.0.1
 access.proxy 173.245.48.0/20
 access.proxy 103.21.244.0/22
 access.proxy 103.22.200.0/22

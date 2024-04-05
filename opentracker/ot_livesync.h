@@ -28,19 +28,13 @@
   Each tracker instance accumulates announce requests until its buffer is
   full or a timeout is reached. Then it broadcasts its live sync packer:
 
-  packet type SYNC_LIVE4
+  packet type SYNC_LIVE
   [ 0x0008 0x14 info_hash
     0x001c 0x04 peer's ipv4 address
     0x0020 0x02 peer's port
     0x0024 0x02 peer flags v1 ( SEEDING = 0x80, COMPLETE = 0x40, STOPPED = 0x20 )
   ]*
 
-  packet type SYNC_LIVE6
-  [ 0x0008 0x14 info_hash
-    0x001c 0x10 peer's ipv6 address
-    0x002c 0x02 peer's port
-    0x002e 0x02 peer flags v1 ( SEEDING = 0x80, COMPLETE = 0x40, STOPPED = 0x20 )
-  ]*
 */
 
 #ifdef WANT_SYNC_LIVE

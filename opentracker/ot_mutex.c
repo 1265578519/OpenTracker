@@ -36,8 +36,8 @@ ot_vector *mutex_bucket_lock( int bucket ) {
   return all_torrents + bucket;
 }
 
-ot_vector *mutex_bucket_lock_by_hash( ot_hash const hash ) {
-  return mutex_bucket_lock( uint32_read_big( (const char*)hash ) >> OT_BUCKET_COUNT_SHIFT );
+ot_vector *mutex_bucket_lock_by_hash( ot_hash hash ) {
+  return mutex_bucket_lock( uint32_read_big( (char*)hash ) >> OT_BUCKET_COUNT_SHIFT );
 }
 
 void mutex_bucket_unlock( int bucket, int delta_torrentcount ) {
@@ -45,7 +45,7 @@ void mutex_bucket_unlock( int bucket, int delta_torrentcount ) {
   g_torrent_count += delta_torrentcount;
 }
 
-void mutex_bucket_unlock_by_hash( ot_hash const hash, int delta_torrentcount ) {
+void mutex_bucket_unlock_by_hash( ot_hash hash, int delta_torrentcount ) {
   mutex_bucket_unlock( uint32_read_big( (char*)hash ) >> OT_BUCKET_COUNT_SHIFT, delta_torrentcount );
 }
 
@@ -205,11 +205,11 @@ int64 mutex_workqueue_popresult( int *iovec_entries, struct iovec ** iovec ) {
     if ((*task)->tasktype == TASK_DONE) {
       struct ot_task *ptask = *task;
 
-      *iovec_entries = ptask->iovec_entries;
-      *iovec         = ptask->iovec;
-      sock           = ptask->sock;
+      *iovec_entries = (*task)->iovec_entries;
+      *iovec         = (*task)->iovec;
+      sock           = (*task)->sock;
 
-      *task = ptask->next;
+      *task = (*task)->next;
       free( ptask );
       break;
     }
