@@ -73,13 +73,13 @@ static time_t ot_start_time;
 #define __LDR(P,D)   ((__BYTE((P),(D))>>__SHFT((D)))&__MSK)
 #define __STR(P,D,V)   __BYTE((P),(D))=(__BYTE((P),(D))&~(__MSK<<__SHFT((D))))|((V)<<__SHFT((D)))
 
-#ifdef WANT_V6
+#if 0
+// XXX
 #define STATS_NETWORK_NODE_MAXDEPTH  (68-STATS_NETWORK_NODE_BITWIDTH)
 #define STATS_NETWORK_NODE_LIMIT     (48-STATS_NETWORK_NODE_BITWIDTH)
-#else
+#endif
 #define STATS_NETWORK_NODE_MAXDEPTH  (28-STATS_NETWORK_NODE_BITWIDTH)
 #define STATS_NETWORK_NODE_LIMIT     (24-STATS_NETWORK_NODE_BITWIDTH)
-#endif
 
 typedef union stats_network_node stats_network_node;
 union stats_network_node {
@@ -202,9 +202,10 @@ static size_t stats_return_busy_networks( char * reply, stats_network_node *tree
   for( i=amount-1; i>=0; --i) {
     if( scores[i] ) {
       r += sprintf( r, "%08zd: ", scores[i] );
-#ifdef WANT_V6
+//#ifdef WANT_V6
       r += fmt_ip6c( r, networks[i] );
-#else
+#if 0
+    // XXX
       r += fmt_ip4( r, networks[i]);
 #endif
       *r++ = '\n';
@@ -219,12 +220,12 @@ static size_t stats_slash24s_txt( char *reply, size_t amount ) {
   stats_network_node *slash24s_network_counters_root = NULL;
   char *r=reply;
   int bucket;
-  size_t i;
+  size_t i, peer_size = OT_PEER_SIZE4;
 
   for( bucket=0; bucket<OT_BUCKET_COUNT; ++bucket ) {
     ot_vector *torrents_list = mutex_bucket_lock( bucket );
     for( i=0; i<torrents_list->size; ++i ) {
-      ot_peerlist *peer_list = ( ((ot_torrent*)(torrents_list->data))[i] ).peer_list;
+      ot_peerlist *peer_list = ( ((ot_torrent*)(torrents_list->data))[i] ).peer_list4;
       ot_vector   *bucket_list = &peer_list->peers;
       int          num_buckets = 1;
 
@@ -236,9 +237,11 @@ static size_t stats_slash24s_txt( char *reply, size_t amount ) {
       while( num_buckets-- ) {
         ot_peer *peers = (ot_peer*)bucket_list->data;
         size_t   numpeers = bucket_list->size;
-        while( numpeers-- )
-          if( stat_increase_network_count( &slash24s_network_counters_root, 0, (uintptr_t)(peers++) ) )
+        while( numpeers-- ) {
+          if( stat_increase_network_count( &slash24s_network_counters_root, 0, (uintptr_t)(peers) ) )
             goto bailout_unlock;
+          peers += peer_size;
+        }
         ++bucket_list;
       }
     }
@@ -285,8 +288,8 @@ typedef struct {
 static int torrent_statter( ot_torrent *torrent, uintptr_t data ) {
   torrent_stats *stats = (torrent_stats*)data;
   stats->torrent_count++;
-  stats->peer_count += torrent->peer_list->peer_count;
-  stats->seed_count += torrent->peer_list->seed_count;
+  stats->peer_count += torrent->peer_list6->peer_count + torrent->peer_list4->peer_count;
+  stats->seed_count += torrent->peer_list6->seed_count + torrent->peer_list4->seed_count;
   return 0;
 }
 
@@ -312,21 +315,23 @@ size_t stats_top_txt( char * reply, int amount ) {
     ot_vector *torrents_list = mutex_bucket_lock( bucket );
     for( j=0; j<torrents_list->size; ++j ) {
       ot_torrent *torrent = (ot_torrent*)(torrents_list->data) + j;
+      size_t peer_count = torrent->peer_list6->peer_count + torrent->peer_list4->peer_count;
+      size_t seed_count = torrent->peer_list6->seed_count + torrent->peer_list4->seed_count;
       idx = amount - 1;
-      while( (idx >= 0) && ( torrent->peer_list->peer_count > top100c[idx].val ) )
+      while( (idx >= 0) && ( peer_count > top100c[idx].val ) )
         --idx;
       if ( idx++ != amount - 1 ) {
         memmove( top100c + idx + 1, top100c + idx, ( amount - 1 - idx ) * sizeof( ot_record ) );
         memcpy( &top100c[idx].hash, &torrent->hash, sizeof(ot_hash));
-        top100c[idx].val = torrent->peer_list->peer_count;
+        top100c[idx].val = peer_count;
       }
       idx = amount - 1;
-      while( (idx >= 0) && ( torrent->peer_list->seed_count > top100s[idx].val ) )
+      while( (idx >= 0) && ( seed_count > top100s[idx].val ) )
         --idx;
       if ( idx++ != amount - 1 ) {
         memmove( top100s + idx + 1, top100s + idx, ( amount - 1 - idx ) * sizeof( ot_record ) );
         memcpy( &top100s[idx].hash, &torrent->hash, sizeof(ot_hash));
-        top100s[idx].val = torrent->peer_list->seed_count;
+        top100s[idx].val = seed_count;
       }
     }
     mutex_bucket_unlock( bucket, 0 );
@@ -671,9 +676,9 @@ void stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event
           *peerid_hex=0;
         }
 
-#ifdef WANT_V6
         ip_readable[ fmt_ip6c( ip_readable, (char*)&ws->peer ) ] = 0;
-#else
+#if 0
+        /* XXX */
         ip_readable[ fmt_ip4( ip_readable, (char*)&ws->peer ) ] = 0;
 #endif
         syslog( LOG_INFO, "time=%s event=completed info_hash=%s peer_id=%s ip=%s", timestring, hash_hex, peerid_hex, ip_readable );
@@ -718,7 +723,7 @@ void stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event
       break;
     case EVENT_SYNC:
       ot_overall_sync_count+=event_data;
-	    break;
+      break;
     case EVENT_BUCKET_LOCKED:
       ot_overall_stall_count++;
       break;

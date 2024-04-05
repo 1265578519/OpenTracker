@@ -12,10 +12,10 @@ void mutex_init( void );
 void mutex_deinit( void );
 
 ot_vector *mutex_bucket_lock( int bucket );
-ot_vector *mutex_bucket_lock_by_hash( ot_hash hash );
+ot_vector *mutex_bucket_lock_by_hash( ot_hash const hash );
 
 void mutex_bucket_unlock( int bucket, int delta_torrentcount );
-void mutex_bucket_unlock_by_hash( ot_hash hash, int delta_torrentcount );
+void mutex_bucket_unlock_by_hash( ot_hash const hash, int delta_torrentcount );
 
 size_t mutex_get_torrent_count(void);
 
@@ -43,7 +43,7 @@ typedef enum {
   TASK_STATS_EVERYTHING            = 0x0106,
   TASK_STATS_FULLLOG               = 0x0107,
   TASK_STATS_WOODPECKERS           = 0x0108,
-  
+
   TASK_FULLSCRAPE                  = 0x0200, /* Default mode */
   TASK_FULLSCRAPE_TPB_BINARY       = 0x0201,
   TASK_FULLSCRAPE_TPB_ASCII        = 0x0202,
