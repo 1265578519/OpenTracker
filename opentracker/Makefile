@@ -1,7 +1,5 @@
 # $Id$
 
-CC?=gcc
-
 # Linux flavour
 # PREFIX?=/opt/diet
 # LIBOWFAT_HEADERS=$(PREFIX)/include
@@ -20,8 +18,7 @@ LIBOWFAT_LIBRARY=$(PREFIX)/libowfat
 BINDIR?=$(PREFIX)/bin
 STRIP?=strip
 
-FEATURES+=-DWANT_V6
-
+#FEATURES+=-DWAND_V4_ONLY
 #FEATURES+=-DWANT_ACCESSLIST_BLACK
 #FEATURES+=-DWANT_ACCESSLIST_WHITE
 #FEATURES+=-DWANT_DYNAMIC_ACCESSLIST
@@ -50,8 +47,8 @@ FEATURES+=-DWANT_V6
 OPTS_debug=-D_DEBUG -g -ggdb # -pg -fprofile-arcs -ftest-coverage
 OPTS_production=-O3
 
-CFLAGS+=-I$(LIBOWFAT_HEADERS) -Wall -pipe -Wextra #-ansi -pedantic
-LDFLAGS+=-L$(LIBOWFAT_LIBRARY) -lowfat -pthread -lpthread -lz
+CFLAGS+=-I$(LIBOWFAT_HEADERS) -Wall -pipe -pthread -Wextra #-ansi -pedantic
+LDFLAGS+=-L$(LIBOWFAT_LIBRARY) -lowfat -pthread -lz
 #LDFLAGS+=-lbsd
 
 BINARY =opentracker

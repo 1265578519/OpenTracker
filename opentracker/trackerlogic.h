@@ -24,13 +24,15 @@ typedef time_t  ot_time;
 typedef char    ot_ip6[16];
 typedef struct { ot_ip6 address; int bits; }
                 ot_net;
-#ifdef WANT_V6
-#define OT_IP_SIZE 16
-#define PEERS_BENCODED "6:peers6"
-#else
-#define OT_IP_SIZE 4
-#define PEERS_BENCODED "5:peers"
-#endif
+/* List of peers should fit in a single UDP packet (around 1200 bytes) */
+#define OT_MAX_PEERS_UDP6 66
+#define OT_MAX_PEERS_UDP4 200
+
+#define OT_IP_SIZE6 16
+#define OT_IP_SIZE4 4
+#define OT_PORT_SIZE 2
+#define OT_FLAG_SIZE 1
+#define OT_TIME_SIZE 1
 
 /* Some tracker behaviour tunable */
 #define OT_CLIENT_TIMEOUT 30
@@ -55,6 +57,7 @@ typedef struct { ot_ip6 address; int bits; }
 #define OT_ADMINIP_MAX 64
 #define OT_MAX_THREADS 64
 
+/* Number of minutes after announce before peer is removed */
 #define OT_PEER_TIMEOUT 144
 
 /* We maintain a list of 1024 pointers to sorted list of ot_torrent structs
@@ -72,32 +75,44 @@ extern volatile int g_opentracker_running;
 extern uint32_t g_tracker_id;
 typedef enum { FLAG_TCP, FLAG_UDP, FLAG_MCA, FLAG_SELFPIPE } PROTO_FLAG;
 
-typedef struct {
-  uint8_t data[OT_IP_SIZE+2+2];
-} ot_peer;
+#define OT_PEER_COMPARE_SIZE6 ((OT_IP_SIZE6)+(OT_PORT_SIZE))
+#define OT_PEER_COMPARE_SIZE4 ((OT_IP_SIZE4)+(OT_PORT_SIZE))
+#define OT_PEER_COMPARE_SIZE_FROM_PEER_SIZE(PEER_SIZE) ((PEER_SIZE)-(OT_TIME_SIZE)-(OT_FLAG_SIZE))
+
+#define OT_PEER_SIZE6 ((OT_TIME_SIZE)+(OT_FLAG_SIZE)+(OT_PEER_COMPARE_SIZE6))
+#define OT_PEER_SIZE4 ((OT_TIME_SIZE)+(OT_FLAG_SIZE)+(OT_PEER_COMPARE_SIZE4))
+
+typedef uint8_t ot_peer[1]; /* Generic pointer to a v6 or v4 peer */
+typedef uint8_t ot_peer6[OT_PEER_SIZE6];
+typedef uint8_t ot_peer4[OT_PEER_SIZE4];
 static const uint8_t PEER_FLAG_SEEDING   = 0x80;
 static const uint8_t PEER_FLAG_COMPLETED = 0x40;
 static const uint8_t PEER_FLAG_STOPPED   = 0x20;
 static const uint8_t PEER_FLAG_FROM_SYNC = 0x10;
 static const uint8_t PEER_FLAG_LEECHING  = 0x00;
 
-#ifdef WANT_V6
-#define OT_SETIP(peer,ip)     memcpy((peer),(ip),(OT_IP_SIZE))
-#else
-#define OT_SETIP(peer,ip)     memcpy((peer),(((uint8_t*)ip)+12),(OT_IP_SIZE))
-#endif
-#define OT_SETPORT(peer,port) memcpy(((uint8_t*)(peer))+(OT_IP_SIZE),(port),2)
-#define OT_PEERFLAG(peer)     (((uint8_t*)(peer))[(OT_IP_SIZE)+2])
-#define OT_PEERTIME(peer)     (((uint8_t*)(peer))[(OT_IP_SIZE)+3])
+/* Takes an ot_peer6 and returns the proper pointer to the peer and sets peer_size */
+ot_peer *peer_from_peer6(ot_peer6 *peer, size_t *peer_size);
+size_t   peer_size_from_peer6(ot_peer6 *peer);
+
+/* New style */
+#define OT_SETIP(peer,ip)              memcpy((uint8_t*)(peer),(ip),OT_IP_SIZE6)
+#define OT_SETPORT(peer,port)          memcpy(((uint8_t*)(peer))+(OT_IP_SIZE6),(port),2)
+#define OT_PEERFLAG(peer)             (((uint8_t*)(peer))[(OT_IP_SIZE6)+2])
+#define OT_PEERFLAG_D(peer,peersize)  (((uint8_t*)(peer))[(peersize)-2])
+#define OT_PEERTIME(peer,peersize)    (((uint8_t*)(peer))[(peersize)-1])
+
+#define PEERS_BENCODED6 "6:peers6"
+#define PEERS_BENCODED4 "5:peers"
 
 #define OT_HASH_COMPARE_SIZE (sizeof(ot_hash))
-#define OT_PEER_COMPARE_SIZE ((OT_IP_SIZE)+2)
 
 struct ot_peerlist;
 typedef struct ot_peerlist ot_peerlist;
 typedef struct {
   ot_hash      hash;
-  ot_peerlist *peer_list;
+  ot_peerlist *peer_list6;
+  ot_peerlist *peer_list4;
 } ot_torrent;
 
 #include "ot_vector.h"
@@ -126,7 +141,7 @@ struct ot_workstruct {
 #endif
 
   /* The peer currently in the working */
-  ot_peer  peer;
+  ot_peer6 peer; /* Can fit v6 and v4 peers */
 
   /* Pointers into the request buffer */
   ot_hash *hash;
@@ -172,9 +187,9 @@ void exerr( char * message );
    otherwise it is released in return_peers_for_torrent */
 size_t  add_peer_to_torrent_and_return_peers( PROTO_FLAG proto, struct ot_workstruct *ws, size_t amount );
 size_t  remove_peer_from_torrent( PROTO_FLAG proto, struct ot_workstruct *ws );
-size_t  return_tcp_scrape_for_torrent( ot_hash *hash, int amount, char *reply );
-size_t  return_udp_scrape_for_torrent( ot_hash hash, char *reply );
-void    add_torrent_from_saved_state( ot_hash hash, ot_time base, size_t down_count );
+size_t  return_tcp_scrape_for_torrent( ot_hash const *hash_list, int amount, char *reply );
+size_t  return_udp_scrape_for_torrent( ot_hash const hash, char *reply );
+void    add_torrent_from_saved_state( ot_hash const hash, ot_time base, size_t down_count );
 
 /* torrent iterator */
 void iterate_all_torrents( int (*for_each)( ot_torrent* torrent, uintptr_t data ), uintptr_t data );
