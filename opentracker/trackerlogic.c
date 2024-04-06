@@ -215,7 +215,7 @@ static size_t return_peers_all( ot_peerlist *peer_list, size_t peer_size, char *
     size_t   peer_count = bucket_list[bucket].size;
     while( peer_count-- ) {
       if( OT_PEERFLAG_D(peers, peer_size) & PEER_FLAG_SEEDING ) {
-        r_end -= peer_size;
+        r_end -= compare_size;
         memcpy( r_end, peers, compare_size);
       } else {
         memcpy( reply, peers, compare_size );
