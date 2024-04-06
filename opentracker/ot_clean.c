@@ -45,7 +45,7 @@ static ssize_t clean_single_bucket( ot_peer *peers, size_t peer_count, size_t pe
         (*removed_seeders)++;
   }
 
-  return peers - insert_point;
+  return (peers - insert_point) / peer_size;
 }
 
 int clean_single_peer_list( ot_peerlist *peer_list, size_t peer_size ) {

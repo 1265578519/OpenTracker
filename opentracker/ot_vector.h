@@ -32,5 +32,6 @@ void     vector_remove_torrent( ot_vector *vector, ot_torrent *match );
 /* For ot_clean.c */
 void     vector_redistribute_buckets( ot_peerlist * peer_list, size_t peer_size );
 void     vector_fixup_peers( ot_vector * vector, size_t peer_size );
+void     vector_clean_list( ot_vector * vector, int num_buckets);
 
 #endif

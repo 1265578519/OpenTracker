@@ -157,8 +157,8 @@ void vector_remove_torrent( ot_vector *vector, ot_torrent *match ) {
 
   /* If this is being called after a unsuccessful malloc() for peer_list
      in add_peer_to_torrent, match->peer_list actually might be NULL */
-  if( match->peer_list6) free_peerlist( match->peer_list6 );
-  if( match->peer_list4) free_peerlist( match->peer_list4 );
+  free_peerlist( match->peer_list6 );
+  free_peerlist( match->peer_list4 );
 
   memmove( match, match + 1, sizeof(ot_torrent) * ( end - match - 1 ) );
   if( ( --vector->size * OT_VECTOR_SHRINK_THRESH < vector->space ) && ( vector->space >= OT_VECTOR_SHRINK_RATIO * OT_VECTOR_MIN_MEMBERS ) ) {

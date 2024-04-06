@@ -21,6 +21,7 @@
 
 /* Opentracker */
 #include "trackerlogic.h"
+#include "ot_vector.h"
 #include "ot_mutex.h"
 #include "ot_stats.h"
 #include "ot_clean.h"
@@ -34,13 +35,10 @@ size_t return_peers_for_torrent( struct ot_workstruct * ws, ot_torrent *torrent,
 
 void free_peerlist( ot_peerlist *peer_list ) {
   if( peer_list->peers.data ) {
-    if( OT_PEERLIST_HASBUCKETS( peer_list ) ) {
-      ot_vector *bucket_list = (ot_vector*)(peer_list->peers.data);
-
-      while( peer_list->peers.size-- )
-        free( bucket_list++->data );
-    }
-    free( peer_list->peers.data );
+    if( OT_PEERLIST_HASBUCKETS( peer_list ) )
+      vector_clean_list( (ot_vector*)peer_list->peers.data, peer_list->peers.size );
+    else
+      free( peer_list->peers.data );
   }
   free( peer_list );
 }

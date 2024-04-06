@@ -368,7 +368,7 @@ static ssize_t http_handle_scrape( const int64 sock, struct ot_workstruct *ws, c
     numwant = OT_MAXMULTISCRAPE_COUNT;
 
   /* Enough for http header + whole scrape string */
-  ws->reply_size = return_tcp_scrape_for_torrent( multiscrape_buf, numwant, ws->reply );
+  ws->reply_size = return_tcp_scrape_for_torrent( (const ot_hash*)multiscrape_buf, numwant, ws->reply );
   stats_issue_event( EVENT_SCRAPE, FLAG_TCP, ws->reply_size );
   return ws->reply_size;
 }
@@ -573,8 +573,8 @@ ssize_t http_handle_request( const int64 sock, struct ot_workstruct *ws ) {
           g_logchain_first = g_logchain_last = log;
         else {
           g_logchain_last->next = log;
-          g_logchain_last = log;  
-        }        
+          g_logchain_last = log;
+        }
       } else
         free( log );
     }
