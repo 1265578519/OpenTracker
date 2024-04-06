@@ -588,7 +588,7 @@ ssize_t http_handle_request( const int64 sock, struct ot_workstruct *ws ) {
   memcpy( ws->debugbuf, ws->request, reply_off );
   ws->debugbuf[ reply_off ] = 0;
 #endif
-  
+
   /* Tell subroutines where to put reply data */
   ws->reply = ws->outbuf + SUCCESS_HTTP_HEADER_LENGTH;
 

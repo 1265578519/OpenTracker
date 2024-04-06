@@ -78,13 +78,13 @@ void add_torrent_from_saved_state( ot_hash const hash, ot_time base, size_t down
 }
 
 size_t add_peer_to_torrent_and_return_peers( PROTO_FLAG proto, struct ot_workstruct *ws, size_t amount ) {
-  int          exactmatch, delta_torrentcount = 0;
-  ot_torrent  *torrent;
-  ot_peer     *peer_dest;
-  ot_vector   *torrents_list = mutex_bucket_lock_by_hash( *ws->hash );
-  ot_peerlist *peer_list;
-  size_t       peer_size; /* initialized in next line */
-  ot_peer     *peer_src = peer_from_peer6(&ws->peer, &peer_size);
+  int           exactmatch, delta_torrentcount = 0;
+  ot_torrent   *torrent;
+  ot_peer      *peer_dest;
+  ot_vector    *torrents_list = mutex_bucket_lock_by_hash( *ws->hash );
+  ot_peerlist  *peer_list;
+  size_t        peer_size; /* initialized in next line */
+  ot_peer const *peer_src = peer_from_peer6(&ws->peer, &peer_size);
 
   if( !accesslist_hashisvalid( *ws->hash ) ) {
     mutex_bucket_unlock_by_hash( *ws->hash, 0 );
@@ -276,6 +276,94 @@ static size_t return_peers_selection( struct ot_workstruct *ws, ot_peerlist *pee
   return result;
 }
 
+static size_t return_peers_for_torrent_udp( struct ot_workstruct * ws, ot_torrent *torrent, size_t amount, char *reply ) {
+  char                *r = reply;
+  size_t       peer_size = peer_size_from_peer6(&ws->peer);
+  ot_peerlist *peer_list = peer_size == OT_PEER_SIZE6 ? torrent->peer_list6 : torrent->peer_list4;
+
+  if( amount > peer_list->peer_count )
+    amount = peer_list->peer_count;
+
+  *(uint32_t*)(r+0) = htonl( OT_CLIENT_REQUEST_INTERVAL_RANDOM );
+  *(uint32_t*)(r+4) = htonl( peer_list->peer_count - peer_list->seed_count );
+  *(uint32_t*)(r+8) = htonl( peer_list->seed_count );
+  r += 12;
+
+  if( amount ) {
+    if( amount == peer_list->peer_count )
+      r += return_peers_all( peer_list, peer_size, r );
+    else
+      r += return_peers_selection( ws, peer_list, peer_size, amount, r );
+  }
+  return r - reply;
+}
+
+static size_t return_peers_for_torrent_tcp( struct ot_workstruct * ws, ot_torrent *torrent, size_t amount, char *reply ) {
+  char   *r = reply;
+  int     erval = OT_CLIENT_REQUEST_INTERVAL_RANDOM;
+  size_t  seed_count = torrent->peer_list6->seed_count + torrent->peer_list4->seed_count;
+  size_t  down_count = torrent->peer_list6->down_count + torrent->peer_list4->down_count;
+  size_t  peer_count = torrent->peer_list6->peer_count + torrent->peer_list4->peer_count - seed_count;
+
+  /* Simple case: amount of peers in both lists is less than requested, here we return all results */
+  size_t  amount_v4 = torrent->peer_list4->peer_count;
+  size_t  amount_v6 = torrent->peer_list6->peer_count;
+
+  /* Complex case: both lists have more than enough entries and we need to split between v4 and v6 clients */
+  if( amount_v4 + amount_v6 > amount ) {
+    size_t amount_left, percent_v6 = 0, percent_v4 = 0, left_v6, left_v4;
+    const size_t SCALE = 1024;
+
+    /* If possible, fill at least a quarter of peer from each family */
+    if( amount / 4 <= amount_v4 )
+        amount_v4 = amount / 4;
+    if( amount / 4 <= amount_v6 )
+        amount_v6 = amount / 4;
+
+    /* Fill the rest according to which family's pool provides more peers */
+    amount_left = amount - (amount_v4 + amount_v6);
+
+    left_v4     = torrent->peer_list4->peer_count - amount_v4;
+    left_v6     = torrent->peer_list6->peer_count - amount_v6;
+
+    if( left_v4 + left_v6 ) {
+      percent_v4  = (SCALE * left_v4) / (left_v4 + left_v6);
+      percent_v6  = (SCALE * left_v6) / (left_v4 + left_v6);
+    }
+
+    amount_v4  += (amount_left * percent_v4) / SCALE;
+    amount_v6  += (amount_left * percent_v6) / SCALE;
+
+    /* Integer division rounding can leave out a peer */
+    if( amount_v4 + amount_v6 < amount && amount_v6 < torrent->peer_list6->peer_count )
+      ++amount_v6;
+    if( amount_v4 + amount_v6 < amount && amount_v4 < torrent->peer_list4->peer_count )
+      ++amount_v4;
+  }
+
+  r += sprintf( r, "d8:completei%zde10:downloadedi%zde10:incompletei%zde8:intervali%ie12:min intervali%ie", seed_count, down_count, peer_count, erval, erval/2 );
+
+  if( amount_v4 ) {
+    r += sprintf( r, PEERS_BENCODED4 "%zd:", OT_PEER_COMPARE_SIZE4 * amount_v4);
+    if( amount_v4 == torrent->peer_list4->peer_count )
+      r += return_peers_all( torrent->peer_list4, OT_PEER_SIZE4, r );
+    else
+      r += return_peers_selection( ws, torrent->peer_list4, OT_PEER_SIZE4, amount_v4, r );
+  }
+
+  if( amount_v6 ) {
+    r += sprintf( r, PEERS_BENCODED6 "%zd:", OT_PEER_COMPARE_SIZE6 * amount_v6);
+    if( amount_v6 == torrent->peer_list6->peer_count )
+      r += return_peers_all( torrent->peer_list6, OT_PEER_SIZE6, r );
+    else
+      r += return_peers_selection( ws, torrent->peer_list6, OT_PEER_SIZE6, amount_v6, r );
+  }
+
+  *r++ = 'e';
+
+  return r - reply;
+}
+
 /* Compiles a list of random peers for a torrent
    * Reply must have enough space to hold:
    * 92 + 6 * amount bytes for TCP/IPv4
@@ -285,35 +373,7 @@ static size_t return_peers_selection( struct ot_workstruct *ws, ot_peerlist *pee
    * Does not yet check not to return self
 */
 size_t return_peers_for_torrent( struct ot_workstruct * ws, ot_torrent *torrent, size_t amount, char *reply, PROTO_FLAG proto ) {
-  size_t       peer_size = peer_size_from_peer6(&ws->peer);
-  ot_peerlist *peer_list = peer_size == OT_PEER_SIZE6 ? torrent->peer_list6 : torrent->peer_list4;
-  char        *r = reply;
-  size_t      compare_size = OT_PEER_COMPARE_SIZE_FROM_PEER_SIZE(peer_size);
-
-  if( amount > peer_list->peer_count )
-    amount = peer_list->peer_count;
-
-  if( proto == FLAG_TCP ) {
-    int erval = OT_CLIENT_REQUEST_INTERVAL_RANDOM;
-    r += sprintf( r, "d8:completei%zde10:downloadedi%zde10:incompletei%zde8:intervali%ie12:min intervali%ie%s%zd:", peer_list->seed_count, peer_list->down_count, peer_list->peer_count-peer_list->seed_count, erval, erval/2, peer_size == OT_PEER_SIZE6 ? PEERS_BENCODED6 : PEERS_BENCODED4, compare_size * amount );
-  } else {
-    *(uint32_t*)(r+0) = htonl( OT_CLIENT_REQUEST_INTERVAL_RANDOM );
-    *(uint32_t*)(r+4) = htonl( peer_list->peer_count - peer_list->seed_count );
-    *(uint32_t*)(r+8) = htonl( peer_list->seed_count );
-    r += 12;
-  }
-
-  if( amount ) {
-    if( amount == peer_list->peer_count )
-      r += return_peers_all( peer_list, peer_size, r );
-    else
-      r += return_peers_selection( ws, peer_list, peer_size, amount, r );
-  }
-
-  if( proto == FLAG_TCP )
-    *r++ = 'e';
-
-  return r - reply;
+  return proto == FLAG_TCP ? return_peers_for_torrent_tcp(ws, torrent, amount, reply) : return_peers_for_torrent_udp(ws, torrent, amount, reply);
 }
 
 /* Fetches scrape info for a specific torrent */
@@ -378,12 +438,12 @@ size_t return_tcp_scrape_for_torrent( ot_hash const *hash_list, int amount, char
 
 static ot_peerlist dummy_list;
 size_t remove_peer_from_torrent( PROTO_FLAG proto, struct ot_workstruct *ws ) {
-  int          exactmatch;
-  ot_vector   *torrents_list = mutex_bucket_lock_by_hash( *ws->hash );
-  ot_torrent  *torrent = binary_search( ws->hash, torrents_list->data, torrents_list->size, sizeof( ot_torrent ), OT_HASH_COMPARE_SIZE, &exactmatch );
-  ot_peerlist *peer_list = &dummy_list;
-  size_t       peer_size; /* initialized in next line */
-  ot_peer     *peer_src = peer_from_peer6(&ws->peer, &peer_size);
+  int            exactmatch;
+  ot_vector     *torrents_list = mutex_bucket_lock_by_hash( *ws->hash );
+  ot_torrent    *torrent = binary_search( ws->hash, torrents_list->data, torrents_list->size, sizeof( ot_torrent ), OT_HASH_COMPARE_SIZE, &exactmatch );
+  ot_peerlist   *peer_list = &dummy_list;
+  size_t         peer_size; /* initialized in next line */
+  ot_peer const *peer_src = peer_from_peer6(&ws->peer, &peer_size);
 
 #ifdef WANT_SYNC_LIVE
   if( proto != FLAG_MCA ) {

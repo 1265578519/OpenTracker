@@ -38,7 +38,7 @@ typedef struct { ot_ip6 address; int bits; }
 #define OT_CLIENT_TIMEOUT 30
 #define OT_CLIENT_TIMEOUT_CHECKINTERVAL 10
 #define OT_CLIENT_TIMEOUT_SEND (60*30)
-#define OT_CLIENT_REQUEST_INTERVAL (60*120)
+#define OT_CLIENT_REQUEST_INTERVAL (60*114)
 #define OT_CLIENT_REQUEST_VARIATION (60*6)
 
 #define OT_TORRENT_TIMEOUT_HOURS 24
@@ -82,7 +82,7 @@ typedef enum { FLAG_TCP, FLAG_UDP, FLAG_MCA, FLAG_SELFPIPE } PROTO_FLAG;
 #define OT_PEER_SIZE6 ((OT_TIME_SIZE)+(OT_FLAG_SIZE)+(OT_PEER_COMPARE_SIZE6))
 #define OT_PEER_SIZE4 ((OT_TIME_SIZE)+(OT_FLAG_SIZE)+(OT_PEER_COMPARE_SIZE4))
 
-typedef uint8_t ot_peer[1]; /* Generic pointer to a v6 or v4 peer */
+typedef uint8_t ot_peer; /* Generic pointer to a v6 or v4 peer */
 typedef uint8_t ot_peer6[OT_PEER_SIZE6];
 typedef uint8_t ot_peer4[OT_PEER_SIZE4];
 static const uint8_t PEER_FLAG_SEEDING   = 0x80;
