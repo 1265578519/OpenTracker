@@ -146,7 +146,7 @@ Example:   ./opentracker -i 127.0.0.1 -p 6969 -P 6969 -f ./opentracker.conf -i 1
 trackerlogic.h:#define OT_CLIENT_TIMEOUT_SEND (60*15)#(60*30)，客户端最小间隔请求时间，客户端可能不会遵守
 trackerlogic.h:#define OT_CLIENT_REQUEST_INTERVAL (60*30)#(60*120)，客户端默认间隔请求时间
 trackerlogic.h:#define OT_CLIENT_REQUEST_VARIATION (60*6)，服务端下发随机客户端间隔请求时间调整，提高性能，默认允许误差随机6分钟内，保持默认无修改
-trackerlogic.h:#define OT_PEER_TIMEOUT 45#144，服务端删除peer时间，单位分钟
+trackerlogic.h:#define OT_PEER_TIMEOUT 45#180，服务端删除peer时间，单位分钟
 ```
 
 
