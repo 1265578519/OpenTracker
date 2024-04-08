@@ -278,13 +278,15 @@ static size_t return_peers_for_torrent_udp( struct ot_workstruct * ws, ot_torren
   char                *r = reply;
   size_t       peer_size = peer_size_from_peer6(&ws->peer);
   ot_peerlist *peer_list = peer_size == OT_PEER_SIZE6 ? torrent->peer_list6 : torrent->peer_list4;
+  size_t       peer_count = torrent->peer_list6->peer_count + torrent->peer_list4->peer_count;
+  size_t       seed_count = torrent->peer_list6->seed_count + torrent->peer_list4->seed_count;
 
   if( amount > peer_list->peer_count )
     amount = peer_list->peer_count;
 
   *(uint32_t*)(r+0) = htonl( OT_CLIENT_REQUEST_INTERVAL_RANDOM );
-  *(uint32_t*)(r+4) = htonl( peer_list->peer_count - peer_list->seed_count );
-  *(uint32_t*)(r+8) = htonl( peer_list->seed_count );
+  *(uint32_t*)(r+4) = htonl( peer_count - seed_count );
+  *(uint32_t*)(r+8) = htonl( seed_count );
   r += 12;
 
   if( amount ) {
@@ -442,6 +444,7 @@ size_t remove_peer_from_torrent( PROTO_FLAG proto, struct ot_workstruct *ws ) {
   ot_peerlist   *peer_list = &dummy_list;
   size_t         peer_size; /* initialized in next line */
   ot_peer const *peer_src = peer_from_peer6(&ws->peer, &peer_size);
+  size_t         peer_count, seed_count;
 
 #ifdef WANT_SYNC_LIVE
   if( proto != FLAG_MCA ) {
@@ -459,16 +462,19 @@ size_t remove_peer_from_torrent( PROTO_FLAG proto, struct ot_workstruct *ws ) {
     }
   }
 
+  peer_count = torrent->peer_list6->peer_count + torrent->peer_list4->peer_count;
+  seed_count = torrent->peer_list6->seed_count + torrent->peer_list4->seed_count;
+
   if( proto == FLAG_TCP ) {
     int erval = OT_CLIENT_REQUEST_INTERVAL_RANDOM;
-    ws->reply_size = sprintf( ws->reply, "d8:completei%zde10:incompletei%zde8:intervali%ie12:min intervali%ie%s0:e", peer_list->seed_count, peer_list->peer_count - peer_list->seed_count, erval, erval / 2, peer_size == OT_PEER_SIZE6 ? PEERS_BENCODED6 : PEERS_BENCODED4 );
+    ws->reply_size = sprintf( ws->reply, "d8:completei%zde10:incompletei%zde8:intervali%ie12:min intervali%ie%s0:e", seed_count, peer_count - seed_count, erval, erval / 2, peer_size == OT_PEER_SIZE6 ? PEERS_BENCODED6 : PEERS_BENCODED4 );
   }
 
   /* Handle UDP reply */
   if( proto == FLAG_UDP ) {
     ((uint32_t*)ws->reply)[2] = htonl( OT_CLIENT_REQUEST_INTERVAL_RANDOM );
-    ((uint32_t*)ws->reply)[3] = htonl( peer_list->peer_count - peer_list->seed_count );
-    ((uint32_t*)ws->reply)[4] = htonl( peer_list->seed_count);
+    ((uint32_t*)ws->reply)[3] = htonl( peer_count - seed_count );
+    ((uint32_t*)ws->reply)[4] = htonl( seed_count);
     ws->reply_size = 20;
   }
 
