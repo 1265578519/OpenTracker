@@ -26,7 +26,7 @@
 /* Our global all torrents list */
 static ot_vector all_torrents[OT_BUCKET_COUNT];
 static pthread_mutex_t bucket_mutex[OT_BUCKET_COUNT];
-static size_t g_torrent_count;
+static size_t    g_torrent_count;
 
 /* Self pipe from opentracker.c */
 extern int g_self_pipe[2];
