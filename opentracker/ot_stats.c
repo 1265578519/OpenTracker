@@ -39,7 +39,7 @@
 
 /* Forward declaration */
 static void stats_make( int *iovec_entries, struct iovec **iovector, ot_tasktype mode );
-#define OT_STATS_TMPSIZE 8192
+#define OT_STATS_TMPSIZE (8192*2)
 
 /* Clumsy counters... to be rethought */
 static unsigned long long ot_overall_tcp_connections = 0;
