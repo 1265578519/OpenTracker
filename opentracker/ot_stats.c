@@ -39,7 +39,7 @@
 
 /* Forward declaration */
 static void stats_make( int *iovec_entries, struct iovec **iovector, ot_tasktype mode );
-#define OT_STATS_TMPSIZE (8192*2)
+#define OT_STATS_TMPSIZE 8192
 
 /* Clumsy counters... to be rethought */
 static unsigned long long ot_overall_tcp_connections = 0;
@@ -627,7 +627,9 @@ static void stats_make( int *iovec_entries, struct iovec **iovector, ot_tasktype
                                  r = iovec_fix_increase_or_free( iovec_entries, iovector, r, 4 * OT_STATS_TMPSIZE );
                                  if( !r ) return;
                                  r += stats_top_txt( r, 100 );              break;
-    case TASK_STATS_EVERYTHING:  r += stats_return_everything( r );         break;
+    case TASK_STATS_EVERYTHING:  r = iovec_fix_increase_or_free( iovec_entries, iovector, r, OT_STATS_TMPSIZE + 64 * OT_PEER_TIMEOUT );
+                                 if( !r ) return;
+                                 r += stats_return_everything( r );         break;
 #ifdef WANT_SPOT_WOODPECKER
     case TASK_STATS_WOODPECKERS: r += stats_return_woodpeckers( r, 128 );   break;
 #endif

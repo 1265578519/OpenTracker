@@ -55,7 +55,7 @@ static void http_senddata( const int64 sock, struct ot_workstruct *ws ) {
       memmove( array_start(&cookie->request), ws->request + ws->header_size, rest );
       array_truncate( &cookie->request, 1, rest );
     } else
-      array_catb(&cookie->request, ws->request + ws->header_size, rest );    
+      array_catb(&cookie->request, ws->request + ws->header_size, rest );
   } else
     array_reset( &cookie->request );
 
