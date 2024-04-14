@@ -70,10 +70,6 @@ static void signal_handler( int s ) {
 #endif
 
     exit( 0 );
-  } else if( s == SIGALRM ) {
-    /* Maintain our copy of the clock. time() on BSDs is very expensive. */
-    g_now_seconds = time(NULL);
-    alarm(5);
   }
 }
 
@@ -83,7 +79,6 @@ static void defaul_signal_handlers( void ) {
   sigaddset (&signal_mask, SIGPIPE);
   sigaddset (&signal_mask, SIGHUP);
   sigaddset (&signal_mask, SIGINT);
-  sigaddset (&signal_mask, SIGALRM);
   pthread_sigmask (SIG_BLOCK, &signal_mask, NULL);
 }
 
@@ -95,11 +90,10 @@ static void install_signal_handlers( void ) {
   sa.sa_handler = signal_handler;
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = SA_RESTART;
-  if ((sigaction(SIGINT, &sa, NULL) == -1) || (sigaction(SIGALRM, &sa, NULL) == -1) )
+  if ((sigaction(SIGINT, &sa, NULL) == -1))
     panic( "install_signal_handlers" );
 
   sigaddset (&signal_mask, SIGINT);
-  sigaddset (&signal_mask, SIGALRM);
   pthread_sigmask (SIG_UNBLOCK, &signal_mask, NULL);
 }
 
@@ -608,12 +602,22 @@ int drop_privileges ( const char * const serveruser, const char * const serverdi
   return 0;
 }
 
+/* Maintain our copy of the clock. time() on BSDs is very expensive. */
+static void *time_caching_worker(void*args) {
+  (void)args;
+  while (1) {
+    g_now_seconds = time(NULL);
+    sleep(5);
+  }
+}
+
 int main( int argc, char **argv ) {
   ot_ip6 serverip;
   ot_net tmpnet;
   int bound = 0, scanon = 1;
   uint16_t tmpport;
   char * statefile = 0;
+  pthread_t thread_id; /* time cacher */
 
   memset( serverip, 0, sizeof(ot_ip6) );
 #ifdef WANT_V4_ONLY
@@ -690,6 +694,7 @@ int main( int argc, char **argv ) {
     panic( "drop_privileges failed, exiting. Last error");
 
   g_now_seconds = time( NULL );
+  pthread_create( &thread_id, NULL, time_caching_worker, NULL);
 
   /* Create our self pipe which allows us to interrupt mainloops
      io_wait in case some data is available to send out */
@@ -713,9 +718,6 @@ int main( int argc, char **argv ) {
 
   if( !g_udp_workers )
     udp_init( -1, 0 );
-
-  /* Kick off our initial clock setting alarm */
-  alarm(5);
 
   server_mainloop( 0 );
 
