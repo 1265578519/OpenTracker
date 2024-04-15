@@ -167,3 +167,7 @@ https://www.vultr.com/?ref=6813695
 
 注：2024年2月27日更新一次版本代码改动
 centos6仅支持libowfat 0.31，centos7仅支持libowfat 0.32，请使用对应系统的版本编译opentracker，上方提供的安装代码当前版本为libowfat 0.32
+centos6在使用 cd libowfat 进入目录的上方插入并且运行这段代码
+```
+rm -rf libowfat;mv libowfat-0.31 libowfat
+```
