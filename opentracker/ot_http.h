@@ -7,9 +7,12 @@
 #define OT_HTTP_H__
 
 typedef enum {
-  STRUCT_HTTP_FLAG_WAITINGFORTASK = 1,
-  STRUCT_HTTP_FLAG_GZIP           = 2,
-  STRUCT_HTTP_FLAG_BZIP2          = 4
+  STRUCT_HTTP_FLAG_WAITINGFORTASK      = 1,
+  STRUCT_HTTP_FLAG_GZIP                = 2,
+  STRUCT_HTTP_FLAG_BZIP2               = 4,
+  STRUCT_HTTP_FLAG_ZSTD                = 8,
+  STRUCT_HTTP_FLAG_CHUNKED             = 16,
+  STRUCT_HTTP_FLAG_CHUNKED_IN_TRANSFER = 32
 } STRUCT_HTTP_FLAG;
 
 struct http_data {
@@ -20,9 +23,9 @@ struct http_data {
   STRUCT_HTTP_FLAG flag;
 };
 
-ssize_t http_handle_request( const int64 s, struct ot_workstruct *ws );
-ssize_t http_sendiovecdata( const int64 s, struct ot_workstruct *ws, int iovec_entries, struct iovec *iovector );
-ssize_t http_issue_error( const int64 s, struct ot_workstruct *ws, int code );
+ssize_t        http_handle_request(const int64 s, struct ot_workstruct *ws);
+ssize_t        http_sendiovecdata(const int64 s, struct ot_workstruct *ws, int iovec_entries, struct iovec *iovector, int is_partial);
+ssize_t        http_issue_error(const int64 s, struct ot_workstruct *ws, int code);
 
 extern char   *g_stats_path;
 extern ssize_t g_stats_path_len;

@@ -1,0 +1,142 @@
+.Dd 15/4/2024
+.Dt opentracker 1
+.Os Unix
+.Sh opentracker
+.Nm opentracker
+.Nd a free and open bittorrent tracker
+.Sh SYNOPSIS
+.Nm
+.Op Fl f Ar config
+.Op Fl i Ar ip-select
+.Op Fl p Ar port-bind-tcp
+.Op Fl P Ar port-bind-udp
+.Op Fl A Ar blessed-ip
+.Op Fl r Ar redirect-url
+.Op Fl d Ar chdir
+.Op Fl u Ar user
+.Op Fl w| Fl b accesslist
+.Sh DESCRIPTION
+.Nm
+is a bittorrent tracker that implements announce and scrape actions over the
+UDP and the plain http protocol, aiming for minimal resource usage.
+.Pp
+
+When invoked with parameters, it binds to TCP and UDP port 6969 on all
+interfaces. The recommended way to configure opentracker is by providing a
+config file using the
+.Op Fl f Ar config
+option. See
+.Xr opentracker.conf 4
+for details.
+.Pp
+
+.Sh OPTIONS
+The following options are available:
+
+.Bl -tag -width -indent=8
+.It Fl f Ar config
+Parse a config file with a list of options. Consecutive command options
+will override options from the config file. See
+.Xr opentracker.conf 4
+for details.
+
+.It Fl i Ar ip-select
+Select an ip address that will be used with the next
+.Op Fl p
+or
+.Op Fl P
+command to actually bind to this address. Setting this option without any bind
+options in the config file or
+.Op Fl p
+or
+.Op Fl P
+commands will limit opentracker to only bind to this address.
+.It Fl p Ar port-bind-tcp
+Bind to the TCP port on the last preceding ip address set with the
+.Op Fl i ip-select
+option or to all available addresses if none has been set. Can be given multiple
+times.
+.It Fl P Ar port-bind-udp
+Bind to the UDP port on the last preceding ip address set with the
+.Op Fl i ip-select
+option or to all available addresses if none has been set. Can be given multiple
+times.
+.It Fl A Ar blessed-ip
+Set an ip address in IPv4 or IPv6 or a net in CIDR notation to bless the network
+for access to restricted resources.
+.It Fl r Ar redirect-url
+Set the URL that
+.Nm
+will redirect users to when the / address is requested via HTTP.
+.It Fl d Ar chdir
+Sets the directory
+.Nm
+will
+.Xr chroot 2
+to if ran as root or
+.Xr chdir 2
+to if ran as unprivileged user. Note that any accesslist files need to be
+relative to and within that directory.
+.It Fl u Ar user
+User to run
+.Nm
+under after all operations that need privileges have finished.
+.It Fl w Ar accesslist | Fl b Ar accesslist
+If
+.Nm
+has been compiled with the
+.B WANT_ACCESSLIST_BLACK
+or
+.Br WANT_ACCESSLIST_WHITE
+options, this option sets the location of the accesslist.
+.El
+
+.Sh EXAMPLES
+
+Start
+.Nm
+bound on UDP and TCP ports 6969 on IPv6 localhost.
+
+.Dl # ./opentracker -i ::1 -p 6969 -P 6969
+
+.Pp
+Start
+.Nm
+bound on UDP port 6868 and TCP port 6868 on IPv4 localhost and allow
+privileged access from the network 192.168/16 while redirecting
+HTTP clients accessing the root directory, which is not covered by the
+bittorrent tracker protocol, to https://my-trackersite.com/.
+
+.Dl # ./opentracker -i 192.168.0.4 -p 6868 -P 6969 -A 192.168/16 -r https://my-trackersite.com/
+
+The announce URLs are http://192.168.0.4:6868/announce and
+udp://192.168.0.4:6868/announce respectively.
+
+.Sh FILES
+.Bl -tag -width indent
+.It Pa opentracker.conf
+The
+.Nm
+config file.
+.El
+.Sh SEE ALSO
+.Xr opentracker.conf 4
+.Pp
+opentracker documentation
+.Lk https://erdgeist.org/arts/software/opentracker
+.Pp
+Bittorrent tracker protocol
+.Lk http://www.bittorrent.org/beps/bep_0015.html
+.Sh
+.Sh AUTHOR
+.An Dirk Engling
+.Aq Mt erdgeist@erdgeist.org .
+.Sh LICENSE
+This software is released under the Beerware License:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+and associated documentation files (the "Software"), to deal in the Software with the following
+terms and conditions:
+
+If you meet the author(s) someday, and you think this software is worth it, you can buy them
+a beer in return.

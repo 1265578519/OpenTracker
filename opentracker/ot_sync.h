@@ -9,11 +9,11 @@
 #ifdef WANT_SYNC_BATCH
 enum { SYNC_IN, SYNC_OUT };
 
-void sync_init( );
-void sync_deinit( );
-void sync_deliver( int64 socket );
+void sync_init();
+void sync_deinit();
+void sync_deliver(int64 socket);
 
-int  add_changeset_to_tracker( uint8_t *data, size_t len );
+int  add_changeset_to_tracker(uint8_t *data, size_t len);
 #else
 
 #define sync_init()

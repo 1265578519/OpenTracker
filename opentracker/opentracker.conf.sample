@@ -2,7 +2,7 @@
 #
 
 # I)   Address opentracker will listen on, using both, tcp AND udp family
-#      (note, that port 6969 is implicite if ommitted).
+#      (note, that port 6969 is implicit if omitted).
 #
 #      If no listen option is given (here or on the command line), opentracker
 #      listens on 0.0.0.0:6969 tcp and udp.
@@ -83,9 +83,10 @@
 # IIb)
 #      If you do not want to grant anyone access to your stats, enable the
 #      WANT_RESTRICT_STATS option in Makefile and bless the ip addresses
-#      allowed to fetch stats here.
+#      or network allowed to fetch stats here.
 #
 # access.stats 192.168.0.23
+# access.stats 10.1.1.23
 #
 #      There is another way of hiding your stats. You can obfuscate the path
 #      to them. Normally it is located at /stats but you can configure it to

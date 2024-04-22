@@ -1,0 +1,86 @@
+.Dd 2024-04-18
+.Dt opentracker.conf 5
+.Os Unix
+.Sh NAME
+.Nm opentracker.conf
+.Nd configuration file for opentracker
+.Sh SYNOPSIS
+.Nm
+.Sh DESCRIPTION
+The
+.Nm
+configuration file specifies various options for configuring the behavior of the opentracker program.
+.Pp
+Lines starting with '#' are comments and are ignored. Options are specified as 'keyword value' pairs.
+.Pp
+The following options are available:
+
+.Bl -tag -width ".It access.proxy" -compact
+.It listen.tcp_udp Ar address
+Specifies an address opentracker will listen on for both TCP and UDP connections. If none are specified, opentracker listens on 0.0.0.0:6969 by default. Can be added more than once.
+
+.It listen.tcp Ar address
+Specifies the address opentracker will listen on for TCP connections. Can be added more than once.
+
+.It listen.udp Ar address
+Specifies the address opentracker will listen on for UDP connections. Can be added more than once.
+
+.It listen.udp.workers Ar threads
+Specifies how many threads will be spawned to handle UDP connections. Defaults to 4.
+
+.It access.whitelist Ar path/to/whitelist
+Specifies the path to the whitelist file containing all torrent hashes that opentracker will serve. Use this option if opentracker runs in a non-open mode.
+
+.It access.blacklist Ar path/to/blacklist
+Specifies the path to the blacklist file containing all torrent hashes that opentracker will not serve. Use this option if opentracker was compiled to allow blacklisting.
+
+.It access.fifo_add Ar path/to/adder.fifo
+Specifies the path to the FIFO (named pipe) used for dynamic changesets to accesslists. Info hashes written to this FIFO will be added to the main accesslist file.
+
+.It access.fifo_delete Ar path/to/deleter.fifo
+Specifies the path to the FIFO (named pipe) used for dynamic changesets to accesslists. Info hashes written to this FIFO will be removed from the main accesslist file.
+
+.It access.stats Ar ip_address_or_network
+Specifies the IP address or network in CIDR notation allowed to fetch stats from opentracker.
+
+.It access.stats_path Ar path
+Specifies the path to the stats location. You can configure opentracker to appear anywhere on your tracker. Defaults to /stats.
+
+.It access.proxy Ar ip_address_or_network
+Specifies the IP address or network of the reverse proxies. Opentracker will take the X-Forwarded-For address instead of the source IP address. Can be added more than once.
+
+.It livesync.cluster.listen Ar ip_address:port
+Specifies the IP address and port opentracker will listen on for incoming live sync packets to keep a cluster of opentrackers synchronized.
+
+.It livesync.cluster.node_ip Ar ip_address
+Specifies one trusted IP address for sync between trackers running in a cluster. Can be added more than once.
+
+.It batchsync.cluster.admin_ip Ar ip_address
+Specifies the admin IP address for old-style (HTTP-based) asynchronous tracker syncing.
+
+.It tracker.rootdir Ar path
+Specifies the directory opentracker will chroot/chdir to. All black/white list files must be located in this directory.
+
+.It tracker.user Ar username
+Specifies the user opentracker will setuid to after binding to potentially privileged ports.
+
+.It tracker.redirect_url Ar URL
+Specifies the URL opentracker will redirect to in response to a "GET / HTTP" request.
+
+.Sh EXAMPLES
+To specify the address opentracker will listen on for both TCP and UDP connections:
+.Dl listen.tcp_udp 0.0.0.0:6969
+.Pp
+To specify the address opentracker will listen on for TCP connections:
+.Dl listen.tcp 0.0.0.0
+.Pp
+To specify the address opentracker will listen on for UDP connections:
+.Dl listen.udp 0.0.0.0:6969
+
+.Sh SEE ALSO
+.Xr opentracker 1
+
+.Sh AUTHOR
+.An Dirk Engling
+.Aq Mt erdgeist@erdgeist.org
+

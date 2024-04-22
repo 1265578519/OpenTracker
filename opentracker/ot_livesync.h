@@ -51,18 +51,18 @@ void livesync_init();
 void livesync_deinit();
 
 /* Join multicast group for listening and create sending socket */
-void livesync_bind_mcast( char *ip, uint16_t port );
+void livesync_bind_mcast(char *ip, uint16_t port);
 
 /* Inform live sync about whats going on. */
-void livesync_tell( struct ot_workstruct *ws );
+void livesync_tell(struct ot_workstruct *ws);
 
 /* Tickle the live sync module from time to time, so no events get
    stuck when there's not enough traffic to fill udp packets fast
    enough */
-void livesync_ticker( );
+void livesync_ticker();
 
 /* Handle an incoming live sync packet */
-void handle_livesync( const int64 sock );
+void handle_livesync(const int64 sock);
 
 #else
 

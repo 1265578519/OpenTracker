@@ -16,22 +16,21 @@
 #define OT_PEER_BUCKET_MAXCOUNT 256
 
 typedef struct {
-  void   *data;
-  size_t  size;
-  size_t  space;
+  void  *data;
+  size_t size;
+  size_t space;
 } ot_vector;
 
-void    *binary_search( const void * const key, const void * base, const size_t member_count, const size_t member_size,
-                        size_t compare_size, int *exactmatch );
-void    *vector_find_or_insert( ot_vector *vector, void *key, size_t member_size, size_t compare_size, int *exactmatch );
-ot_peer *vector_find_or_insert_peer( ot_vector *vector, ot_peer const *peer, size_t peer_size, int *exactmatch );
+void    *binary_search(const void *const key, const void *base, const size_t member_count, const size_t member_size, size_t compare_size, int *exactmatch);
+void    *vector_find_or_insert(ot_vector *vector, void *key, size_t member_size, size_t compare_size, int *exactmatch);
+ot_peer *vector_find_or_insert_peer(ot_vector *vector, ot_peer const *peer, size_t peer_size, int *exactmatch);
 
-int      vector_remove_peer( ot_vector *vector, ot_peer const *peer, size_t peer_size);
-void     vector_remove_torrent( ot_vector *vector, ot_torrent *match );
+int      vector_remove_peer(ot_vector *vector, ot_peer const *peer, size_t peer_size);
+void     vector_remove_torrent(ot_vector *vector, ot_torrent *match);
 
 /* For ot_clean.c */
-void     vector_redistribute_buckets( ot_peerlist * peer_list, size_t peer_size );
-void     vector_fixup_peers( ot_vector * vector, size_t peer_size );
-void     vector_clean_list( ot_vector * vector, int num_buckets);
+void     vector_redistribute_buckets(ot_peerlist *peer_list, size_t peer_size);
+void     vector_fixup_peers(ot_vector *vector, size_t peer_size);
+void     vector_clean_list(ot_vector *vector, int num_buckets);
 
 #endif

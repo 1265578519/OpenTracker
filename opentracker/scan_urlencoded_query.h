@@ -38,18 +38,18 @@ ssize_t scan_urlencoded_query(char **string, char *deststring, SCAN_SEARCHPATH_F
               or -2 for terminator found
               or -3 for no keyword matched
  */
-int scan_find_keywords( const ot_keywords * keywords, char **string, SCAN_SEARCHPATH_FLAG flags);
+int     scan_find_keywords(const ot_keywords *keywords, char **string, SCAN_SEARCHPATH_FLAG flags);
 
 /* string     in: pointer to value of a param=value pair to skip
               out: pointer to next scan position on return
 */
-void scan_urlencoded_skipvalue( char **string );
+void    scan_urlencoded_skipvalue(char **string);
 
 /* data       pointer to len chars of string
  len        length of chars in data to parse
  number     number to receive result
  returns    number of bytes not parsed, mostly !=0 means fail
  */
-ssize_t scan_fixed_int( char *data, size_t len, int *number );
+ssize_t scan_fixed_int(char *data, size_t len, int *number);
 
 #endif
