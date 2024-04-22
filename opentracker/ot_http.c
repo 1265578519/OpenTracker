@@ -526,7 +526,7 @@ static ssize_t     http_handle_announce(const int64 sock, struct ot_workstruct *
 
   OT_SETPORT(ws->peer, &port);
   OT_PEERFLAG(ws->peer) = 0;
-  numwant               = 50;
+  numwant               = 400;
   scanon                = 1;
 
   while (scanon) {
