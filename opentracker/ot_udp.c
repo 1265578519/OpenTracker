@@ -178,7 +178,7 @@ int handle_udp6(int64 serversocket, struct ot_workstruct *ws) {
       uint32_t numwant   = ntohl(inpacket[92 / 4]);
       size_t   max_peers = ip6_isv4mapped(remoteip) ? OT_MAX_PEERS_UDP4 : OT_MAX_PEERS_UDP6;
       if (numwant > max_peers)
-        numwant = 400;
+        numwant = max_peers;
 
       ws->reply      = ws->outbuf + 8;
       ws->reply_size = 8 + add_peer_to_torrent_and_return_peers(FLAG_UDP, ws, numwant);

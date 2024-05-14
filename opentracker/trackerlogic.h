@@ -39,8 +39,8 @@ typedef struct {
 /* Some tracker behaviour tunable */
 #define OT_CLIENT_TIMEOUT               30
 #define OT_CLIENT_TIMEOUT_CHECKINTERVAL 10
-#define OT_CLIENT_TIMEOUT_SEND          (60 * 30)
-#define OT_CLIENT_REQUEST_INTERVAL      (60 * 120)
+#define OT_CLIENT_TIMEOUT_SEND          (60 * 15)
+#define OT_CLIENT_REQUEST_INTERVAL      (60 * 30)
 #define OT_CLIENT_REQUEST_VARIATION     (60 * 6)
 
 #define OT_TORRENT_TIMEOUT_HOURS        24
@@ -61,7 +61,7 @@ typedef struct {
 #define OT_MAX_THREADS                64
 
 /* Number of minutes after announce before peer is removed */
-#define OT_PEER_TIMEOUT               180
+#define OT_PEER_TIMEOUT               45
 
 /* We maintain a list of 1024 pointers to sorted list of ot_torrent structs
  Sort key is, of course, its hash */

@@ -320,7 +320,7 @@ typedef struct {
 /* Fetches stats from tracker */
 size_t stats_top_txt(char *reply, int amount) {
   size_t    j;
-  ot_record top100s[100], top100c[100];
+  ot_record top100s[100], top100c[100], top100l[100];
   char     *r = reply, hex_out[42];
   int       idx, bucket;
 
@@ -329,14 +329,16 @@ size_t stats_top_txt(char *reply, int amount) {
 
   byte_zero(top100s, sizeof(top100s));
   byte_zero(top100c, sizeof(top100c));
+  byte_zero(top100l, sizeof(top100l));
 
   for (bucket = 0; bucket < OT_BUCKET_COUNT; ++bucket) {
-    ot_vector *torrents_list = mutex_bucket_lock(bucket);
+    ot_vector *torrents_list  = mutex_bucket_lock(bucket);
     for (j = 0; j < torrents_list->size; ++j) {
-      ot_torrent *torrent    = (ot_torrent *)(torrents_list->data) + j;
-      size_t      peer_count = torrent->peer_list6->peer_count + torrent->peer_list4->peer_count;
-      size_t      seed_count = torrent->peer_list6->seed_count + torrent->peer_list4->seed_count;
-      idx                    = amount - 1;
+      ot_torrent *torrent     = (ot_torrent *)(torrents_list->data) + j;
+      size_t      peer_count  = torrent->peer_list6->peer_count + torrent->peer_list4->peer_count;
+      size_t      seed_count  = torrent->peer_list6->seed_count + torrent->peer_list4->seed_count;
+      size_t      leech_count = peer_count - seed_count;
+      idx                     = amount - 1;
       while ((idx >= 0) && (peer_count > top100c[idx].val))
         --idx;
       if (idx++ != amount - 1) {
@@ -352,6 +354,14 @@ size_t stats_top_txt(char *reply, int amount) {
         memcpy(&top100s[idx].hash, &torrent->hash, sizeof(ot_hash));
         top100s[idx].val = seed_count;
       }
+      idx = amount - 1;
+      while ((idx >= 0) && (leech_count > top100l[idx].val))
+        --idx;
+      if (idx++ != amount - 1) {
+        memmove(top100l + idx + 1, top100l + idx, (amount - 1 - idx) * sizeof(ot_record));
+        memcpy(&top100l[idx].hash, &torrent->hash, sizeof(ot_hash));
+        top100l[idx].val = leech_count;
+      }
     }
     mutex_bucket_unlock(bucket, 0);
     if (!g_opentracker_running)
@@ -366,6 +376,10 @@ size_t stats_top_txt(char *reply, int amount) {
   for (idx = 0; idx < amount; ++idx)
     if (top100s[idx].val)
       r += sprintf(r, "\t%zd\t%s\n", top100s[idx].val, to_hex(hex_out, top100s[idx].hash));
+  r += sprintf(r, "Top %d torrents by leechers:\n", amount);
+  for (idx = 0; idx < amount; ++idx)
+    if (top100l[idx].val)
+      r += sprintf(r, "\t%zd\t%s\n", top100l[idx].val, to_hex(hex_out, top100l[idx].hash));
 
   return r - reply;
 }
@@ -542,7 +556,7 @@ static size_t stats_return_everything(char *reply) {
 size_t stats_return_tracker_version(char *reply) {
 #define QUOTE(name) #name
 #define SQUOTE(name) QUOTE(name)
-  return sprintf(reply, "v0.2 20240422\n");
+  return sprintf(reply, "v0.3 20240514\n");
 }
 
 size_t return_stats_for_tracker(char *reply, int mode, int format) {
