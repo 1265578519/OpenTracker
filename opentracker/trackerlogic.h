@@ -27,8 +27,8 @@ typedef struct {
   int    bits;
 } ot_net;
 /* List of peers should fit in a single UDP packet (around 1200 bytes) */
-#define OT_MAX_PEERS_UDP6               400
-#define OT_MAX_PEERS_UDP4               400
+#define OT_MAX_PEERS_UDP6               0
+#define OT_MAX_PEERS_UDP4               0
 
 #define OT_IP_SIZE6                     16
 #define OT_IP_SIZE4                     4
