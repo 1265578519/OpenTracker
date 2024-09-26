@@ -8,8 +8,6 @@ udp://tracker3.itzmx.com:6961/announce
 udp://tracker4.itzmx.com:2710/announce
 http://207.241.226.111:6969/announce
 http://207.241.231.226:6969/announce
-http://49.12.76.8:8080/announce
-http://[2a01:4f8:c012:8025::1]:8080/announce
 http://[2a04:ac00:1:3dd8::1:2710]:2710/announce
 http://open.acgtracker.com:1096/announce
 http://retracker.hotplug.ru:2710/announce
@@ -19,9 +17,7 @@ http://tracker.opentrackr.org:1337/announce
 http://tracker2.dler.org/announce
 udp://207.241.226.111:6969/announce
 udp://207.241.231.226:6969/announce
-udp://49.12.76.8:8080/announce
 udp://52.58.128.163:6969/announce
-udp://[2a01:4f8:c012:8025::1]:8080/announce
 udp://[2a03:7220:8083:cd00::1]:451/announce
 udp://[2a04:ac00:1:3dd8::1:2710]:2710/announce
 udp://[2a0f:e586:f:f::81]:6969/announce

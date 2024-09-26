@@ -126,6 +126,12 @@ curl http://localhost:8080/stats
 * * * * * /sbin/pidof opentracker||{ cd /home/OpenTracker-master;cd opentracker;./opentracker -f opentracker.conf.sample -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &}
 ```
 
+方式三，推荐替换二，可以代替之前的pidof判断oom杀进程，毕竟触发oom的之前几分钟因为内存不足都无法新建tcp连接，ssh都上不去
+```markdown
+* * * * * [ $(vmstat -SM | awk 'NR==3 {print $4}') -lt 100 ] && { killall -9 opentracker;sleep 3;cd /home/OpenTracker-master;cd opentracker;./opentracker -f opentracker.conf.sample -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &}
+```
+
+
 软件的自带帮助说明
 ``` markdown
 Usage: ./opentracker [-i ip] [-p port] [-P port] [-r redirect] [-d dir] [-u user] [-A ip] [-f config] [-s livesyncport]
@@ -164,6 +170,7 @@ mail:erdgeist@erdgeist.org
 
 推荐Tracker服务器购买优惠注册地址：
 https://www.vultr.com/?ref=6813695
+https://justhost.ru/services/vps/tariffs/13?ref=75001
 
 注：2024年2月27日更新一次版本代码改动
 centos6仅支持libowfat 0.31，centos7仅支持libowfat 0.32，请使用对应系统的版本编译opentracker，上方提供的安装代码当前版本为libowfat 0.32
@@ -171,3 +178,6 @@ centos6在使用 cd libowfat 进入目录的上方插入并且运行这段代码
 ```
 rm -rf libowfat;mv libowfat-0.31 libowfat
 ```
+
+有关Linux内核优化参数
+只需要调整打开文件数，和禁用系统防火墙避免lsmod加载nf模块引起高CPU占用和触发丢包，其它的参数就微乎其微了
