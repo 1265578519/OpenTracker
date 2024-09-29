@@ -128,7 +128,7 @@ curl http://localhost:8080/stats
 
 方式三，推荐替换二，可以代替之前的pidof判断oom杀进程，毕竟触发oom的之前几分钟因为内存不足都无法新建tcp连接，ssh都上不去
 ```markdown
-* * * * * [ $(vmstat -SM | awk 'NR==3 {print $4}') -lt 100 ] && { killall -9 opentracker;sleep 3;cd /home/OpenTracker-master;cd opentracker;./opentracker -f opentracker.conf.sample -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &}
+* * * * * [ $(awk '/MemFree/ {free=$2} /Buffers/ {buffers=$2} /^Cached/ {cached=$2} END {print free + buffers + cached}' /proc/meminfo) -lt 102400 ] && { killall -9 opentracker;sleep 3;cd /home/OpenTracker-master;cd opentracker;./opentracker -f opentracker.conf.sample -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &}
 ```
 
 
