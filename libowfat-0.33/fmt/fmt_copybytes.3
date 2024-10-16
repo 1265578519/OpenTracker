@@ -1,0 +1,15 @@
+.TH fmt_copybytes 3
+.SH NAME
+fmt_copybytes \- write binary data
+.SH SYNTAX
+.B #include <libowfat/fmt.h>
+
+size_t \fBfmt_copybytes\fP(char *\fIdest\fR,const char *\fIsource\fR, size_t limit);
+.SH DESCRIPTION
+fmt_copybytes copies \fIlimit\fP bytes from \fIsource\fP to \fIdest\fP and returns \fIlimit\fP.
+
+This is a convenience wrapper interface around
+\fImemcpy\fP/\fIbyte_copy\fP to make it work like the other fmt
+functions.
+.SH "SEE ALSO"
+byte_copy(3), memcpy(3)

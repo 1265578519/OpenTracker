@@ -1,0 +1,25 @@
+.TH fmt_strm_alloca 3
+.SH NAME
+fmt_strm_alloca \- write multiple ASCII strings
+.SH SYNTAX
+.B #include <libowfat/fmt.h>
+
+char* \fBfmt_strm_alloca\fP(const char *\fIsource\fR, ...);
+.SH DESCRIPTION
+fmt_strm_alloca copies all leading nonzero bytes from \fIsource\fR and
+following function arguments to a freshly allocated stack buffer and
+returns a pointer to it.
+
+Unlink fmt_strm, fmt_strm_alloca does append \\0.
+
+Warning: Using variable size stack buffers is dangerous. If the size of
+the buffer is larger than the hardware page size, then it can be used to
+skip over the guard page and cause memory corruption. fmt_strm_alloca
+has a built-in limit of 100000 bytes. Use this only for trivially small
+strings.
+
+If the strings do not come from a trusted place or you are not sure they
+are small, prefer fmt_strm_malloc instead.
+
+.SH "SEE ALSO"
+fmt_str(3), fmt_strm(3), fmt_strm_malloc(3), alloca(3), strcpy(3)

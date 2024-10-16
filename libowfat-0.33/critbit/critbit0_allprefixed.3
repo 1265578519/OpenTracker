@@ -1,0 +1,36 @@
+.TH critbit0_allprefixed 3
+.SH NAME
+critbit0_allprefixed \- search a critbit tree by prefix
+.SH SYNTAX
+.B #include <libowfat/critbit.h>
+
+critbit0_tree cb = { 0 };
+
+int \fBcritbit0_allprefixed\fP(critbit0_tree* \fIcb\fR,const char* \fIprefix\fR,
+    int (*handle)(const char*,void*),void* arg);
+.SH DESCRIPTION
+critbit0_allprefixed calls the \fIhandle\fR function on all members of
+\fIcb\fR that start with \fIprefix\fR. It passes \fIarg\fR as second
+argument to \fIhandle\fR.
+
+If \fIhandle\fR returns 0, the search stops and critbit0_allprefixed
+returns 0.
+
+If \fIhandle\fR returns 1, the search continues and critbit0_allprefixed
+returns 1 if all keys with the given prefix were handled.
+
+If \fIhandle\fR returns something else, the search stops and
+critbit0_allprefixed returns -1.
+.SH "NOTE"
+This function uses recursion to traverse the tree. It may require
+nontrivial amounts of available stack space.
+.SH "RETURN VALUE"
+1 if all keys were found and handled (or if there were no keys with that
+prefix).
+
+0 if at least one key was found, \fIhandle\fR was called and returned 0.
+
+-1 if at least one key was found, \fIhandle\fR was called and returned
+something other than 0 or 1.
+.SH "SEE ALSO"
+critbit0_contains(3)

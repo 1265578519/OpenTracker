@@ -1,0 +1,31 @@
+.TH scan_jsonescape 3
+.SH NAME
+scan_jsonescape \- parse JSON escaped string
+.SH SYNTAX
+.B #include <libowfat/textcode.h>
+
+size_t \fBscan_jsonescape\fP(const char *\fIsrc\fR,char *\fIdest\fR,size_t* \fIdestlen\fR);
+
+.SH DESCRIPTION
+scan_jsonescape parses JSON escaped text from src into dest, leaving a
+UTF-8 string in dest. Parsing stops at the 0 terminator, invalid input
+characters or a double quote that was not escaped.
+
+It will then write the number of bytes in dest into *destlen,
+and return the number of bytes decoded from src.
+
+dest can be NULL. destlen can be NULL. dest can be src.
+
+To make sure dest is large enough, either allocate strlen(src)+1 bytes
+or call scan_jsonescape twice, the first time with dest == NULL (*destlen
+will still be written).
+
+.SH "RETURN VALUE"
+scan_jsonescape returns the number of bytes successfully parsed
+from src.
+
+.SH EXAMPLES
+scan_jsonescape("test\n\");",buf,&i) -> return 6, i=5, buf="test\n".
+
+.SH "SEE ALSO"
+fmt_jsonescape(3), scan_cescape(3), scan_ldapescape(3)

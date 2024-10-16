@@ -1,0 +1,20 @@
+.TH assign 3
+.SH NAME
+assign \- assign an integer value, check for truncation
+.SH SYNTAX
+.B #include <libowfat/rangecheck.h>
+
+int \fBassign\fP(dest,a);
+.SH DESCRIPTION
+If a and dest have the same type, or the value of a is representable in
+the type of dest, do dest=a and return 0.
+
+Otherwise, return 1.
+
+Note: This is a macro, so dest does not have to be a pointer.
+.SH BUGS
+In the multiplication functions, a return value of 1 signals success and
+0 failure. In add_of, sub_of and assign it's the other way around.
+.SH "SEE ALSO"
+add_of(3), sub_of(3), imult16(3), umult16(3), imult32(3), umult32(3),
+imult64(3), umult64(3)

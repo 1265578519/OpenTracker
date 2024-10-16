@@ -1,0 +1,17 @@
+.TH critbit0_contains 3
+.SH NAME
+critbit0_contains \- check whether a string is in the critbit tree
+.SH SYNTAX
+.B #include <libowfat/critbit.h>
+
+critbit0_tree cb = { 0 };
+
+int \fBcritbit0_contains\fP(critbit0_tree* \fIcb\fR,const char* \fIstr\fR);
+.SH DESCRIPTION
+critbit0_contains looks up the given string in the critbit0 tree.
+If \fIstr\fR is in \fIcb\fR, critbit0_contains returns 1. Otherwise it
+returns 0.
+.SH "RETURN VALUE"
+1 if the key was found, 0 otherwise.
+.SH "SEE ALSO"
+critbit0_insert(3)

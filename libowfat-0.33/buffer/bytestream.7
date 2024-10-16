@@ -1,0 +1,92 @@
+.TH bytestream 7
+.SH NAME
+bytestream \- length checked input byte stream
+.SH SYNTAX
+.B #include <libowfat/parse.h>
+.B #include <libowfat/buffer.h>
+
+  struct bytestream bs;
+  \fBbs_init_iobuf\fP(&bs, buffer_0);      // tie bytestream to I/O buffer
+  \fBbs_init_iobuf_size\fP(&bs, buffer_0, 64*1024);
+
+  unsigned char byte0 = \fBbs_get\fP(&bs);
+  unsigned char byte1 = \fBbs_get\fP(&bs);
+
+  if (\fBbs_err\fP(&bs)) {
+    // handle error
+  }
+
+  struct bytestream substream;
+  \fBbs_init_bstream_size\fP(&substream, &bs, byte0*256+byte1);
+  // reading from substream really reads from bs
+  // but does implicit additional range check
+
+.SH DESCRIPTION
+
+A bytestream is an adapter that can be put in front of a libowfat
+I/O read buffer, a memory buffer (pointer + size), or another bytestream.
+
+The bytestream API will do two things for you: Implicit range checks and
+well defined error behavior.
+
+If a range check fails, the bytestream is set to the error state, and
+stays in the error state.
+
+Reading from a bytestream in the error state yields 0 bytes, while the
+stream stays in the error state.
+
+The goal of this API design was to end up with parsing code that is
+obviously correct. The risk of forgetting a range check or of having an
+integer overflow in one is delegated to the bytestream API.
+
+The parsing code can in most cases simply read data without checking for
+errors, and only in the end there is a single check that the bytestream
+is not in the error state.
+
+Bytestreams can also be nested. Creating a nested bytestream with a size
+limit that exceeds the available space in the parent stream will set it
+to the error state right from the start.
+
+.SH EXAMPLE
+
+  char inbuf[8192];
+  struct sockaddr_in sa;
+  struct sockaddr_len salen = sizeof sa;
+  ssize_t msgsize = recvfrom(input_socket, inbuf, sizeof(inbuf),
+    0, &sa, &salen);
+  assert(msgsize > 0);
+
+  struct bytestream bs;
+  init_bs_membuf(&bs, inbuf, msgsize);
+
+  // implicit range check that there is 2 bytes left
+  uint16_t version = prs_u16(&bs);  // little endian 16 bit
+
+  // implicit range check that there is 4 bytes left
+  uint32_t hdrlen = prs_u32_big(&bs);  // big endian 32 bit
+
+  struct bytestream pktbs;
+  // implicit range check that hdrlen fits in the packet
+  bs_init_bstream_size(&pktbs, &bs, hdrlen);
+
+  // implicit range check that hdrlen fits in the packet
+  uint32_t strlen = prs_u32_big(&pktbs);  // big endian 32 bit
+
+  // not technically needed but helpful on mmu-less systems
+  if (len_b32 > sizeof(inbuf)) abort();
+  char* str = malloc(len_b32);
+  assert(str);
+
+  // implicit range check that whole string fits in header
+  prs_readblob(&pktbs, str, len_be32);
+
+  // only have to check for error once at the end
+  if (bs_err(&bs)) {
+    free(str);
+    // ... handle errors
+    ...
+  }
+
+
+.SH "SEE ALSO"
+buffer_flush(3)

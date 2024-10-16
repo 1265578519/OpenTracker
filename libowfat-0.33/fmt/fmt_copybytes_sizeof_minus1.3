@@ -1,0 +1,26 @@
+.TH fmt_copybytes_sizeof_minus1 3
+.SH NAME
+fmt_copybytes_sizeof_minus1 \- write binary data
+.SH SYNTAX
+.B #include <libowfat/fmt.h>
+
+size_t \fBfmt_copybytes_sizeof_minus1\fP(char *\fIdest\fR,const char *\fIsource\fR);
+.SH DESCRIPTION
+This macro will copy sizeof(\fIsource\fP)-1 bytes from \fIsource\fP to \fIdest\fP.
+
+This is a convenience wrapper interface around
+\fIfmt_copybytes\fP for the situation where you construct a binary
+message by concatenating hex constant strings like this:
+
+  fmt_copybytes_sizeof_minus1(dest, "\\x01\\x02\\x03\\x04");
+
+Since the source is technically a string, the compiler will add a 0 byte
+and sizeof() will return the size including that 0 byte. That is why we
+have a minus 1 in this function, so we do not copy or count that 0 byte.
+
+.SH NOTE
+Caution: \fIsource\fP must not have side effects or those will be
+evaluated twice.
+
+.SH "SEE ALSO"
+fmt_copybytes(3)
