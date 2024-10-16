@@ -220,3 +220,5 @@ https://bbs.itzmx.com/thread-110212-1-1.html
 
 一个可选内存优化，禁用AnonHugePages释放更多可用内存给予进程
 https://bbs.itzmx.com/thread-110231-1-1.html
+
+同时禁用swap虚拟内存，在/etc/fstab中找到它并且删除swap挂载
