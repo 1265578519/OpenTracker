@@ -126,9 +126,9 @@ curl http://localhost:8080/stats
 * * * * * /sbin/pidof opentracker||{ cd /home/OpenTracker-master;cd opentracker;./opentracker -f opentracker.conf.sample -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &}
 ```
 
-方式三，推荐替换二，可以代替之前的pidof判断oom杀进程，毕竟触发oom的之前几分钟因为内存不足都无法新建tcp连接，ssh都上不去（控制512M内存的80%是100000）
+方式三，推荐替换二，可以代替之前的pidof判断oom杀进程，毕竟触发oom的之前几分钟因为内存不足都无法新建tcp连接，ssh都上不去（控制512M内存的75%是125000，1G内存的75%是250000，避免超过80%）
 ```markdown
-* * * * * [ $(awk '/MemFree/ {free=$2} /Buffers/ {buffers=$2} /^Cached/ {cached=$2} END {print free + buffers + cached}' /proc/meminfo) -lt 100000 ] && { killall -9 opentracker;sleep 3;cd /home/OpenTracker-master;cd opentracker;./opentracker -f opentracker.conf.sample -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &}
+* * * * * [ $(awk '/MemFree/ {free=$2} /Buffers/ {buffers=$2} /^Cached/ {cached=$2} END {print free + buffers + cached}' /proc/meminfo) -lt 125000 ] && { killall -9 opentracker;sleep 3;cd /home/OpenTracker-master;cd opentracker;./opentracker -f opentracker.conf.sample -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &}
 ```
 
 
@@ -214,3 +214,9 @@ lsof -n | awk '{ print $2; }' | uniq -c | sort -rn | head
 cat /proc/28492/limits | grep files
 ```
 虽然实际上ulimit限制显示是1024，但是Linux应该是用4字节作为计算，也就是4124达到阈值，修改打开文件后就可以突破4124，修改成功后两个数值都会显示为1048576
+
+如果你用的是其他操作系统，Debian系统设置limits打开文件
+https://bbs.itzmx.com/thread-110212-1-1.html
+
+一个可选内存优化，禁用AnonHugePages释放更多可用内存给予进程
+https://bbs.itzmx.com/thread-110231-1-1.html
