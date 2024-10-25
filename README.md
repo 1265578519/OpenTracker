@@ -115,9 +115,9 @@ curl http://localhost:8080/stats
 ```
 
 运行crontab -e
-可以根据需要使用计划任务自动重启进程，下方意思，每天0点、4点、8点、12点、16点、20点整，自动重启进程。
+可以根据需要使用计划任务自动重启进程，下方意思，每天0点、6点、12点、18点整，自动重启进程。
 ``` markdown
-0 0,4,8,12,16,20 * * * killall -9 opentracker;sleep 3;cd /home/OpenTracker-master;cd opentracker;./opentracker -f opentracker.conf.sample -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &
+0 0,6,12,18 * * * killall -9 opentracker;sleep 3;cd /home/OpenTracker-master;cd opentracker;./opentracker -f opentracker.conf.sample -p 8080 -P 8080 -p 6961 -P 6961 -p 2710 -P 2710 &
 ```
 
 方法二
