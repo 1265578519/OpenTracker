@@ -31,3 +31,5 @@ udp://tracker.opentrackr.org:1337/announce
 udp://tracker.srv00.com:6969/announce
 udp://v74853.hosted-by-vdsina.com:6969/announce
 udp://tracker.torrent.eu.org:451/announce
+
+http://mp9f95qlr5w6g9:y1elpx1zic9qvx@p.proxik.cloud:8080
