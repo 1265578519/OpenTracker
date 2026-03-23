@@ -179,6 +179,10 @@ centos6在使用 cd libowfat 进入目录的上方插入并且运行这段代码
 rm -rf libowfat;mv libowfat-0.31 libowfat
 ```
 
+我github仓库里的opentracker 最新版本我已经和作者联合开发更新了这功能，现在的最新源代码编译后支持使用CDN传递ip地址，opentracker官网也会更新上这份源代码
+套cloudflare一定要找到规则ID：c9f18c647ae745c6b81b459d8ed59b32（HTTP requests with unusual HTTP headers or URI path），改成本质上为关，这样cf就不会误报拦截访客了
+https://bbs.itzmx.com/thread-101182-1-1.html
+
 有关Linux内核优化参数
 只需要调整打开文件数，和禁用系统防火墙避免lsmod加载nf模块引起高CPU占用和触发丢包，其它的参数就微乎其微了
 1.打开文件数
@@ -201,6 +205,7 @@ echo "net.ipv6.route.max_size = 2147483647" >> /etc/sysctl.conf
 4.给予更多的socket端口号，默认值4096，1G内存设置为100000，这个对访问影响不大一般来说可以保持默认值
 ```
 echo "net.ipv4.tcp_max_orphans = 100000" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_orphan_retries = 3" >> /etc/sysctl.conf
 ```
 然后执行 /sbin/sysctl -p 让参数生效
 以上优化中打开文件和防火墙关闭禁用nf驱动模块最为重要，对于防火墙给予了lsmod查看办法，下面这是确认打开文件设置成功的查看办法
