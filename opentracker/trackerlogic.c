@@ -122,17 +122,8 @@ size_t add_peer_to_torrent_and_return_peers(PROTO_FLAG proto, struct ot_workstru
   peer_list = peer_size == OT_PEER_SIZE6 ? torrent->peer_list6 : torrent->peer_list4;
 
   /* Check for peer in torrent */
-  if ( OT_MAX_PEER > 0 && peer_list->peer_count >= OT_MAX_PEER ) {
-    peer_dest = 0;
-  } else {
   peer_dest = vector_find_or_insert_peer(&(peer_list->peers), peer_src, peer_size, &exactmatch);
-  }
   if (!peer_dest) {
-  if ( OT_MAX_PEER > 0 && peer_list->peer_count >= OT_MAX_PEER ) {
-      ws->reply_size = return_peers_for_torrent(ws, torrent, amount, ws->reply, proto);
-      mutex_bucket_unlock_by_hash(*ws->hash, delta_torrentcount);
-      return ws->reply_size;
-    }
     mutex_bucket_unlock_by_hash(*ws->hash, delta_torrentcount);
     return 0;
   }
