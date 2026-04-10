@@ -19,6 +19,9 @@
 #include "ot_vector.h"
 #include "trackerlogic.h"
 
+/* max_peer_count is trackerlogic.c */
+extern volatile uint64_t max_peer_count;
+
 /* Returns amount of removed peers */
 static ssize_t clean_single_bucket(ot_peer *peers, size_t peer_count, size_t peer_size, time_t timedout, int *removed_seeders) {
   ot_peer *last_peer = peers + peer_count * peer_size, *insert_point;
@@ -75,6 +78,7 @@ int clean_single_peer_list(ot_peerlist *peer_list, size_t peer_size) {
   while (num_buckets--) {
     size_t removed_peers   = clean_single_bucket(peer_vector->data, peer_vector->size, peer_size, timedout, &removed_seeders);
     peer_list->peer_count -= removed_peers;
+    max_peer_count        -= removed_peers;
     peer_vector->size     -= removed_peers;
     if (removed_peers)
       vector_fixup_peers(peer_vector, peer_size);
