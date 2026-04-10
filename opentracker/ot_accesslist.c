@@ -129,8 +129,8 @@ static void accesslist_readfile(void) {
 
   /* We do ignore anything that is not of the form "^[:xdigit:]{40}[^:xdigit:].*" */
   while (read_offs <= map_end) {
-    int i;
-    for (i = 0; i < (int)sizeof(ot_hash); ++i) {
+    size_t i;
+    for (i = 0; i < sizeof(ot_hash); ++i) {
       int eger1 = scan_fromhex((unsigned char)read_offs[2 * i]);
       int eger2 = scan_fromhex((unsigned char)read_offs[1 + 2 * i]);
       if (eger1 < 0 || eger2 < 0)
@@ -262,7 +262,7 @@ static void     *accesslist_adddel_worker(char *fifoname, ot_accesslist *_Atomic
 
     while ((linelen = getline(&line, &linecap, fifo)) > 0) {
       ot_hash info_hash;
-      int     i;
+      size_t  i;
 
       printf("Got line %*s", (int)linelen, line);
       /* We do ignore anything that is not of the form "^[:xdigit:]{40}[^:xdigit:].*"
@@ -270,7 +270,7 @@ static void     *accesslist_adddel_worker(char *fifoname, ot_accesslist *_Atomic
       if (linelen < 41)
         continue;
 
-      for (i = 0; i < (int)sizeof(ot_hash); ++i) {
+      for (i = 0; i < sizeof(ot_hash); ++i) {
         int eger1 = scan_fromhex((unsigned char)line[2 * i]);
         int eger2 = scan_fromhex((unsigned char)line[1 + 2 * i]);
         if (eger1 < 0 || eger2 < 0)
@@ -511,7 +511,7 @@ int proxylist_check_proxy(const ot_ip6 proxy, const ot_ip6 address) {
 
 static ot_net         g_admin_nets[OT_ADMINIP_MAX];
 static ot_permissions g_admin_nets_permissions[OT_ADMINIP_MAX];
-static unsigned int   g_admin_nets_count = 0;
+static size_t         g_admin_nets_count = 0;
 
 int accesslist_bless_net(ot_net *net, ot_permissions permissions) {
   if (g_admin_nets_count >= OT_ADMINIP_MAX)
@@ -553,7 +553,7 @@ int accesslist_bless_net(ot_net *net, ot_permissions permissions) {
 }
 
 int accesslist_is_blessed(ot_ip6 ip, ot_permissions permissions) {
-  unsigned int i;
+  size_t i;
   for (i = 0; i < g_admin_nets_count; ++i)
     if (address_in_net(ip, g_admin_nets + i) && (g_admin_nets_permissions[i] & permissions))
       return 1;

@@ -281,7 +281,8 @@ static void *server_mainloop(void *args) {
   struct ot_workstruct ws;
   time_t               next_timeout_check = g_now_seconds + OT_CLIENT_TIMEOUT_CHECKINTERVAL;
   struct iovec        *iovector;
-  int                  iovec_entries, is_partial;
+  size_t               iovec_entries;
+  int                  is_partial;
 
   (void)args;
 
@@ -444,7 +445,7 @@ int parse_configfile(char *config_filename) {
 #if defined(WANT_RESTRICT_STATS) || defined(WANT_IP_FROM_PROXY) || defined(WANT_SYNC_LIVE)
   ot_net tmpnet;
 #endif
-  int bound             = 0;
+  int bound = 0;
 
   accesslist_filehandle = fopen(config_filename, "r");
 
@@ -566,15 +567,15 @@ void load_state(const char *const state_filename) {
 
   /* We do ignore anything that is not of the form "^[:xdigit:]:\d+:\d+" */
   while (fgets(inbuf, sizeof(inbuf), state_filehandle)) {
-    int i;
-    for (i = 0; i < (int)sizeof(ot_hash); ++i) {
+    size_t i;
+    for (i = 0; i < sizeof(ot_hash); ++i) {
       int eger = 16 * scan_fromhex(inbuf[2 * i]) + scan_fromhex(inbuf[1 + 2 * i]);
       if (eger < 0)
         continue;
       infohash[i] = eger;
     }
 
-    if (i != (int)sizeof(ot_hash))
+    if (i != sizeof(ot_hash))
       continue;
     i *= 2;
 

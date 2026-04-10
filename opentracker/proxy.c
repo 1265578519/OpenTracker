@@ -276,12 +276,12 @@ void reset_info_block(proxy_peer *peer) {
  * Multiple connections to/from the same ip are okay, if tracker_id doesn't match
  * Reconnect attempts occur only twice a minute
  */
-static int        g_connection_count;
+static size_t     g_connection_count;
 static ot_time    g_connection_reconn;
 static proxy_peer g_connections[MAX_PEERS];
 
 static void handle_reconnects(void) {
-  int i;
+  size_t i;
   for (i = 0; i < g_connection_count; ++i)
     if (PROXYPEER_NEEDSCONNECT(g_connections[i].state)) {
       int64 newfd = socket_tcp6();
@@ -625,7 +625,7 @@ int main(int argc, char **argv) {
 static void *streamsync_worker(void *args) {
   (void)args;
   while (1) {
-    int bucket;
+    size_t bucket;
     /* For each bucket... */
     for (bucket = 0; bucket < OT_BUCKET_COUNT; ++bucket) {
       /* Get exclusive access to that bucket */

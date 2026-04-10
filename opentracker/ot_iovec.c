@@ -14,9 +14,9 @@
 /* Opentracker */
 #include "ot_iovec.h"
 
-void *iovec_increase(int *iovec_entries, struct iovec **iovector, size_t new_alloc) {
+void *iovec_increase(size_t *iovec_entries, struct iovec **iovector, size_t new_alloc) {
   void         *new_data;
-  int           new_entries = 1 + *iovec_entries;
+  size_t        new_entries = 1 + *iovec_entries;
   struct iovec *new_vec     = realloc(*iovector, new_entries * sizeof(struct iovec));
 
   if (!new_vec)
@@ -35,8 +35,8 @@ void *iovec_increase(int *iovec_entries, struct iovec **iovector, size_t new_all
   return new_data;
 }
 
-void *iovec_append(int *iovec_entries, struct iovec **iovector, struct iovec *append_iovector) {
-  int           new_entries = *iovec_entries + 1;
+void *iovec_append(size_t *iovec_entries, struct iovec **iovector, struct iovec *append_iovector) {
+  size_t        new_entries = *iovec_entries + 1;
   struct iovec *new_vec     = realloc(*iovector, new_entries * sizeof(struct iovec));
   if (!new_vec)
     return NULL;
@@ -54,15 +54,15 @@ void *iovec_append(int *iovec_entries, struct iovec **iovector, struct iovec *ap
   return new_vec;
 }
 
-void iovec_free(int *iovec_entries, struct iovec **iovector) {
-  int i;
+void iovec_free(size_t *iovec_entries, struct iovec **iovector) {
+  size_t i;
   for (i = 0; i < *iovec_entries; ++i)
     free(((*iovector)[i]).iov_base);
   *iovector      = NULL;
   *iovec_entries = 0;
 }
 
-void iovec_fixlast(int *iovec_entries, struct iovec **iovector, void *last_ptr) {
+void iovec_fixlast(size_t *iovec_entries, struct iovec **iovector, void *last_ptr) {
   if (*iovec_entries) {
     char  *base      = (char *)((*iovector)[*iovec_entries - 1]).iov_base;
     size_t new_alloc = ((char *)last_ptr) - base;
@@ -72,7 +72,7 @@ void iovec_fixlast(int *iovec_entries, struct iovec **iovector, void *last_ptr) 
   }
 }
 
-void *iovec_fix_increase_or_free(int *iovec_entries, struct iovec **iovector, void *last_ptr, size_t new_alloc) {
+void *iovec_fix_increase_or_free(size_t *iovec_entries, struct iovec **iovector, void *last_ptr, size_t new_alloc) {
   void *new_data;
 
   iovec_fixlast(iovec_entries, iovector, last_ptr);
@@ -83,9 +83,8 @@ void *iovec_fix_increase_or_free(int *iovec_entries, struct iovec **iovector, vo
   return new_data;
 }
 
-size_t iovec_length(const int *iovec_entries, const struct iovec **iovector) {
-  size_t length = 0;
-  int    i;
+size_t iovec_length(const size_t *iovec_entries, const struct iovec **iovector) {
+  size_t i, length = 0;
   for (i = 0; i < *iovec_entries; ++i)
     length += ((*iovector)[i]).iov_len;
   return length;

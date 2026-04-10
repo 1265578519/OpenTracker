@@ -72,9 +72,9 @@ int add_changeset_to_tracker(uint8_t *data, size_t len) {
 /* Proposed output format
    d4:syncd20:<info_hash>8*N:(xxxxyyyy)*Nee
 */
-static void sync_make(int *iovec_entries, struct iovec **iovector) {
-  int   bucket;
-  char *r, *re;
+static void sync_make(size_t *iovec_entries, struct iovec **iovector) {
+  size_t bucket;
+  char  *r, *re;
 
   /* Setup return vector... */
   *iovec_entries = 0;
@@ -140,7 +140,7 @@ static void sync_make(int *iovec_entries, struct iovec **iovector) {
    It grabs tasks from mutex_tasklist and delivers results back
 */
 static void *sync_worker(void *args) {
-  int           iovec_entries;
+  size_t        iovec_entries;
   struct iovec *iovector;
 
   args = args;

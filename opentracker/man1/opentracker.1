@@ -20,7 +20,6 @@
 is a bittorrent tracker that implements announce and scrape actions over the
 UDP and the plain http protocol, aiming for minimal resource usage.
 .Pp
-
 When invoked with parameters, it binds to TCP and UDP port 6969 on all
 interfaces. The recommended way to configure opentracker is by providing a
 config file using the
@@ -29,17 +28,14 @@ option. See
 .Xr opentracker.conf 4
 for details.
 .Pp
-
 .Sh OPTIONS
 The following options are available:
-
 .Bl -tag -width -indent=8
 .It Fl f Ar config
 Parse a config file with a list of options. Consecutive command options
 will override options from the config file. See
 .Xr opentracker.conf 4
 for details.
-
 .It Fl i Ar ip-select
 Select an ip address that will be used with the next
 .Op Fl p
@@ -90,15 +86,11 @@ or
 .Br WANT_ACCESSLIST_WHITE
 options, this option sets the location of the accesslist.
 .El
-
 .Sh EXAMPLES
-
 Start
 .Nm
 bound on UDP and TCP ports 6969 on IPv6 localhost.
-
 .Dl # ./opentracker -i ::1 -p 6969 -P 6969
-
 .Pp
 Start
 .Nm
@@ -106,12 +98,9 @@ bound on UDP port 6868 and TCP port 6868 on IPv4 localhost and allow
 privileged access from the network 192.168/16 while redirecting
 HTTP clients accessing the root directory, which is not covered by the
 bittorrent tracker protocol, to https://my-trackersite.com/.
-
 .Dl # ./opentracker -i 192.168.0.4 -p 6868 -P 6969 -A 192.168/16 -r https://my-trackersite.com/
-
 The announce URLs are http://192.168.0.4:6868/announce and
 udp://192.168.0.4:6868/announce respectively.
-
 .Sh FILES
 .Bl -tag -width indent
 .It Pa opentracker.conf
@@ -127,16 +116,15 @@ opentracker documentation
 .Pp
 Bittorrent tracker protocol
 .Lk http://www.bittorrent.org/beps/bep_0015.html
-.Sh
 .Sh AUTHOR
 .An Dirk Engling
 .Aq Mt erdgeist@erdgeist.org .
 .Sh LICENSE
 This software is released under the Beerware License:
-
+.Pp
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software with the following
 terms and conditions:
-
+.Pp
 If you meet the author(s) someday, and you think this software is worth it, you can buy them
 a beer in return.

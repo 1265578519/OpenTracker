@@ -208,7 +208,7 @@ size_t add_peer_to_torrent_and_return_peers(PROTO_FLAG proto, struct ot_workstru
 }
 
 static size_t return_peers_all(ot_peerlist *peer_list, size_t peer_size, char *reply) {
-  unsigned int bucket, num_buckets = 1;
+  size_t       bucket, num_buckets = 1;
   ot_vector   *bucket_list  = &peer_list->peers;
   size_t       compare_size = OT_PEER_COMPARE_SIZE_FROM_PEER_SIZE(peer_size);
   size_t       result       = compare_size * peer_list->peer_count;
@@ -237,7 +237,7 @@ static size_t return_peers_all(ot_peerlist *peer_list, size_t peer_size, char *r
 }
 
 static size_t return_peers_selection(struct ot_workstruct *ws, ot_peerlist *peer_list, size_t peer_size, size_t amount, char *reply) {
-  unsigned int bucket_offset, bucket_index = 0, num_buckets = 1;
+  size_t       bucket_offset, bucket_index = 0, num_buckets = 1;
   ot_vector   *bucket_list  = &peer_list->peers;
   unsigned int shifted_pc   = peer_list->peer_count;
   unsigned int shifted_step = 0;
@@ -416,9 +416,10 @@ size_t return_udp_scrape_for_torrent(ot_hash const hash, char *reply) {
 }
 
 /* Fetches scrape info for a specific torrent */
-size_t return_tcp_scrape_for_torrent(ot_hash const *hash_list, int amount, char *reply) {
+size_t return_tcp_scrape_for_torrent(ot_hash const *hash_list, size_t amount, char *reply) {
   char *r = reply;
-  int   exactmatch, i;
+  int   exactmatch;
+  size_t i;
 
   r += sprintf(r, "d5:filesd");
 
@@ -503,8 +504,7 @@ size_t remove_peer_from_torrent(PROTO_FLAG proto, struct ot_workstruct *ws) {
 }
 
 void iterate_all_torrents(int (*for_each)(ot_torrent *torrent, uintptr_t data), uintptr_t data) {
-  int    bucket;
-  size_t j;
+  size_t bucket, j;
 
   for (bucket = 0; bucket < OT_BUCKET_COUNT; ++bucket) {
     ot_vector  *torrents_list = mutex_bucket_lock(bucket);
@@ -583,8 +583,8 @@ void trackerlogic_init() {
 }
 
 void trackerlogic_deinit(void) {
-  int    bucket, delta_torrentcount = 0;
-  size_t j;
+  int    delta_torrentcount = 0;
+  size_t bucket, j;
 
   /* Free all torrents... */
   for (bucket = 0; bucket < OT_BUCKET_COUNT; ++bucket) {

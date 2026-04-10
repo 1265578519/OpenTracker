@@ -24,7 +24,7 @@ struct http_data {
 };
 
 ssize_t        http_handle_request(const int64 s, struct ot_workstruct *ws);
-ssize_t        http_sendiovecdata(const int64 s, struct ot_workstruct *ws, int iovec_entries, struct iovec *iovector, int is_partial);
+ssize_t        http_sendiovecdata(const int64 s, struct ot_workstruct *ws, size_t iovec_entries, struct iovec *iovector, int is_partial);
 ssize_t        http_issue_error(const int64 s, struct ot_workstruct *ws, int code);
 
 extern char   *g_stats_path;

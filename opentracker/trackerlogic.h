@@ -70,7 +70,7 @@ typedef struct {
  */
  /* From opentracker.c */
 extern size_t max_peer_count;
-#define OT_MAX_PEER                    3000000
+#define OT_MAX_PEER                    1000000000
 
 /* We maintain a list of 1024 pointers to sorted list of ot_torrent structs
  Sort key is, of course, its hash */
@@ -203,7 +203,7 @@ void   exerr(char *message);
    otherwise it is released in return_peers_for_torrent */
 size_t add_peer_to_torrent_and_return_peers(PROTO_FLAG proto, struct ot_workstruct *ws, size_t amount);
 size_t remove_peer_from_torrent(PROTO_FLAG proto, struct ot_workstruct *ws);
-size_t return_tcp_scrape_for_torrent(ot_hash const *hash_list, int amount, char *reply);
+size_t return_tcp_scrape_for_torrent(ot_hash const *hash_list, size_t amount, char *reply);
 size_t return_udp_scrape_for_torrent(ot_hash const hash, char *reply);
 void   add_torrent_from_saved_state(ot_hash const hash, ot_time base, size_t down_count);
 #ifdef _DEBUG_RANDOMTORRENTS

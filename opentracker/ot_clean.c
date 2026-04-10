@@ -20,7 +20,7 @@
 #include "trackerlogic.h"
 
 /* Returns amount of removed peers */
-static ssize_t clean_single_bucket(ot_peer *peers, size_t peer_count, size_t peer_size, time_t timedout, int *removed_seeders) {
+static ssize_t clean_single_bucket(ot_peer *peers, size_t peer_count, size_t peer_size, time_t timedout, size_t *removed_seeders) {
   ot_peer *last_peer = peers + peer_count * peer_size, *insert_point;
 
   /* Two scan modes: unless there is one peer removed, just increase ot_peertime */
@@ -50,7 +50,7 @@ static ssize_t clean_single_bucket(ot_peer *peers, size_t peer_count, size_t pee
 int clean_single_peer_list(ot_peerlist *peer_list, size_t peer_size) {
   ot_vector *peer_vector = &peer_list->peers;
   time_t     timedout    = (time_t)(g_now_minutes - peer_list->base);
-  int        num_buckets = 1, removed_seeders = 0;
+  size_t     num_buckets = 1, removed_seeders = 0;
 
   /* No need to clean empty torrent */
   if (!timedout)
@@ -112,7 +112,7 @@ int clean_single_torrent(ot_torrent *torrent) {
 static void *clean_worker(void *args) {
   (void)args;
   while (1) {
-    int bucket = OT_BUCKET_COUNT;
+    size_t bucket = OT_BUCKET_COUNT;
     while (bucket--) {
       ot_vector *torrents_list = mutex_bucket_lock(bucket);
       size_t     toffs;
