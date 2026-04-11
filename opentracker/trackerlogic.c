@@ -119,6 +119,14 @@ size_t add_peer_to_torrent_and_return_peers(PROTO_FLAG proto, struct ot_workstru
   torrent->peer_list6->base = g_now_minutes;
   torrent->peer_list4->base = g_now_minutes;
 
+#ifdef WANT_LIMIT_PEERS
+  if ( g_max_peers_reached ) {
+    ws->reply_size = return_peers_for_torrent(ws, torrent, amount, ws->reply, proto);
+    mutex_bucket_unlock_by_hash(*ws->hash, delta_torrentcount);
+    return ws->reply_size;
+  }
+#endif
+
   peer_list = peer_size == OT_PEER_SIZE6 ? torrent->peer_list6 : torrent->peer_list4;
 
   /* Check for peer in torrent */

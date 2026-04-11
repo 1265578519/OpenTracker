@@ -19,6 +19,11 @@
 #include "ot_vector.h"
 #include "trackerlogic.h"
 
+#ifdef WANT_LIMIT_PEERS
+volatile int g_max_peers_reached = 0;
+static size_t g_peer_counts[OT_BUCKET_COUNT];
+#endif
+
 /* Returns amount of removed peers */
 static ssize_t clean_single_bucket(ot_peer *peers, size_t peer_count, size_t peer_size, time_t timedout, size_t *removed_seeders) {
   ot_peer *last_peer = peers + peer_count * peer_size, *insert_point;
@@ -117,6 +122,10 @@ static void *clean_worker(void *args) {
       size_t     toffs;
       int        delta_torrentcount = 0;
 
+#ifdef WANT_LIMIT_PEERS
+      g_peer_counts[bucket] = 0;
+#endif
+
       for (toffs = 0; toffs < torrents_list->size; ++toffs) {
         ot_torrent *torrent = ((ot_torrent *)(torrents_list->data)) + toffs;
         if (clean_single_torrent(torrent)) {
@@ -124,10 +133,21 @@ static void *clean_worker(void *args) {
           --delta_torrentcount;
           --toffs;
         }
+#ifdef WANT_LIMIT_PEERS
+        g_peer_counts[bucket] += torrent->peer_list6->peer_count + torrent->peer_list4->peer_count;
+#endif
       }
       mutex_bucket_unlock(bucket, delta_torrentcount);
       if (!g_opentracker_running)
         return NULL;
+#ifdef WANT_LIMIT_PEERS
+      {
+        size_t all_peer_counts = 0, bucket_tmp;
+        for (bucket_tmp = 0; bucket_tmp < OT_BUCKET_COUNT; ++bucket_tmp)
+          all_peer_counts += g_peer_counts[bucket_tmp];
+        g_max_peers_reached = (all_peer_counts >= g_max_peers);
+      }
+#endif
       usleep(OT_CLEAN_SLEEP);
     }
     stats_cleanup();
