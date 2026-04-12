@@ -65,7 +65,7 @@ OPTS_debug=-D_DEBUG -g -ggdb # -pg -fprofile-arcs -ftest-coverage
 OPTS_production=-O3
 
 CFLAGS+=-I$(LIBOWFAT_HEADERS) -DGIT_VERSION=$(GIT_VERSION) -Wall -pipe -pthread -Wextra #-ansi -pedantic
-LDFLAGS+=-L$(LIBOWFAT_LIBRARY) -lowfat -pthread
+LDFLAGS+=-L$(LIBOWFAT_LIBRARY) -lowfat -pthread -lm
 
 BINARY =opentracker
 HEADERS=trackerlogic.h scan_urlencoded_query.h ot_mutex.h ot_stats.h ot_vector.h ot_clean.h ot_udp.h ot_iovec.h ot_fullscrape.h ot_accesslist.h ot_http.h ot_livesync.h ot_rijndael.h
