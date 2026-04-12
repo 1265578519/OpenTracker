@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <math.h>
 
 /* Libowfat */
 #include "array.h"
@@ -74,6 +75,55 @@ void add_torrent_from_saved_state(ot_hash const hash, ot_time base, size_t down_
   return mutex_bucket_unlock_by_hash(hash, 1);
 }
 
+#ifdef WANT_LIMIT_PEERS
+/* Probabilistic admission control with a soft global cap that
+   preserves fairness by favoring underrepresented bins and
+   gradually throttling dominant bins as capacity is approached. */
+const static double alpha = 2.0; /* global pressure steepness */
+const static double beta  = 1.5; /* Fairness strength */
+int FAIRNESS_FUNC(size_t peer_count) {
+  double system_load, global_probability, relative_size, fairness_penalty, fairness_factor, accept_probability;
+
+  /* If global peer count is below water mark or bin is
+     miniscule, allow inserts */
+  if (g_global_peer_count < g_global_peer_watermark ||
+      peer_count < g_minimal_population_allowance)
+    return 1;
+
+  /* If global peer count exceeds global limit and the
+     above exceptions do not match, disallow insert */
+  if (g_global_peer_count >= g_global_peer_limit)
+    return 0;
+
+  /* Acceptance probability is the product of a global load decay
+     and a fairness factor whose influence increases with load. */
+
+  /* Normalize load to 0..1 between watermark and global cap */
+  system_load = ((double)(g_global_peer_count - g_global_peer_watermark)) /
+                ((double)(g_global_peer_limit - g_global_peer_watermark));
+
+  /* Clamp, g_global_peer_limit is a soft limit */
+  if (system_load > 1.0) system_load = 1.0;
+  global_probability = pow(1.0 - system_load, alpha);
+
+  /* Apply fairness penalty to popular bins, log scaled */
+  relative_size = ((double)peer_count) / (double)g_minimal_population_allowance;
+  fairness_penalty = pow(1.0 + log(1.0 + relative_size), beta);
+
+  /* Delay fairness activation so that it ramps up with system pressure */
+  fairness_factor = pow(1.0 / fairness_penalty, system_load);
+  if (fairness_factor > 1.0) fairness_factor = 1.0;
+  if (fairness_factor < 0.0) fairness_factor = 0.0;
+
+  accept_probability = global_probability * fairness_factor;
+
+  /* now decide by coin flip, note: random() yields long up to 2^31 */
+  return random() < (long)(accept_probability * 2147483648.0);
+}
+#else
+#define FAIRNESS_FUNC(X) (1)
+#endif
+
 size_t add_peer_to_torrent_and_return_peers(PROTO_FLAG proto, struct ot_workstruct *ws, size_t amount) {
   int            exactmatch, delta_torrentcount = 0;
   ot_torrent    *torrent;
@@ -122,10 +172,12 @@ size_t add_peer_to_torrent_and_return_peers(PROTO_FLAG proto, struct ot_workstru
   peer_list = peer_size == OT_PEER_SIZE6 ? torrent->peer_list6 : torrent->peer_list4;
 
   /* Check for peer in torrent */
-  peer_dest = vector_find_or_insert_peer(&(peer_list->peers), peer_src, peer_size, &exactmatch);
+  peer_dest = vector_find_or_insert_peer(&(peer_list->peers), peer_src, peer_size, &exactmatch, FAIRNESS_FUNC(peer_list->peer_count));
+
   if (!peer_dest) {
+    ws->reply_size = return_peers_for_torrent(ws, torrent, amount, ws->reply, proto);
     mutex_bucket_unlock_by_hash(*ws->hash, delta_torrentcount);
-    return 0;
+    return ws->reply_size;;
   }
 
   /* Tell peer that it's fresh */

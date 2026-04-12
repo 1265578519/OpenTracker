@@ -86,7 +86,7 @@ void *vector_find_or_insert(ot_vector *vector, void *key, size_t member_size, si
   return match;
 }
 
-ot_peer *vector_find_or_insert_peer(ot_vector *vector, ot_peer const *peer, size_t peer_size, int *exactmatch) {
+ot_peer *vector_find_or_insert_peer(ot_vector *vector, ot_peer const *peer, size_t peer_size, int *exactmatch, int may_insert) {
   ot_peer     *match, *end;
   const size_t compare_size = OT_PEER_COMPARE_SIZE_FROM_PEER_SIZE(peer_size);
   size_t       match_to_end;
@@ -96,7 +96,7 @@ ot_peer *vector_find_or_insert_peer(ot_vector *vector, ot_peer const *peer, size
     vector = ((ot_vector *)vector->data) + vector_hash_peer(peer, compare_size, vector->size);
   match = binary_search(peer, vector->data, vector->size, peer_size, compare_size, exactmatch);
 
-  if (*exactmatch)
+  if (*exactmatch || !may_insert)
     return match;
 
   /* This is the amount of bytes that needs to be pushed backwards by peer_size bytes to make room for new peer */

@@ -43,6 +43,11 @@ char               *g_redirecturl;
 uint32_t            g_tracker_id;
 volatile int        g_opentracker_running = 1;
 int                 g_self_pipe[2];
+#ifdef WANT_LIMIT_PEERS
+size_t              g_minimal_population_allowance = 10; /* TODO tweakable */
+size_t              g_global_peer_limit = 1000000000;
+size_t              g_global_peer_watermark = 700000000;
+#endif
 
 static char        *g_serverdir;
 static char        *g_serveruser;
@@ -476,6 +481,16 @@ int parse_configfile(char *config_filename) {
       set_config_option(&g_serverdir, p + 16);
     } else if (!byte_diff(p, 12, "tracker.user") && isspace(p[12])) {
       set_config_option(&g_serveruser, p + 13);
+#ifdef WANT_LIMIT_PEERS
+    } else if (!byte_diff(p, 17, "tracker.max_peers") && isspace(p[17])) {
+      unsigned int tmp;
+      char *value = p + 17;
+      while (isspace(*value))
+        ++value;
+      scan_uint(value, &tmp);
+      g_global_peer_limit = tmp;
+      g_global_peer_watermark = (size_t)(0.7 * (double)tmp);
+#endif
     } else if (!byte_diff(p, 14, "listen.tcp_udp") && isspace(p[14])) {
       uint16_t tmpport = 6969;
       if (!scan_ip6_port(p + 15, tmpip, &tmpport))

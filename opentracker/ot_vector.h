@@ -23,7 +23,7 @@ typedef struct {
 
 void    *binary_search(const void *const key, const void *base, const size_t member_count, const size_t member_size, size_t compare_size, int *exactmatch);
 void    *vector_find_or_insert(ot_vector *vector, void *key, size_t member_size, size_t compare_size, int *exactmatch);
-ot_peer *vector_find_or_insert_peer(ot_vector *vector, ot_peer const *peer, size_t peer_size, int *exactmatch);
+ot_peer *vector_find_or_insert_peer(ot_vector *vector, ot_peer const *peer, size_t peer_size, int *exactmatch, int may_insert);
 
 int      vector_remove_peer(ot_vector *vector, ot_peer const *peer, size_t peer_size);
 void     vector_remove_torrent(ot_vector *vector, ot_torrent *match);
