@@ -46,7 +46,6 @@ FEATURES+=-DWANT_IP_FROM_PROXY
 #FEATURES+=-DWANT_SYSLOGS
 #FEATURES+=-DWANT_DEV_RANDOM
 #FEATURES+=-DWANT_FULLSCRAPE
-FEATURES+=-DWANT_LIMIT_PEERS
 
 # You need libowfat version 0.34 to allow for automatic release of chunks during
 # full scrape transfer, if you rely on an older versions, enable this flag
