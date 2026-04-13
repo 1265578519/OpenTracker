@@ -30,6 +30,11 @@
 #include "ot_vector.h"
 #include "trackerlogic.h"
 
+#ifdef WANT_MAX_PEER
+/* max_peer_count */
+size_t max_peer_count = 0;
+#endif
+
 /* Forward declaration */
 size_t return_peers_for_torrent(struct ot_workstruct *ws, ot_torrent *torrent, size_t amount, char *reply, PROTO_FLAG proto);
 
@@ -122,6 +127,13 @@ size_t add_peer_to_torrent_and_return_peers(PROTO_FLAG proto, struct ot_workstru
   peer_list = peer_size == OT_PEER_SIZE6 ? torrent->peer_list6 : torrent->peer_list4;
 
   /* Check for peer in torrent */
+#ifdef WANT_MAX_PEER
+  if ( (OT_MAX_PEER > 0 && max_peer_count >= OT_MAX_PEER) || (peer_list->peer_count >= OT_MAX_TORRENT_PEER) ) {
+    ws->reply_size = return_peers_for_torrent(ws, torrent, amount, ws->reply, proto);
+    mutex_bucket_unlock_by_hash(*ws->hash, delta_torrentcount);
+    return ws->reply_size;
+  }
+#endif
   peer_dest = vector_find_or_insert_peer(&(peer_list->peers), peer_src, peer_size, &exactmatch);
   if (!peer_dest) {
     mutex_bucket_unlock_by_hash(*ws->hash, delta_torrentcount);
@@ -146,6 +158,9 @@ size_t add_peer_to_torrent_and_return_peers(PROTO_FLAG proto, struct ot_workstru
 #endif
 
     peer_list->peer_count++;
+#ifdef WANT_MAX_PEER
+    max_peer_count++;
+#endif
     if (OT_PEERFLAG(ws->peer) & PEER_FLAG_COMPLETED) {
       peer_list->down_count++;
       stats_issue_event(EVENT_COMPLETED, 0, (uintptr_t)ws);
@@ -462,6 +477,9 @@ size_t remove_peer_from_torrent(PROTO_FLAG proto, struct ot_workstruct *ws) {
       peer_list->seed_count--; /* Intentional fallthrough */
     case 1:
       peer_list->peer_count--; /* Intentional fallthrough */
+#ifdef WANT_MAX_PEER
+      max_peer_count--;
+#endif
     default:
       break;
     }

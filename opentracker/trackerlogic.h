@@ -63,6 +63,18 @@ typedef struct {
 /* Number of minutes after announce before peer is removed */
 #define OT_PEER_TIMEOUT               180
 
+#ifdef WANT_MAX_PEER
+/* Max number of peers allowed in memory. DO NOT set this to 0.
+ * - Process Memory: Each 1000000 peers use ~85MB.
+ * - Total System Memory (including TCP stack): Each 1000000 peers use ~128MB (avg. 134 bytes/peer).
+ * A limit of 3000000 peers keeps the total system memory usage around 400MB.
+ */
+ /* From opentracker.c */
+extern size_t max_peer_count;
+#define OT_MAX_PEER                    3000000
+#define OT_MAX_TORRENT_PEER            400
+#endif
+
 /* We maintain a list of 1024 pointers to sorted list of ot_torrent structs
  Sort key is, of course, its hash */
 #define OT_BUCKET_COUNT_BITS          10
