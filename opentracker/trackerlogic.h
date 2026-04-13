@@ -63,20 +63,6 @@ typedef struct {
 /* Number of minutes after announce before peer is removed */
 #define OT_PEER_TIMEOUT               180
 
-/* Max number of peers allowed in memory. DO NOT set this to 0.
- * - Process Memory: Each 1000000 peers use ~85MB.
- * - Total System Memory (including TCP stack): Each 1000000 peers use ~128MB (avg. 134 bytes/peer).
- * A limit of 3000000 peers keeps the total system memory usage around 400MB.
- */
-#ifdef WANT_LIMIT_PEERS
-/* From opentracker.c */
-extern size_t g_minimal_population_allowance;
-extern size_t g_global_peer_limit;
-extern size_t g_global_peer_watermark;
-/* From ot_clean.c */
-extern volatile size_t g_global_peer_count;
-#endif
-
 /* We maintain a list of 1024 pointers to sorted list of ot_torrent structs
  Sort key is, of course, its hash */
 #define OT_BUCKET_COUNT_BITS          10
@@ -208,7 +194,7 @@ void   exerr(char *message);
    otherwise it is released in return_peers_for_torrent */
 size_t add_peer_to_torrent_and_return_peers(PROTO_FLAG proto, struct ot_workstruct *ws, size_t amount);
 size_t remove_peer_from_torrent(PROTO_FLAG proto, struct ot_workstruct *ws);
-size_t return_tcp_scrape_for_torrent(ot_hash const *hash_list, size_t amount, char *reply);
+size_t return_tcp_scrape_for_torrent(ot_hash const *hash_list, int amount, char *reply);
 size_t return_udp_scrape_for_torrent(ot_hash const hash, char *reply);
 void   add_torrent_from_saved_state(ot_hash const hash, ot_time base, size_t down_count);
 #ifdef _DEBUG_RANDOMTORRENTS

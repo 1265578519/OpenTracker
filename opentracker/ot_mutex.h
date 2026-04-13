@@ -73,8 +73,8 @@ int                   mutex_workqueue_pushtask(int64 sock, ot_tasktype tasktype)
 void                  mutex_workqueue_canceltask(int64 sock);
 void                  mutex_workqueue_pushsuccess(ot_taskid taskid);
 ot_taskid             mutex_workqueue_poptask(ot_tasktype *tasktype);
-int                   mutex_workqueue_pushresult(ot_taskid taskid, size_t iovec_entries, struct iovec *iovector);
+int                   mutex_workqueue_pushresult(ot_taskid taskid, int iovec_entries, struct iovec *iovector);
 int                   mutex_workqueue_pushchunked(ot_taskid taskid, struct iovec *iovec);
-int64                 mutex_workqueue_popresult(size_t *iovec_entries, struct iovec **iovector, int *is_partial);
+int64                 mutex_workqueue_popresult(int *iovec_entries, struct iovec **iovector, int *is_partial);
 
 #endif

@@ -56,7 +56,7 @@ struct ot_task {
   ot_taskid       taskid;
   ot_tasktype     tasktype;
   int64           sock;
-  size_t          iovec_entries;
+  int             iovec_entries;
   struct iovec   *iovec;
   struct ot_task *next;
 };
@@ -105,7 +105,7 @@ void mutex_workqueue_canceltask(int64 sock) {
     if ((*task)->sock == sock) {
       struct iovec   *iovec = (*task)->iovec;
       struct ot_task *ptask = *task;
-      size_t                   i;
+      int             i;
 
       /* Free task's iovec */
       for (i = 0; i < (*task)->iovec_entries; ++i)
@@ -167,7 +167,7 @@ void mutex_workqueue_pushsuccess(ot_taskid taskid) {
   pthread_mutex_unlock(&tasklist_mutex);
 }
 
-int mutex_workqueue_pushresult(ot_taskid taskid, size_t iovec_entries, struct iovec *iovec) {
+int mutex_workqueue_pushresult(ot_taskid taskid, int iovec_entries, struct iovec *iovec) {
   struct ot_task *task;
   const char      byte = 'o';
 
@@ -219,7 +219,7 @@ int mutex_workqueue_pushchunked(ot_taskid taskid, struct iovec *iovec) {
   return task ? 0 : -1;
 }
 
-int64 mutex_workqueue_popresult(size_t *iovec_entries, struct iovec **iovec, int *is_partial) {
+int64 mutex_workqueue_popresult(int *iovec_entries, struct iovec **iovec, int *is_partial) {
   struct ot_task **task;
   int64            sock = -1;
 
@@ -254,7 +254,7 @@ int64 mutex_workqueue_popresult(size_t *iovec_entries, struct iovec **iovec, int
 }
 
 void mutex_init() {
-  size_t i;
+  int i;
   pthread_mutex_init(&tasklist_mutex, NULL);
   pthread_cond_init(&tasklist_being_filled, NULL);
   for (i = 0; i < OT_BUCKET_COUNT; ++i)
@@ -263,7 +263,7 @@ void mutex_init() {
 }
 
 void mutex_deinit() {
-  size_t i;
+  int i;
   for (i = 0; i < OT_BUCKET_COUNT; ++i)
     pthread_mutex_destroy(bucket_mutex + i);
   pthread_mutex_destroy(&tasklist_mutex);

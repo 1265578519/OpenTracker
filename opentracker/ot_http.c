@@ -32,7 +32,7 @@
 #include "trackerlogic.h"
 
 #ifdef WANT_NO_AUTO_FREE
-#define OT_IOB_INIT(B) (bzero(B, sizeof(io_batch)), 0)
+#define OT_IOB_INIT(B) bzero(B, sizeof(io_batch))
 #else
 #define OT_IOB_INIT(B) iob_init_autofree(B, 0)
 #endif
@@ -88,15 +88,7 @@ static void http_senddata(const int64 sock, struct ot_workstruct *ws) {
     memcpy(outbuf, ws->reply + written_size, ws->reply_size - written_size);
     if (!cookie->batch) {
       cookie->batch = malloc(sizeof(io_batch));
-      if (!cookie->batch || OT_IOB_INIT(cookie->batch) == -1) {
-        free(cookie->batch);
-        free(outbuf);
-        array_reset(&cookie->request);
-        free(cookie);
-        io_close(sock);
-        return;
-      }
-
+      OT_IOB_INIT(cookie->batch);
       cookie->batches = 1;
     }
 
@@ -141,12 +133,13 @@ ssize_t http_issue_error(const int64 sock, struct ot_workstruct *ws, int code) {
   return ws->reply_size = -2;
 }
 
-ssize_t http_sendiovecdata(const int64 sock, struct ot_workstruct *ws, size_t iovec_entries, struct iovec *iovector, int is_partial) {
+ssize_t http_sendiovecdata(const int64 sock, struct ot_workstruct *ws, int iovec_entries, struct iovec *iovector, int is_partial) {
   struct http_data *cookie = io_getcookie(sock);
   io_batch         *current;
   char             *header;
   const char       *encoding = "";
-  size_t            i, header_size, size = iovec_length(&iovec_entries, (const struct iovec **)&iovector);
+  int               i;
+  size_t            header_size, size = iovec_length(&iovec_entries, (const struct iovec **)&iovector);
   tai6464           t;
 
   /* No cookie? Bad socket. Leave. */
@@ -190,26 +183,26 @@ ssize_t http_sendiovecdata(const int64 sock, struct ot_workstruct *ws, size_t io
 
     if (!cookie->batch) {
       cookie->batch = malloc(sizeof(io_batch));
-      if (!cookie->batch || OT_IOB_INIT(cookie->batch) == -1) {
-        free(cookie->batch);
+      if (!cookie->batch) {
         free(header);
         iovec_free(&iovec_entries, &iovector);
         HTTPERROR_500;
       }
+      OT_IOB_INIT(cookie->batch);
       cookie->batches = 1;
     }
     current = cookie->batch + cookie->batches - 1;
     iob_addbuf_free(current, header, header_size);
 
     /* Split huge iovectors into separate io_batches */
-    for (i = 0; i < (size_t)iovec_entries; ++i) {
+    for (i = 0; i < iovec_entries; ++i) {
       /* If the current batch's limit is reached, try to reallocate a new batch to work on */
       if (current->bytesleft > OT_BATCH_LIMIT) {
         io_batch *new_batch = realloc(cookie->batch, (cookie->batches + 1) * sizeof(io_batch));
         if (new_batch) {
           cookie->batch = new_batch;
-          if (OT_IOB_INIT(current) != -1)
-            current = cookie->batch + cookie->batches++;
+          current       = cookie->batch + cookie->batches++;
+          OT_IOB_INIT(current);
         }
       }
       iob_addbuf_free(current, iovector[i].iov_base, iovector[i].iov_len);
@@ -425,9 +418,8 @@ static ssize_t http_handle_fullscrape(const int64 sock, struct ot_workstruct *ws
 static ssize_t http_handle_scrape(const int64 sock, struct ot_workstruct *ws, char *read_ptr) {
   static const ot_keywords keywords_scrape[] = {{"info_hash", 1}, {NULL, -3}};
 
-  ot_hash *multiscrape_buf   = (ot_hash *)ws->request;
-  int      scanon = 1;
-  size_t   numwant = 0;
+  ot_hash                 *multiscrape_buf   = (ot_hash *)ws->request;
+  int                      scanon = 1, numwant = 0;
 
   /* This is to hack around stupid clients that send "scrape ?info_hash" */
   if (read_ptr[-1] != '?') {
@@ -502,8 +494,7 @@ static ot_keywords keywords_announce[] = {{"port", 1},    {"left", 2}, {"event",
                                           {"peer_id", 9}, {NULL, -3}};
 static ot_keywords keywords_announce_event[] = {{"completed", 1}, {"stopped", 2}, {NULL, -3}};
 static ssize_t     http_handle_announce(const int64 sock, struct ot_workstruct *ws, char *read_ptr) {
-  size_t            numwant;
-  int               tmp, scanon;
+  int               numwant, tmp, scanon;
   unsigned short    port = 0;
   char             *write_ptr;
   ssize_t           len;
@@ -579,13 +570,12 @@ static ssize_t     http_handle_announce(const int64 sock, struct ot_workstruct *
       break;
     case 4: /* matched "numwant" */
       len = scan_urlencoded_query(&read_ptr, write_ptr = read_ptr, SCAN_SEARCHPATH_VALUE);
-      if ((len <= 0) || scan_fixed_int(write_ptr, len, &tmp))
+      if ((len <= 0) || scan_fixed_int(write_ptr, len, &numwant))
         HTTPERROR_400_PARAM;
-      if (tmp < 0)
-        tmp = 400;
-      if (tmp > 0)
-        tmp = 400;
-      numwant = tmp;
+      if (numwant < 0)
+        numwant = 400;
+      if (numwant > 0)
+        numwant = 400;
       break;
     case 5: /* matched "compact" */
       len = scan_urlencoded_query(&read_ptr, write_ptr = read_ptr, SCAN_SEARCHPATH_VALUE);

@@ -43,11 +43,6 @@ char               *g_redirecturl;
 uint32_t            g_tracker_id;
 volatile int        g_opentracker_running = 1;
 int                 g_self_pipe[2];
-#ifdef WANT_LIMIT_PEERS
-size_t              g_minimal_population_allowance = 10; /* TODO tweakable */
-size_t              g_global_peer_limit = 1000000000;
-size_t              g_global_peer_watermark = 700000000;
-#endif
 
 static char        *g_serverdir;
 static char        *g_serveruser;
@@ -286,8 +281,7 @@ static void *server_mainloop(void *args) {
   struct ot_workstruct ws;
   time_t               next_timeout_check = g_now_seconds + OT_CLIENT_TIMEOUT_CHECKINTERVAL;
   struct iovec        *iovector;
-  size_t               iovec_entries;
-  int                  is_partial;
+  int                  iovec_entries, is_partial;
 
   (void)args;
 
@@ -450,7 +444,7 @@ int parse_configfile(char *config_filename) {
 #if defined(WANT_RESTRICT_STATS) || defined(WANT_IP_FROM_PROXY) || defined(WANT_SYNC_LIVE)
   ot_net tmpnet;
 #endif
-  int bound = 0;
+  int bound             = 0;
 
   accesslist_filehandle = fopen(config_filename, "r");
 
@@ -481,16 +475,6 @@ int parse_configfile(char *config_filename) {
       set_config_option(&g_serverdir, p + 16);
     } else if (!byte_diff(p, 12, "tracker.user") && isspace(p[12])) {
       set_config_option(&g_serveruser, p + 13);
-#ifdef WANT_LIMIT_PEERS
-    } else if (!byte_diff(p, 17, "tracker.max_peers") && isspace(p[17])) {
-      unsigned int tmp;
-      char *value = p + 17;
-      while (isspace(*value))
-        ++value;
-      scan_uint(value, &tmp);
-      g_global_peer_limit = tmp;
-      g_global_peer_watermark = (size_t)(0.7 * (double)tmp);
-#endif
     } else if (!byte_diff(p, 14, "listen.tcp_udp") && isspace(p[14])) {
       uint16_t tmpport = 6969;
       if (!scan_ip6_port(p + 15, tmpip, &tmpport))
@@ -582,15 +566,15 @@ void load_state(const char *const state_filename) {
 
   /* We do ignore anything that is not of the form "^[:xdigit:]:\d+:\d+" */
   while (fgets(inbuf, sizeof(inbuf), state_filehandle)) {
-    size_t i;
-    for (i = 0; i < sizeof(ot_hash); ++i) {
+    int i;
+    for (i = 0; i < (int)sizeof(ot_hash); ++i) {
       int eger = 16 * scan_fromhex(inbuf[2 * i]) + scan_fromhex(inbuf[1 + 2 * i]);
       if (eger < 0)
         continue;
       infohash[i] = eger;
     }
 
-    if (i != sizeof(ot_hash))
+    if (i != (int)sizeof(ot_hash))
       continue;
     i *= 2;
 

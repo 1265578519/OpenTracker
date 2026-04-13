@@ -149,8 +149,8 @@ static char * fullscrape_write_one( ot_tasktype mode, char *r, ot_torrent *torre
 }
 
 static void fullscrape_make(int taskid, ot_tasktype mode) {
-  size_t bucket;
-  char  *r, *re;
+  int          bucket;
+  char        *r, *re;
   struct iovec iovector = {NULL, 0};
 
   /* Setup return vector... */
@@ -212,7 +212,7 @@ static void fullscrape_make(int taskid, ot_tasktype mode) {
 #ifdef WANT_COMPRESSION_GZIP
 
 static void fullscrape_make_gzip(int taskid, ot_tasktype mode) {
-  size_t       bucket;
+  int          bucket;
   char        *r;
   struct iovec iovector = {NULL, 0};
   int          zres;

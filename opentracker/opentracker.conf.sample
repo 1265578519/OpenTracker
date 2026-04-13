@@ -175,9 +175,3 @@ access.proxy 2c0f:f248::/32
 #      redirect to another location (shell option -r).
 #
 # tracker.redirect_url https://your.tracker.local/
-
-# VII) Max number of peers allowed in memory. DO NOT set this to 0.
-#      - Process Memory: Each 1000000 peers use ~85MB.
-#      - Total System Memory (including TCP stack): Each 1000000 peers use ~128MB (avg. 134 bytes/peer).
-#      A limit of 3000000 peers keeps the total system memory usage around 400MB.
-# tracker.max_peers 3000000
