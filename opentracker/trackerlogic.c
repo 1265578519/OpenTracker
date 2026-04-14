@@ -30,11 +30,6 @@
 #include "ot_vector.h"
 #include "trackerlogic.h"
 
-#ifdef WANT_MAX_PEER
-/* max_peer_count */
-size_t max_peer_count = 0;
-#endif
-
 /* Forward declaration */
 size_t return_peers_for_torrent(struct ot_workstruct *ws, ot_torrent *torrent, size_t amount, char *reply, PROTO_FLAG proto);
 
@@ -127,13 +122,6 @@ size_t add_peer_to_torrent_and_return_peers(PROTO_FLAG proto, struct ot_workstru
   peer_list = peer_size == OT_PEER_SIZE6 ? torrent->peer_list6 : torrent->peer_list4;
 
   /* Check for peer in torrent */
-#ifdef WANT_MAX_PEER
-  if ( (OT_MAX_PEER > 0 && max_peer_count >= OT_MAX_PEER) || (peer_list->peer_count >= OT_MAX_TORRENT_PEER) ) {
-    ws->reply_size = return_peers_for_torrent(ws, torrent, amount, ws->reply, proto);
-    mutex_bucket_unlock_by_hash(*ws->hash, delta_torrentcount);
-    return ws->reply_size;
-  }
-#endif
   peer_dest = vector_find_or_insert_peer(&(peer_list->peers), peer_src, peer_size, &exactmatch);
   if (!peer_dest) {
     mutex_bucket_unlock_by_hash(*ws->hash, delta_torrentcount);
@@ -158,9 +146,6 @@ size_t add_peer_to_torrent_and_return_peers(PROTO_FLAG proto, struct ot_workstru
 #endif
 
     peer_list->peer_count++;
-#ifdef WANT_MAX_PEER
-    max_peer_count++;
-#endif
     if (OT_PEERFLAG(ws->peer) & PEER_FLAG_COMPLETED) {
       peer_list->down_count++;
       stats_issue_event(EVENT_COMPLETED, 0, (uintptr_t)ws);
@@ -299,9 +284,6 @@ static size_t return_peers_for_torrent_udp(struct ot_workstruct *ws, ot_torrent 
   if (amount > peer_list->peer_count)
     amount = peer_list->peer_count;
 
-  if ( peer_list->peer_count > OT_INTERVAL_PEER )
-  *(uint32_t *)(r + 0)  = htonl(OT_CLIENT_REQUEST_INTERVAL_RANDOM2);
-  else
   *(uint32_t *)(r + 0)  = htonl(OT_CLIENT_REQUEST_INTERVAL_RANDOM);
   *(uint32_t *)(r + 4)  = htonl(peer_count - seed_count);
   *(uint32_t *)(r + 8)  = htonl(seed_count);
@@ -318,13 +300,7 @@ static size_t return_peers_for_torrent_udp(struct ot_workstruct *ws, ot_torrent 
 
 static size_t return_peers_for_torrent_tcp(struct ot_workstruct *ws, ot_torrent *torrent, size_t amount, char *reply) {
   char  *r          = reply;
-  size_t       peer_size  = peer_size_from_peer6(&ws->peer);
-  ot_peerlist *peer_list  = peer_size == OT_PEER_SIZE6 ? torrent->peer_list6 : torrent->peer_list4;
-  int erval; 
-  if ( peer_list->peer_count > OT_INTERVAL_PEER )
-    erval = OT_CLIENT_REQUEST_INTERVAL_RANDOM2;
-  else
-    erval = OT_CLIENT_REQUEST_INTERVAL_RANDOM;
+  int    erval      = OT_CLIENT_REQUEST_INTERVAL_RANDOM;
   size_t seed_count = torrent->peer_list6->seed_count + torrent->peer_list4->seed_count;
   size_t down_count = torrent->peer_list6->down_count + torrent->peer_list4->down_count;
   size_t peer_count = torrent->peer_list6->peer_count + torrent->peer_list4->peer_count - seed_count;
@@ -486,9 +462,6 @@ size_t remove_peer_from_torrent(PROTO_FLAG proto, struct ot_workstruct *ws) {
       peer_list->seed_count--; /* Intentional fallthrough */
     case 1:
       peer_list->peer_count--; /* Intentional fallthrough */
-#ifdef WANT_MAX_PEER
-      max_peer_count--;
-#endif
     default:
       break;
     }
