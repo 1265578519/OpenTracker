@@ -75,9 +75,6 @@ int clean_single_peer_list(ot_peerlist *peer_list, size_t peer_size) {
   while (num_buckets--) {
     size_t removed_peers   = clean_single_bucket(peer_vector->data, peer_vector->size, peer_size, timedout, &removed_seeders);
     peer_list->peer_count -= removed_peers;
-#ifdef WANT_MAX_PEER
-    max_peer_count        -= removed_peers;
-#endif
     peer_vector->size     -= removed_peers;
     if (removed_peers)
       vector_fixup_peers(peer_vector, peer_size);
