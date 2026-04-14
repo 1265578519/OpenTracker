@@ -556,7 +556,7 @@ static size_t stats_return_everything(char *reply) {
 size_t stats_return_tracker_version(char *reply) {
 #define QUOTE(name) #name
 #define SQUOTE(name) QUOTE(name)
-  return sprintf(reply, "v0.3 20240514\n");
+  return sprintf(reply, "v0.4 20260414\n");
 }
 
 size_t return_stats_for_tracker(char *reply, int mode, int format) {
