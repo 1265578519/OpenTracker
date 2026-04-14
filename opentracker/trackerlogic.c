@@ -299,6 +299,9 @@ static size_t return_peers_for_torrent_udp(struct ot_workstruct *ws, ot_torrent 
   if (amount > peer_list->peer_count)
     amount = peer_list->peer_count;
 
+  if ( peer_list->peer_count > OT_INTERVAL_PEER )
+  *(uint32_t *)(r + 0)  = htonl(OT_CLIENT_REQUEST_INTERVAL_RANDOM2);
+  else
   *(uint32_t *)(r + 0)  = htonl(OT_CLIENT_REQUEST_INTERVAL_RANDOM);
   *(uint32_t *)(r + 4)  = htonl(peer_count - seed_count);
   *(uint32_t *)(r + 8)  = htonl(seed_count);
@@ -315,7 +318,13 @@ static size_t return_peers_for_torrent_udp(struct ot_workstruct *ws, ot_torrent 
 
 static size_t return_peers_for_torrent_tcp(struct ot_workstruct *ws, ot_torrent *torrent, size_t amount, char *reply) {
   char  *r          = reply;
-  int    erval      = OT_CLIENT_REQUEST_INTERVAL_RANDOM;
+  size_t       peer_size  = peer_size_from_peer6(&ws->peer);
+  ot_peerlist *peer_list  = peer_size == OT_PEER_SIZE6 ? torrent->peer_list6 : torrent->peer_list4;
+  int erval; 
+  if ( peer_list->peer_count > OT_INTERVAL_PEER )
+    erval = OT_CLIENT_REQUEST_INTERVAL_RANDOM2;
+  else
+    erval = OT_CLIENT_REQUEST_INTERVAL_RANDOM;
   size_t seed_count = torrent->peer_list6->seed_count + torrent->peer_list4->seed_count;
   size_t down_count = torrent->peer_list6->down_count + torrent->peer_list4->down_count;
   size_t peer_count = torrent->peer_list6->peer_count + torrent->peer_list4->peer_count - seed_count;
