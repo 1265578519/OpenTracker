@@ -319,7 +319,7 @@ static size_t return_peers_for_torrent_udp(struct ot_workstruct *ws, ot_torrent 
 static size_t return_peers_for_torrent_tcp(struct ot_workstruct *ws, ot_torrent *torrent, size_t amount, char *reply) {
   char  *r          = reply;
   int erval; 
-  if ( peer_list->peer_count > OT_INTERVAL_PEER )
+  if ( torrent->peer_list4->peer_count > OT_INTERVAL_PEER )
     erval = OT_CLIENT_REQUEST_INTERVAL_RANDOM2;
   else
     erval = OT_CLIENT_REQUEST_INTERVAL_RANDOM;
