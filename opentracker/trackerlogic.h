@@ -77,10 +77,6 @@ typedef struct {
 extern size_t max_peer_count;
 #define OT_MAX_PEER                    5000000
 #define OT_MAX_TORRENT_PEER            400
-#define OT_FRIDGE_PEER                 1000000
-#define OT_FRIDGE_TORRENT_PEER         2
-/* Auto calculate fridge the peer value 5000000 - 1000000 */
-#define OT_FRIDGE_PEER_CAPACITY        (OT_MAX_PEER - OT_FRIDGE_PEER)
 #endif
 
 /* We maintain a list of 1024 pointers to sorted list of ot_torrent structs
