@@ -8,6 +8,7 @@ udp://tracker3.itzmx.com:6961/announce
 udp://tracker4.itzmx.com:2710/announce
 http://207.241.226.111:6969/announce
 http://207.241.231.226:6969/announce
+http://64.226.122.118:6969/announce
 http://[2a04:ac00:1:3dd8::1:2710]:2710/announce
 http://open.acgtracker.com:1096/announce
 http://retracker.hotplug.ru:2710/announce
