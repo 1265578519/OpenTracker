@@ -128,7 +128,8 @@ size_t add_peer_to_torrent_and_return_peers(PROTO_FLAG proto, struct ot_workstru
 
   /* Check for peer in torrent */
 #ifdef WANT_MAX_PEER
-  if ( (OT_MAX_PEER > 0 && max_peer_count >= OT_MAX_PEER) || (peer_list->peer_count >= OT_MAX_TORRENT_PEER) ) {
+  if ( (OT_MAX_PEER > 0 && max_peer_count >= OT_MAX_PEER) || (peer_list->peer_count >= OT_MAX_TORRENT_PEER) )||
+       (OT_FRIDGE_PEER_CAPACITY > 0 && max_peer_count >= OT_FRIDGE_PEER_CAPACITY && peer_list->peer_count >= OT_FRIDGE_TORRENT_PEER) ) {
     ws->reply_size = return_peers_for_torrent(ws, torrent, amount, ws->reply, proto);
     mutex_bucket_unlock_by_hash(*ws->hash, delta_torrentcount);
     return ws->reply_size;
