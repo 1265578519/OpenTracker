@@ -191,23 +191,38 @@ ulimit -n 1048576
 echo "* soft nofile 1048576" >> /etc/security/limits.conf
 echo "* hard nofile 1048576" >> /etc/security/limits.conf
 ```
+
 2.ksoftirqd内核进程占用高CPU的优化，禁用防火墙和确认lsmod中不存在加载nf驱动模块
 centos7关闭防火墙并且禁用nf驱动模块，对于其它系统的关闭方法请使用搜索引擎
 ```
 yum -y install iptables-services;service ip6tables stop;chkconfig ip6tables off;service iptables stop;chkconfig iptables off;systemctl stop firewalld;systemctl disable firewalld
 ```
 关闭防火墙后，通过 lsmod 指令确认驱动模块加载情况，不能有包含"nf"开头的模块
+
 3.如果使用ipv6网络，需要设置最大连接数，默认值4096，改为最大值不限制
 ```
 echo "net.ipv6.route.max_size = 2147483647" >> /etc/sysctl.conf
 ```
 然后执行 /sbin/sysctl -p 让参数生效
+
 4.给予更多的socket端口号，默认值4096，1G内存设置为100000，这个对访问影响不大一般来说可以保持默认值
 ```
 echo "net.ipv4.tcp_max_orphans = 100000" >> /etc/sysctl.conf
 echo "net.ipv4.tcp_orphan_retries = 3" >> /etc/sysctl.conf
 ```
 然后执行 /sbin/sysctl -p 让参数生效
+
+5.如果提供udp tracker，那么分配更多大的socket缓存有利于减少RcvbufErrors丢包率
+```
+echo "net.core.rmem_max = 67108864" >> /etc/sysctl.conf
+echo "net.core.wmem_max = 67108864" >> /etc/sysctl.conf
+echo "net.core.rmem_default = 33554432" >> /etc/sysctl.conf
+echo "net.core.wmem_default = 33554432" >> /etc/sysctl.conf
+echo "net.ipv4.ipfrag_low_thresh = 1" >> /etc/sysctl.conf
+echo "net.ipv4.ipfrag_high_thresh = 1" >> /etc/sysctl.conf
+```
+然后执行 /sbin/sysctl -p 让参数生效（需要重启当前运行的进程来获取新的值）
+
 以上优化中打开文件和防火墙关闭禁用nf驱动模块最为重要，对于防火墙给予了lsmod查看办法，下面这是确认打开文件设置成功的查看办法
 根据软件的pid进行排序显示
 ```
