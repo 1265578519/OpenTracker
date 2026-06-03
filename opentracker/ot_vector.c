@@ -96,6 +96,10 @@ ot_peer *vector_find_or_insert_peer(ot_vector *vector, ot_peer const *peer, size
   if (*exactmatch)
     return match;
 
+  /* Enforce per-bucket peer limit to prevent unbounded memory growth */
+  if (vector->size >= OT_VECTOR_MAX_PEERS)
+    return NULL;
+
   /* This is the amount of bytes that needs to be pushed backwards by peer_size bytes to make room for new peer */
   end          = (ot_peer *)vector->data + vector->size * peer_size;
   match_to_end = end - match;
@@ -205,10 +209,9 @@ void vector_redistribute_buckets(ot_peerlist *peer_list, size_t peer_size) {
     return;
 
   /* Assume near perfect distribution */
-  bucket_list_new = malloc(num_buckets_new * sizeof(ot_vector));
+  bucket_list_new = calloc(num_buckets_new, sizeof(ot_vector));
   if (!bucket_list_new)
     return;
-  bzero(bucket_list_new, num_buckets_new * sizeof(ot_vector));
 
   tmp             = peer_list->peer_count / num_buckets_new;
   bucket_size_new = OT_VECTOR_MIN_MEMBERS;
@@ -218,7 +221,7 @@ void vector_redistribute_buckets(ot_peerlist *peer_list, size_t peer_size) {
   /* preallocate vectors to hold all peers */
   for (bucket = 0; bucket < num_buckets_new; ++bucket) {
     bucket_list_new[bucket].space = bucket_size_new;
-    bucket_list_new[bucket].data  = malloc(bucket_size_new * peer_size);
+    bucket_list_new[bucket].data  = calloc(bucket_size_new, peer_size);
     if (!bucket_list_new[bucket].data)
       return vector_clean_list(bucket_list_new, num_buckets_new);
   }
