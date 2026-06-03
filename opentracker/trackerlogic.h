@@ -41,7 +41,7 @@ typedef struct {
 #define OT_CLIENT_TIMEOUT_CHECKINTERVAL 10
 #define OT_CLIENT_TIMEOUT_SEND          (60 * 30)
 #define OT_CLIENT_REQUEST_INTERVAL      (60 * 120)
-#define OT_INTERVAL_PEER                25
+#define OT_INTERVAL_PEER                2
 #define OT_CLIENT_REQUEST_INTERVAL2     (60 * 176)
 #define OT_CLIENT_REQUEST_VARIATION     (60 * 6)
 
@@ -78,7 +78,7 @@ extern size_t max_peer_count;
 #define OT_MAX_PEER                    3000000
 #define OT_MAX_TORRENT_PEER            400
 #define OT_FRIDGE_PEER                 1000000
-#define OT_FRIDGE_TORRENT_PEER         24
+#define OT_FRIDGE_TORRENT_PEER         8
 /* Auto calculate fridge the peer value 3000000 - 1000000 */
 #define OT_FRIDGE_PEER_CAPACITY        (OT_MAX_PEER - OT_FRIDGE_PEER)
 #endif
