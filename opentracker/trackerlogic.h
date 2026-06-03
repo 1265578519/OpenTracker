@@ -41,7 +41,7 @@ typedef struct {
 #define OT_CLIENT_TIMEOUT_CHECKINTERVAL 10
 #define OT_CLIENT_TIMEOUT_SEND          (60 * 30)
 #define OT_CLIENT_REQUEST_INTERVAL      (60 * 120)
-#define OT_INTERVAL_PEER                50
+#define OT_INTERVAL_PEER                4
 #define OT_CLIENT_REQUEST_INTERVAL2     (60 * 176)
 #define OT_CLIENT_REQUEST_VARIATION     (60 * 6)
 
