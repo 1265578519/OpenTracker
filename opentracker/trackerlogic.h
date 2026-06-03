@@ -78,7 +78,7 @@ extern size_t max_peer_count;
 #define OT_MAX_PEER                    4000000
 #define OT_MAX_TORRENT_PEER            400
 #define OT_FRIDGE_PEER                 1000000
-#define OT_FRIDGE_TORRENT_PEER         20
+#define OT_FRIDGE_TORRENT_PEER         8
 /* Auto calculate fridge the peer value 4000000 - 1000000 */
 #define OT_FRIDGE_PEER_CAPACITY        (OT_MAX_PEER - OT_FRIDGE_PEER)
 #endif
