@@ -1,0 +1,20 @@
+.TH scan_asn1dertag 3
+.SH NAME
+scan_asn1dertag \- decode an unsigned integer from ASN.1 DER length encoding
+.SH SYNTAX
+.B #include <libowfat/scan.h>
+
+size_t \fBscan_asn1dertag\fP(const char *\fIsrc\fR,size_t \fIlen\fR,unsigned long long *\fIdest\fR);
+.SH DESCRIPTION
+scan_asn1dertag decodes an unsigned integer in ASN.1 DER tag encoding
+from a memory area holding binary data.  It writes the decode value in
+\fIdest\fR and returns the number of bytes it read from \fIsrc\fR.
+
+scan_asn1dertag never reads more than \fIlen\fR bytes from \fIsrc\fR.  If the
+sequence is longer than that, or the memory area contains an invalid
+sequence, scan_asn1dertag returns 0 and does not touch \fIdest\fR.
+
+The length of the longest ASN.1 DER length sequence is 128 bytes.  In
+practice the largest sequence is sizeof(*dest)+1.
+.SH "SEE ALSO"
+fmt_asn1dertag(3)

@@ -1,0 +1,19 @@
+.TH fmt_asn1derlength 3
+.SH NAME
+fmt_asn1derlength \- encode unsigned integer like ASN.1 DER length
+.SH SYNTAX
+.B #include <libowfat/fmt.h>
+
+size_t \fBfmt_asn1derlength\fP(char *\fIdest\fR,unsigned long long \fIsource\fR);
+.SH DESCRIPTION
+fmt_asn1derlength encodes an unsigned integer using the ASN.1 DER
+for encoding tag lengths.  This can take from 1 byte (0-0x7f) up to
+sizeof(source)+1 bytes.
+
+If \fIdest\fR equals FMT_LEN (i.e. is NULL), fmt_asn1derlength returns the
+number of bytes it would have written.
+
+For convenience, fmt.h defines the integer FMT_ASN1LENGTH to be big
+enough to contain every possible fmt_asn1derlength output.
+.SH "SEE ALSO"
+scan_asn1derlength(3)

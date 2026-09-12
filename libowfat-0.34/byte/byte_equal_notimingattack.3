@@ -1,0 +1,17 @@
+.TH byte_equal_notimingattack 3
+.SH NAME
+byte_equal_notimingattack \- compare two strings
+.SH SYNTAX
+.B #include <libowfat/byte.h>
+
+int \fBbyte_equal_notimingattack\fP(const char *\fIone\fR,size_t \fIlen\fR,const char *\fItwo\fR);
+.SH DESCRIPTION
+\fIbyte_equal_notimingattack\fR returns 1 if the strings are equal, 0 otherwise.
+
+When the strings are different, byte_equal_notimingattack will still
+read and compare all the other bytes. That way, an attacker observing
+the timing of the execution can not learn where the first mismatch
+occurred.
+
+.SH "SEE ALSO"
+byte_diff(3), byte_equal(3)

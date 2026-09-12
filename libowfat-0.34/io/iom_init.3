@@ -1,0 +1,30 @@
+.TH iom_init 3
+.SH NAME
+iom_init \- create new I/O multiplexer
+.SH SYNTAX
+.B #include <libowfat/io.h>
+
+int \fBiom_init\fP(iomux_t* c);
+.SH DESCRIPTION
+iom_init initializes an I/O multiplexer.
+
+An I/O multiplexer is a context that can be used to do I/O multiplexing
+with support for multiple threads. Add events to a multiplexer using
+\fIiom_add\fR, and then get the next available event with
+\fIiom_wait\fR. If you are done and want to signal all the threads
+something, set a volatile global variable to tell the threads to stop
+and then fall \fIiom_abort\fR to tell all pending iom_wait operations in
+all threads to return immediately.
+
+After \fIiom_init\fR is done, \fIiom_add\fR and \fIiom_wait\fR can be
+called from different threads on the same context, and they will
+synchronize internally.
+
+.SH "LINKING"
+You may have to add \fI-lpthread\fR to the command line in the linking
+step.
+
+.SH "RETURN VALUE"
+iom_init returns 0 on success and -1 on error, setting errno.
+.SH "SEE ALSO"
+iom_add, iom_wait, iom_abort

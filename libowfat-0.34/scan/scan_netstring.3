@@ -1,0 +1,27 @@
+.TH scan_netstring 3
+.SH NAME
+scan_netstring \- parse a netstring
+.SH SYNTAX
+.B #include <libowfat/scan.h>
+
+size_t \fBscan_netstring\fP(const char *\fIin\fR,size_t len,char** \fIdest\fR, size_t *\fIslen\fR);
+.SH DESCRIPTION
+scan_netstring attempts to parse the netstring in the input buffer
+(in,len). If the buffer contains a valid netstring, then (*dest,*slen)
+is set to the start and length of the transported string.
+
+Note that this string is not zero terminated. No copy is made.
+scan_netstring points it inside the input buffer.
+.SH "RETURN VALUE"
+scan_netstring returns the number of bytes in the netstring (the outer
+representation, not the transported inner string) if parsing worked, or
+0 if the input buffer did not contain a valid (or full) netstring.
+
+.SH EXAMPLE
+The raw memory buffer "foo" would become the netstring "3:foo,"
+.SH SPEC
+http://cr.yp.to/proto/netstrings.txt
+
+.SH "SEE ALSO"
+fmt_netstring(3)
+

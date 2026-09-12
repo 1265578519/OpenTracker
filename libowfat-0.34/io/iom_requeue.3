@@ -1,0 +1,35 @@
+.TH iom_requeue 3
+.SH NAME
+iom_requeue \- re-add event to I/O multiplexer
+.SH SYNTAX
+.B #include <libowfat/io.h>
+
+int \fBiom_requeue\fP(iomux_t* c, int64 fd, unsigned int events);
+.SH DESCRIPTION
+iom_requeue adds an event you are interested in to an I/O multiplexer.
+
+\fIfd\fR is the file descriptor (usually a socket) you are interested
+in, and \fIevents\fR is the operation you want to do. It can be IOM_READ
+or IOM_WRITE.
+
+If that operation becomes possible on that descriptor, \fIiom_wait\fR
+will return and tell you the fd and the event.
+
+Note that the event registration is removed from the iomux_t context if
+it occurs. You will have to call \fIiom_requeue\fR again if you are
+interested in more events for this descriptor. Do this only after you
+are done handling this event, otherwise \fIiom_wait\fR might indicate a
+new event to another thread while this thread is still working on the
+descriptor, leading to unexpected behavior.
+
+Closing a file descriptor with registered events will discard the event
+registration.
+
+.SH "LINKING"
+You may have to add \fI-lpthread\fR to the command line in the linking
+step.
+
+.SH "RETURN VALUE"
+iom_requeue returns 0 on success and -1 on error, setting errno.
+.SH "SEE ALSO"
+iom_init, iom_add, iom_wait, iom_abort

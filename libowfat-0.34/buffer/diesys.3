@@ -1,0 +1,18 @@
+.TH die 3
+.SH NAME
+die \- print warning diagnostic and abort program
+.SH SYNTAX
+.B #include <libowfat/errmsg.h>
+
+void \fBdie\fP(int \fIexitcode\fP, const char *\fImessage\fR, ...);
+.SH DESCRIPTION
+
+\fIdiesys\fP is like \fIdie\fP, but it will also print a string
+representation of the system error code (from errno).
+
+.SH NOTE
+
+This function does not return.
+
+.SH "SEE ALSO"
+errmsg(7), die(3)

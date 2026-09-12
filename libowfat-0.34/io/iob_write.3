@@ -1,0 +1,42 @@
+.TH iob_write 3
+.SH NAME
+iob_write \- send I/O batch through callback
+.SH SYNTAX
+.B #include <libowfat/iob.h>
+
+typedef int64 (*io_write_callback)(int64 s,const void* buf,uint64 n);
+
+int64 \fBiob_write\fR(int64 s,io_batch* b,io_write_callback cb);
+.SH DESCRIPTION
+iob_write sends the (rest of) \fIb\fR through the callback \fIcb\fR,
+passing \fIs\fR as first argument.  \fIcb\fR is expected to behave like
+io_trywrite(2).
+
+This interface is intended to send an I/O batch through a filter, for
+example to encrypt or compress it.  If you just want to send an I/O
+batch to a socket, use iob_send instead.
+
+iob_write returns the number of bytes written, 0 if there were no more
+bytes to be written in the batch, -1 for EAGAIN, or -3 for a permanent
+error (for example "connection reset by peer").
+
+The normal usage pattern is using io_wait to know when a descriptor is
+writable, and then calling iob_write until it returns 0, -1 or -3.
+
+If iob_write returns 0, terminate the loop (everything was written OK).  If it
+returns -1, call io_wait again.  If it returned -3, signal an error.
+
+The callback is supposed to behave like write(2), i.e. return the number
+of bytes written, 0 for EOF, -1 for error (iob_write will return -3
+then).  Return -1 with errno==EAGAIN if using non-blocking I/O when we
+need to wait for the next write event.  iob_write will then return -1.
+
+.SH NOTE
+iob_write will continue to call your callback until it returns an error.
+So if you are in a state machine, for example a web server using this
+for SSL support, make sure to write at most n bytes at a time (e.g. 64k)
+and the next time you are called return -1.  Otherwise iob_write might
+not return until the whole file is served.
+
+.SH "SEE ALSO"
+iob_send(3)

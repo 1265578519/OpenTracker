@@ -1,0 +1,31 @@
+.TH scan_ldapescape 3
+.SH NAME
+scan_ldapescape \- parse LDIF escaped string
+.SH SYNTAX
+.B #include <libowfat/textcode.h>
+
+size_t \fBscan_ldapescape\fP(const char *\fIsrc\fR,char *\fIdest\fR,size_t* \fIdestlen\fR);
+
+.SH DESCRIPTION
+scan_ldapescape parses LDIF escaped text from src into dest.
+Parsing stops at the 0 terminator or invalid input characters.
+
+This function will turn backslash escaped characters into their binary
+equivalent, i.e. \0a to new-line and \5c to backslash.
+
+scan_cescape will then write the number of bytes in dest into *destlen,
+and return the number of bytes decoded from src.
+
+dest can be NULL. destlen can be NULL. dest can be src.
+
+The decoded data need at most as much space as the encoded data used.
+
+.SH "RETURN VALUE"
+scan_ldapescape returns the number of bytes successfully parsed
+from src.
+
+.SH EXAMPLES
+scan_ldapescape("test\5C\\");",buf,&i) -> return 7, i=5, buf="test\\" (C notation).
+
+.SH "SEE ALSO"
+fmt_ldapescape(3), scan_cescape(3), scan_ldapescape(3)

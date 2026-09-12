@@ -1,0 +1,23 @@
+.TH critbit0_insert 3
+.SH NAME
+critbit0_insert \- insert a string into a critbit tree
+.SH SYNTAX
+.B #include <libowfat/critbit.h>
+
+critbit0_tree cb = { 0 };
+
+int \fBcritbit0_insert\fP(critbit0_tree* \fIcb\fR,const char* \fIstr\fR);
+.SH DESCRIPTION
+critbit0_insert attempts to insert a string into a critbit0 tree. For
+this it does not insert a copy of the pointer but makes a copy of the
+whole string.
+If \fIstr\fR is already in \fIcb\fR, critbit0_insert returns 1.
+If \fIstr\fR is not in \fIcb\fR, it is inserted and critbit0_insert
+returns 2.
+If there is a memory allocation failure on the way, critbit0_insert
+leaves \fIcb\fR alone and returns 0.
+.SH "RETURN VALUE"
+2 if the key was inserted, 1 if it was already in cb, 0 on memory
+allocation failure.
+.SH "SEE ALSO"
+critbit0_contains(3)

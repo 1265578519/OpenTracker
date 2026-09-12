@@ -1,0 +1,57 @@
+.TH array_allocate 3
+.SH NAME
+array_allocate \- make sure array has at least n elements allocated
+.SH SYNTAX
+.B #include <libowfat/array.h>
+
+void* \fBarray_allocate\fP(array* \fIx\fR, uint64 \fImembersize\fR, int64 \fIpos\fR);
+
+  array \fIx\fR;
+  int64 \fIpos\fR;
+  \fIt\fR* p = array_allocate(&\fIx\fR,sizeof(\fIt\fR),\fIpos\fR);
+
+.SH DESCRIPTION
+array_allocate makes sure that enough bytes are allocated in \fIx\fR for
+at least \fIpos\fR+1 objects of type \fIt\fR. (The size of \fIt\fR must
+be positive; otherwise the effects are undefined.) If not enough bytes
+are allocated (or \fIx\fR is unallocated), array_allocate allocates more
+bytes, moving the dynamically allocated region if necessary.
+array_allocate often allocates somewhat more bytes than necessary, to
+save time later.
+
+array_allocate then makes sure that the number of bytes initialized
+covers at least those \fIpos\fR+1 objects. If not enough bytes are
+initialized, array_allocate initializes more bytes (setting them to 0),
+up to exactly the end of the \fIpos\fR+1st object.
+
+array_allocate then returns a pointer to the \fIpos\fR+1st object; i.e.,
+object number \fIpos\fR, with objects numbered starting at 0. This
+pointer can be used to change or inspect the object. The pointer can
+continue to be used through subsequent calls to array_get, array_start,
+array_length, and array_bytes, but it must not be used after any other
+operations on this array.
+
+If something goes wrong, array_allocate returns 0, setting \fBerrno\fR
+appropriately, without touching \fIx\fR. In particular, array_allocate
+returns 0 if
+
+.sp 1
+.IP \(bu
+\fIx\fR has failed, or
+.IP \(bu
+\fIpos\fR is negative, or
+.IP \(bu
+not enough memory is available.
+.PP
+
+array_allocate does \fInot\fR change \fIx\fR to have failed; if you want
+to do that, use array_fail.
+
+.SH PERFORMANCE
+This function can call realloc when the array needs to be enlarged.
+Under exceptional circumstances, this can lead to blocking the current thread.
+It will also zero-fill the newly enlarged part of the array, leading to
+all pages being mapped in by the operating system.  If a small array is
+enlarged to a very large array, this can lead to swapping and blocking.
+.SH "SEE ALSO"
+array_get(3), array_start(3), array_fail(3)

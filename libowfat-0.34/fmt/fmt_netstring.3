@@ -1,0 +1,29 @@
+.TH fmt_netstring 3
+.SH NAME
+fmt_netstring \- convert a memory buffer into a netstring
+.SH SYNTAX
+.B #include <libowfat/fmt.h>
+
+size_t \fBfmt_netstring\fP(char *\fIdest\fR,const char *\fIsource\fR,
+                      size_t \fIlen\fR);
+.SH DESCRIPTION
+fmt_netstring creates a netstring from a raw memory buffer and returns
+the length.
+
+fmt_netstring does not append \\0.
+
+If \fIdest\fR equals FMT_LEN (i.e. is zero), fmt_netstring returns the number
+of bytes it would have written.
+.SH "RETURN VALUE"
+fmt_netstring returns the number of bytes written (or that would have
+been written, had the destination pointer not pointed to NULL).
+
+If the input buffer is implausibly large, fmt_netstring returns 0
+instead.
+.SH EXAMPLE
+The raw memory buffer "foo" would become the netstring "3:foo,"
+.SH SPEC
+http://cr.yp.to/proto/netstrings.txt
+
+.SH "SEE ALSO"
+scan_netstring(3)

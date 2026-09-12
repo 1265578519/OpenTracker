@@ -1,0 +1,31 @@
+.TH socket_accept4_makenonblocking_setcloseonexec 3
+.SH NAME
+socket_accept4_makenonblocking_setcloseonexec \- accept an IPv4 TCP connection on a socket and set it to non-blocking I/O and close-on-exec
+.nSH SYNTAX
+.B #include <libowfat/socket.h>
+
+int \fBsocket_accept4_makenonblocking_setcloseonexec\fP(int \fIs\fR,char \fIip\fR[4],uint16 *\fIport\fR);
+.SH DESCRIPTION
+This is functionally equivalent to calling \fIsocket_accept4\fR and then
+calling \fIndelay_on\fR and \fIio_tcloseonexec\fR on the returned socket.
+
+However, if may save a syscall or two and in the process avoid a race
+condition.
+
+.SH EXAMPLE
+  #include <libowfat/socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[4];
+  uint16 \fIp\fR;
+
+  \fIs\fR = socket_tcp4();
+  socket_bind4(s,ip,p);
+  socket_listen(s,16);
+  socket_accept4_makenonblocking_setcloseonexec(s,ip,&p);
+
+.SH "SEE ALSO"
+socket_accept4(3), socket_connected(3),
+socket_accept4_makenonblocking(3),
+socket_accept4_setcloseonexec(3),
+socket_accept6_makenonblocking_setcloseonexec(3)

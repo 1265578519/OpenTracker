@@ -1,0 +1,19 @@
+.TH byte_equal 3
+.SH NAME
+byte_equal \- compare two strings
+.SH SYNTAX
+.B #include <libowfat/byte.h>
+
+int \fBbyte_equal\fP(const char *\fIone\fR,size_t \fIlen\fR,const char *\fItwo\fR);
+.SH DESCRIPTION
+\fIbyte_equal\fR returns 1 if the strings are equal, 0 otherwise.
+
+When the strings are different, byte_equal does not read bytes past the
+first difference. An attacker observing the execution timing can thus
+learn where the first mismatch happened.
+
+Use byte_equal_notimingattack to compare keys, passphrases, cookies or
+hashes instead.
+
+.SH "SEE ALSO"
+byte_diff(3), byte_equal_notimingattack(3)

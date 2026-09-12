@@ -1,0 +1,25 @@
+.TH iob_init 3
+.SH NAME
+iob_init \- initialize new I/O batch
+.SH SYNTAX
+.B #include <libowfat/iob.h>
+
+int \fBiob_init\fP(io_batch* b,size_t hint_entries);
+.SH DESCRIPTION
+iob_init initializes \fI*b\fR with enough space allocated for
+\fIhint_entries\fR entries (buffers or files). This is purely a
+performance hint, if you are unsure just pass 1.
+
+You can add buffers, strings and files to an I/O batch and then send it
+all at once using iob_send.
+
+The benefit of the I/O batch API is that it exploits platform specific
+APIs like FreeBSD's sendfile.  The file contents will always be sent in
+a way that allows the operating systems to perform zero copy TCP, and
+the buffers will always be sent using as few syscalls as possible and
+avoiding unnecessary copying (using writev).
+.SH "RETURN VALUE"
+iob_init returns 0 on success. If there was a memory allocation error,
+it returns -1 instead.
+.SH "SEE ALSO"
+iob_new(3), iob_init_autofree(3), iob_reset(3), iob_send(3), iob_addbuf(3), iob_adds_free(3), iob_addfile(3)

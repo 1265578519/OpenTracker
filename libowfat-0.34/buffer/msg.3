@@ -1,0 +1,20 @@
+.TH msg 3
+.SH NAME
+msg \- print diagnostic
+.SH SYNTAX
+.B #include <libowfat/errmsg.h>
+
+void \fBmsg\fP(const char *\fImessage\fR, ...);
+.SH DESCRIPTION
+
+If \fIerrmsg_iam\fP was called to set the program name, \fImsg\fP will
+first print that program name and a colon.
+
+\fImsg\fP will print all its arguments to stdout (fd #1).
+
+It does not synchronize with any other output method.
+
+If you have unflushed data in \fIbuffer_1\fP, it will stay there.
+
+.SH "SEE ALSO"
+errmsg(7), buffer_flush(3)

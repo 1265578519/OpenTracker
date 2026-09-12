@@ -1,0 +1,14 @@
+.TH carpsys 3
+.SH NAME
+carp \- print warning diagnostic
+.SH SYNTAX
+.B #include <libowfat/errmsg.h>
+
+void \fBcarpsys\fP(const char *\fImessage\fR, ...);
+.SH DESCRIPTION
+
+\fIcarpsys\fP is like \fIcarp\fP, but it will also print a string
+representation of the system error code (from errno).
+
+.SH "SEE ALSO"
+errmsg(7), carp(3)

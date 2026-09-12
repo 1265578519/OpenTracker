@@ -1,0 +1,30 @@
+.TH socket_fastopen 3
+.SH NAME
+socket_fastopen \- enable TCP Fast Open on a server-side TCP socket
+.SH SYNTAX
+.B #include <libowfat/socket.h>
+
+int \fBsocket_fastopen\fP(int \fIs\fR);
+.SH DESCRIPTION
+socket_fastopen enables TCP Fast Open support on a server-side TCP
+socket.  Call this before socket_listen().  If the platform does not
+support this functionality, returns -1 and sets errno to ENOPROTOOPT (or
+ENOSYS if the platform does not define ENOPROTOOPT).
+
+Normally socket_fastopen returns 0. If anything goes wrong, socket_fastopen
+returns -1, setting errno appropriately.
+
+.SH EXAMPLE
+  #include <libowfat/socket.h>
+
+  int \fIs\fR;
+  char \fIip\fR[4];
+  uint16 \fIp\fR;
+
+  \fIs\fR = socket_tcp4b();
+  socket_fastopen(s);
+  socket_bind4_reuse(s,ip,p);
+  socket_listen(16);
+
+.SH "SEE ALSO"
+socket_fastopen_connect4(3), socket_fastopen_connect6(3)

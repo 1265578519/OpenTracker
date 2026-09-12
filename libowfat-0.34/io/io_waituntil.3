@@ -1,0 +1,23 @@
+.TH io_waituntil 3
+.SH NAME
+io_waituntil \- wait for events
+.SH SYNTAX
+.B #include <libowfat/io.h>
+
+void \fBio_waituntil\fP(tai6464 t);
+.SH DESCRIPTION
+io_waituntil(t) is like io_wait() but does not wait (noticeably) past time \fIt\fR.
+
+.SH NOTE
+Depending on the underlying operating system primitive, there is a
+potential race condition to be aware of. Some event notification
+mechanisms (for example, kqueue on BSD and epoll on Linux) will return
+multiple events. If your application operates on pairs of file
+descriptors (a proxy server maybe), and an error on one descriptor
+can lead to closing the other descriptor, then an outstanding event on
+the other descriptor can still be queued for delivery to you. Be
+prepared to receive events for a descriptor that has already been
+closed.
+
+.SH "SEE ALSO"
+io_wait(3), io_check(3), io_wantread(3), io_wantwrite(3), io_fd(3)

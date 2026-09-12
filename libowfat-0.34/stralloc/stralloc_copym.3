@@ -1,0 +1,18 @@
+.TH stralloc_copym 3
+.SH NAME
+stralloc_copym \- copy string(s) to a stralloc
+.SH SYNTAX
+.B #include <libowfat/stralloc.h>
+
+int \fBstralloc_copym\fP(stralloc* \fIsa\fR,const char* \fIs\fR, ...);
+.SH DESCRIPTION
+stralloc_copym copies \\0-terminated strings from \fIs\fR... to \fIsa\fR,
+allocating space if necessary, and returns 1.  If there is data in the
+\fIsa\fR, it is cleared first.
+
+If it runs out of memory, stralloc_copym returns 0.  At that point, it
+may already have copied a few of the strings to sa.
+.SH "RETURN VALUE"
+1 for success, 0 on memory allocation failure.
+.SH "SEE ALSO"
+stralloc_copys(3)

@@ -1,0 +1,31 @@
+.TH scan_asn1derlength 3
+.SH NAME
+scan_asn1derlength \- decode an unsigned integer from ASN.1 DER length encoding
+.SH SYNTAX
+.B #include <libowfat/scan.h>
+
+size_t \fBscan_asn1derlength\fP(const char *\fIsrc\fR,size_t \fIlen\fR,unsigned long long *\fIdest\fR);
+.SH DESCRIPTION
+scan_asn1derlength decodes an unsigned integer in ASN.1 DER length encoding
+from a memory area holding binary data.  It writes the decode value in
+\fIdest\fR and returns the number of bytes it read from \fIsrc\fR.
+
+scan_asn1derlength never reads more than \fIlen\fR bytes from \fIsrc\fR.  If the
+sequence is longer than that, or the memory area contains an invalid
+sequence, scan_asn1derlength returns 0 and does not touch \fIdest\fR.
+
+The length of the longest spec-compliant ASN.1 DER length is 128 bytes,
+but this implementation will return an error if the value does not fit
+into the target integer type.  In practice the largest sequence is
+sizeof(*dest)+1.
+
+This implementation will reject values that are not encoded in the
+minimum amount of bytes.
+
+In addition to reading the length value, this implementation will also
+validate the length value. If the length value is so large that the data
+would not fit in the source buffer, it will return a failure.  If you
+only want to parse the length value without this check, use
+scan_asn1derlengthvalue() instead.
+.SH "SEE ALSO"
+fmt_asn1derlength(3), scan_asn1derlengthvalue(3)

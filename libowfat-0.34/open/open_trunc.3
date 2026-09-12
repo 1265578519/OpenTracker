@@ -1,0 +1,15 @@
+.TH open_trunc 3
+.SH NAME
+open_trunc \- open a file for writing
+.SH SYNTAX
+.B #include <libowfat/open.h>
+
+int \fBopen_trunc\fP(const char *\fIfilename\fR);
+.SH DESCRIPTION
+open_trunc opens the file \fIfilename\fR for write-only use
+and returns the file handle.  If the file exists, it will be truncated
+to zero bytes length.  If it does not exist, it will be created
+with mode 0644.  If there was an error opening or creating the file,
+open_trunc returns -1 and sets errno accordingly.
+.SH "SEE ALSO"
+open(2), open_append(3), open_excl(3), open_read(3), open_rw(3), open_write(3), openreadclose(3), readclose(3), readclose_append(3)
