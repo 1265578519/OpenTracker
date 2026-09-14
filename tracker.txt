@@ -6,8 +6,8 @@ udp://tracker1.itzmx.com:8080/announce
 udp://tracker2.itzmx.com:6961/announce
 udp://tracker3.itzmx.com:6961/announce
 udp://tracker4.itzmx.com:2710/announce
+http://94.23.207.177:6969/announce
 http://107.189.2.131:1337/announce
-http://132.243.161.144:6969/announce
 http://207.241.226.111:6969/announce
 http://207.241.231.226:6969/announce
 http://[2605:6400:30:fad6::dead:c0d3]:1337/announce
