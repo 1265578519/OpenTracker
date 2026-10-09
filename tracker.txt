@@ -19,11 +19,8 @@ http://retracker.hotplug.ru:2710/announce
 http://retracker01-msk-virt.corbina.net/announce
 http://tracker.dhitechnical.com:6969/announce
 http://tracker.dler.com:6969/announce
-http://tracker.opentorrent.top:6969/announce
 http://tracker.opentrackr.org:1337/announce
-http://tracker.plx.im:6969/announce
 http://tracker.renfei.net:8080/announce
-http://tracker.therarbg.to:6969/announce
 http://tracker2.dler.org/announce
 https://004430.xyz/announce
 udp://52.58.128.163:6969/announce
