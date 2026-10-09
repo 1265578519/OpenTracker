@@ -242,3 +242,12 @@ https://bbs.itzmx.com/thread-110212-1-1.html
 https://bbs.itzmx.com/thread-110231-1-1.html
 
 同时禁用swap虚拟内存，在/etc/fstab中找到它并且删除swap挂载
+
+
+-------
+全局peer最大数量限制与冰箱模式可通过Makefile文件添加#号进行关闭，默认开启，以便控制服务器内存使用率
+Makefile:FEATURES+=-DWANT_MAX_PEER，全局peer最大数量限制与冰箱模式的总开关，在v0.4版本新增该功能
+trackerlogic.h:#define OT_MAX_PEER 3000000，全局peer最大数量限制，防止1G内存VPS直接OOM，如果觉得不满意就上调值，该默认值可以自由修改
+trackerlogic.h:#define OT_MAX_TORRENT_PEER 400，控制的是每种ip协议存储的最大数量为400，ipv4+ipv6共800，这个值很富裕了，推荐保持默认值不做修改
+trackerlogic.h:#define OT_FRIDGE_PEER 1000000，剩余100万的时候触发冰箱模式，必须保持默认值不做修改
+trackerlogic.h:#define OT_FRIDGE_TORRENT_PEER 8，冰箱模式存储数量从400改成8保证冷门种子正常工作，必须保持默认值不做修改
